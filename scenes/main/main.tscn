@@ -1,0 +1,54 @@
+[gd_scene load_steps=6 format=3 uid="uid://dqy1f0m2q8k5b"]
+
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="1_player"]
+[ext_resource type="NoiseTexture2D" path="res://scenes/main/ground_noise.tres" id="2_ground_noise"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
+size = Vector2(960, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_v"]
+size = Vector2(32, 640)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_obstacle"]
+size = Vector2(96, 96)
+
+[node name="Main" type="Node2D"]
+
+[node name="Ground" type="Sprite2D" parent="."]
+position = Vector2(480, 320)
+texture = ExtResource("2_ground_noise")
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector2(480, 320)
+
+[node name="Walls" type="Node2D" parent="."]
+
+[node name="TopWall" type="StaticBody2D" parent="Walls"]
+position = Vector2(480, 16)
+
+[node name="TopWallShape" type="CollisionShape2D" parent="Walls/TopWall"]
+shape = SubResource("RectangleShape2D_wall_h")
+
+[node name="BottomWall" type="StaticBody2D" parent="Walls"]
+position = Vector2(480, 624)
+
+[node name="BottomWallShape" type="CollisionShape2D" parent="Walls/BottomWall"]
+shape = SubResource("RectangleShape2D_wall_h")
+
+[node name="LeftWall" type="StaticBody2D" parent="Walls"]
+position = Vector2(16, 320)
+
+[node name="LeftWallShape" type="CollisionShape2D" parent="Walls/LeftWall"]
+shape = SubResource("RectangleShape2D_wall_v")
+
+[node name="RightWall" type="StaticBody2D" parent="Walls"]
+position = Vector2(944, 320)
+
+[node name="RightWallShape" type="CollisionShape2D" parent="Walls/RightWall"]
+shape = SubResource("RectangleShape2D_wall_v")
+
+[node name="CenterObstacle" type="StaticBody2D" parent="."]
+position = Vector2(680, 220)
+
+[node name="CenterObstacleShape" type="CollisionShape2D" parent="CenterObstacle"]
+shape = SubResource("RectangleShape2D_obstacle")
