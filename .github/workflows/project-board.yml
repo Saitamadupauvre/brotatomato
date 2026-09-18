@@ -1,0 +1,40 @@
+name: Project board
+
+on:
+  issues:
+    types: [opened, reopened, assigned, unassigned]
+  create:
+  push:
+    branches: ['**']
+  pull_request_target:
+    types: [opened, reopened, edited, ready_for_review, converted_to_draft, closed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: project-board
+  cancel-in-progress: false
+
+env:
+  PROJECT_OWNER: "Saitamadupauvre"
+  PROJECT_NUMBER: "4"
+  DEV_BRANCH: "dev"
+  MAIN_BRANCH: "main"
+  DEFAULT_PRIORITY: "Medium"
+
+jobs:
+  sync:
+    if: github.event_name != 'create' || github.event.ref_type == 'branch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          sparse-checkout: .github/scripts
+      - uses: actions/github-script@v9
+        with:
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          script: |
+            const run = require('./.github/scripts/project-board.js');
+            await run({ github, context, core });
