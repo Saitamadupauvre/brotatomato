@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://scripts/components/behaviors/outline_behavior.gd" id="2_outline"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/interact_prompt_behavior.gd" id="3_prompt"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/altar_behavior.gd" id="4_altar"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/opened_state_behavior.gd" id="5_opened"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_altar"]
 size = Vector2(80, 80)
@@ -59,3 +60,7 @@ script = ExtResource("3_prompt")
 [node name="AltarBehavior" type="Node" parent="Interactable/Host"]
 script = ExtResource("4_altar")
 status_label_path = NodePath("StatusLabel")
+
+[node name="OpenedStateBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("5_opened")
+sprite_path = NodePath("Sprite")

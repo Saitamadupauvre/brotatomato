@@ -1,13 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://ccontainer0001"]
+[gd_scene load_steps=8 format=3 uid="uid://ccontainer0001"]
 
 [ext_resource type="PackedScene" path="res://scenes/components/interactable.tscn" id="1_interactable"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/outline_behavior.gd" id="2_outline"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/interact_prompt_behavior.gd" id="3_prompt"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/container_behavior.gd" id="4_container"]
 [ext_resource type="Script" path="res://scripts/data/loot_entry.gd" id="5_loot_entry"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_container"]
-size = Vector2(64, 64)
+[ext_resource type="Script" path="res://scripts/components/behaviors/opened_state_behavior.gd" id="6_opened"]
 
 [sub_resource type="Resource" id="LootEntry_loot"]
 script = ExtResource("5_loot_entry")
@@ -29,10 +27,7 @@ script = ExtResource("5_loot_entry")
 item_id = "gold"
 amount = 5
 
-[node name="Container" type="StaticBody2D"]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("RectangleShape2D_container")
+[node name="Container" type="Node2D"]
 
 [node name="Sprite" type="ColorRect" parent="."]
 offset_left = -32.0
@@ -56,3 +51,7 @@ script = ExtResource("3_prompt")
 [node name="ContainerBehavior" type="Node" parent="Interactable/Host"]
 script = ExtResource("4_container")
 contents = Array[LootEntry]([SubResource("LootEntry_loot"), SubResource("LootEntry_water"), SubResource("LootEntry_materials"), SubResource("LootEntry_gold")])
+
+[node name="OpenedStateBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("6_opened")
+sprite_path = NodePath("Sprite")

@@ -13,6 +13,10 @@ extends Area2D
 signal interacted
 signal player_out_of_range
 
+## Set by OpenedStateBehavior once the entity has nothing left to give —
+## stops all further proximity/interact broadcasts for good.
+var disabled: bool = false
+
 @onready var _host: BehaviorHost = $Host
 
 var _player_nearby: bool = false
@@ -24,12 +28,14 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if _player_nearby and event.is_action_pressed("interact"):
+	if not disabled and _player_nearby and event.is_action_pressed("interact"):
 		_host.broadcast("interacted")
 		interacted.emit()
 
 
 func _on_body_entered(body: Node2D) -> void:
+	if disabled:
+		return
 	if body.is_in_group("player"):
 		_player_nearby = true
 		_host.broadcast("player_in_range")

@@ -14,3 +14,4 @@ func on_event(event_name: String, _payload: Dictionary = {}) -> void:
 	if event_name == "interacted":
 		LootSpawner.spawn(contents, owner_entity, scatter_min_distance, scatter_max_distance, scatter_attempts)
 		contents.clear()
+		host.broadcast("contents_emptied")

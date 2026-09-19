@@ -78,6 +78,7 @@ func _on_wave_cleared() -> void:
 	LootSpawner.spawn(contents, owner_entity)
 	_update_visuals()
 	wave_cleared.emit()
+	host.broadcast("contents_emptied")
 
 
 func _update_visuals() -> void:
