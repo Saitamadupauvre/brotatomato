@@ -23,6 +23,7 @@ signal tomato_changed(count: int)
 signal life_lost(remaining: int)
 signal player_died
 signal villager_spawned(villager_id: int, position: Vector2)
+signal villager_removed(villager_id: int)
 signal plot_placed(plot_id: int, position: Vector2)
 signal item_changed(item_id: String, count: int)
 signal crop_stored_changed(count: int)
@@ -95,11 +96,18 @@ func remove_item(item_id: String, amount: int = 1) -> bool:
 
 
 ## Forced loss (dungeon hit), distinct from a spend — always clamps to 0
-## and triggers death at 0 rather than failing silently.
+## and triggers death at 0 rather than failing silently. A villager IS a
+## life (see spawn_villager), so losing one here pops a villager entry
+## too, keeping villagers.size() in sync with tomatoes — see #34.
 func lose_tomato(amount: int = 1) -> void:
 	tomatoes = max(tomatoes - amount, 0)
 	tomato_changed.emit(tomatoes)
 	life_lost.emit(tomatoes)
+	for i in amount:
+		if villagers.is_empty():
+			break
+		var removed: Dictionary = villagers.pop_back()
+		villager_removed.emit(removed["id"])
 	if tomatoes <= 0:
 		player_died.emit()
 
