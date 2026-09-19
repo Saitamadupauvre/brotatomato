@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/weapon_data.gd" id="1_bow"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_bow")
+id = "bow"
+display_name = "Bow"
+icon = ExtResource("2_icon")
+stackable = false
+max_stack = 1
+slot = 0
+attack_type = 1
+damage = 1
+attack_cooldown = 0.5
