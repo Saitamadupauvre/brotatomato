@@ -6,6 +6,8 @@
 radius = 14.0
 
 [node name="Villager" type="CharacterBody2D"]
+collision_layer = 16
+collision_mask = 2
 script = ExtResource("1_villager")
 
 [node name="Sprite" type="ColorRect" parent="."]
