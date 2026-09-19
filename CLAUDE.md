@@ -30,9 +30,9 @@ Both Camp (`scenes/main/main.tscn`) and Dungeon (`scenes/dungeon/dungeon.tscn`) 
 - `Behavior` (`scripts/components/behavior.gd`) is the base class; a `BehaviorHost` (`scripts/components/behavior_host.gd`) holds `Behavior` children and `broadcast(event_name, payload)`s named events to them.
 - `InteractableComponent` (an `Area2D`) detects the `"player"` group in range and broadcasts `player_in_range` / `player_out_of_range` / `interacted` (E-press) to its own `Host`.
 - Generic, entity-agnostic behaviors (`OutlineBehavior`, `PromptBehavior`) just react to those events and work on anything.
-- Entity-specific behaviors reuse the exact same mechanism for their own logic: `PlotBehavior` (camp plot state machine: `EMPTY → SEEDED → GROWING → RIPE`), `ContainerBehavior`/`GiveItemBehavior` (loot), `PlacePlotBehavior`, `SceneTransitionBehavior`.
+- Entity-specific behaviors reuse the exact same mechanism for their own logic: `PlotBehavior` (camp plot state machine: `EMPTY → SEEDED → GROWING → RIPE`), `ContainerBehavior`/`GiveItemBehavior` (loot), `SceneTransitionBehavior`.
 - `Enemy` drives the same `BehaviorHost` for a different, recurring event instead of one-shot interactions: it broadcasts `physics_tick` (with `delta`) every physics frame, so enemy movement and attack AI are themselves swappable `Behavior`s (see below) rather than hardcoded per enemy type.
-- **Pattern for adding a new interactable or enemy type**: instance a shared *base* scene (`scenes/components/interactable.tscn`, `scenes/dungeon/enemy_base.tscn`) and drop the desired `Behavior` children under its `Host` — no new code. Existing variants: `shop.tscn`, `container.tscn`, `plot.tscn`, `plot_slot.tscn`, `scene_transition_point.tscn` (Interactable-based); `enemy_slime/imp/brute/charger/archer.tscn` (Enemy-based).
+- **Pattern for adding a new interactable or enemy type**: instance a shared *base* scene (`scenes/components/interactable.tscn`, `scenes/dungeon/enemy_base.tscn`) and drop the desired `Behavior` children under its `Host` — no new code. Existing variants: `shop.tscn`, `container.tscn`, `plot.tscn`, `scene_transition_point.tscn` (Interactable-based); `enemy_slime/imp/brute/charger/archer.tscn` (Enemy-based).
 
 **Combat** (`scripts/components/{health,hurtbox,hitbox}_component.gd`): `HurtboxComponent` (`Area2D`) just re-emits `damage_taken`; `HitboxComponent` (`Area2D`) deals its `damage` to any `HurtboxComponent` it overlaps; `HealthComponent` tracks HP and emits `died`. Collision layers: `1` = physics bodies (walls, default), `4` = player hurtbox, `8` = enemy hurtbox — each side's Hitbox sets `collision_mask` to the *other* side's hurtbox layer.
 
@@ -47,7 +47,7 @@ Both Camp (`scenes/main/main.tscn`) and Dungeon (`scenes/dungeon/dungeon.tscn`) 
 ## Mechanics summary (full detail in GDD)
 
 - **Camp = safe zone**, no threats. 4 tomato plots at start, timer-based growth (2-3 min), harvest by interacting with a ripe plot.
-- Growth beyond a natural cap requires dungeon-sourced materials to speed up or expand plots (passive anti-farm, no active punishment). Plot placement (spending `materials` on a `PlotSlot`) is implemented.
+- Growth beyond a natural cap requires dungeon-sourced materials to speed up or expand plots (passive anti-farm, no active punishment). Plot placement via a grid-snapped placement cursor (key G), spending `materials`, is implemented.
 - **Dungeon**: one fixed room, 5 enemy variants across the 4 attack archetypes (contact, melee, dash, ranged). Getting hit = lose a tomato. 0 tomatoes = death, return to camp. Tomatoes lost in the dungeon are gone permanently (enemies never drop tomatoes/seeds).
 - **Villagers**: Farmer Tomato (auto-harvest), Blacksmith Tomato (crafts from loot), rest are decorative with no function — none of the special roles are implemented yet.
 - **Card system** (Rounds-like): at cumulative tomato thresholds (20/50/100...), player picks 1 of 3 random cards (Combat / Management / Agility categories). Open questions live in the GDD. Not implemented.
