@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://da6g5koj8r42o"]
+
+[ext_resource type="PackedScene" path="res://scenes/dungeon/enemy_base.tscn" id="1_base"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/chase_movement_behavior.gd" id="2_chase"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/dash_attack_behavior.gd" id="3_dash"]
+[ext_resource type="Resource" path="res://resources/enemies/charger.tres" id="4_data"]
+
+[node name="EnemyCharger" instance=ExtResource("1_base")]
+data = ExtResource("4_data")
+
+[node name="Sprite" parent="." index="0"]
+color = Color(0.9, 0.5, 0.1, 1)
+
+[node name="ChaseMovementBehavior" type="Node" parent="Host"]
+script = ExtResource("2_chase")
+
+[node name="DashAttackBehavior" type="Node" parent="Host"]
+script = ExtResource("3_dash")

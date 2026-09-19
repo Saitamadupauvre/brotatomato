@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://c21ydap88eaea"]
+
+[ext_resource type="Script" path="res://scripts/entities/enemy.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/components/health_component.gd" id="2_health"]
+[ext_resource type="Script" path="res://scripts/components/hurtbox_component.gd" id="3_hurtbox"]
+[ext_resource type="Script" path="res://scripts/components/behavior_host.gd" id="4_host"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/mob_info_behavior.gd" id="5_mob_info"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 14.0
+
+[node name="Enemy" type="CharacterBody2D"]
+script = ExtResource("1_enemy")
+
+[node name="Sprite" type="ColorRect" parent="."]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.5, 0.15, 0.55, 1)
+mouse_filter = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_body")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("2_health")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("3_hurtbox")
+
+[node name="HurtboxShape" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("CircleShape2D_body")
+
+[node name="Host" type="Node" parent="."]
+script = ExtResource("4_host")
+
+[node name="MobInfoBehavior" type="Node" parent="Host"]
+script = ExtResource("5_mob_info")

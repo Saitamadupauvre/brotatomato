@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://c21ydr1ygraea"]
+
+[ext_resource type="PackedScene" path="res://scenes/dungeon/enemy_base.tscn" id="1_base"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/chase_movement_behavior.gd" id="2_chase"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/contact_attack_behavior.gd" id="3_contact"]
+[ext_resource type="Resource" path="res://resources/enemies/slime.tres" id="4_data"]
+
+[node name="EnemySlime" instance=ExtResource("1_base")]
+data = ExtResource("4_data")
+
+[node name="ChaseMovementBehavior" type="Node" parent="Host"]
+script = ExtResource("2_chase")
+
+[node name="ContactAttackBehavior" type="Node" parent="Host"]
+script = ExtResource("3_contact")
