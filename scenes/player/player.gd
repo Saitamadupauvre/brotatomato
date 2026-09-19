@@ -10,6 +10,9 @@ extends CharacterBody2D
 @export var attack_damage: int = 1
 @export var attack_duration: float = 0.15
 @export var attack_cooldown: float = 0.3
+## Movement speed multiplier applied while an attack is in progress (GDD has
+## no fixed number for this).
+@export var attack_move_speed_multiplier: float = 0.2
 ## Tip-to-player distance of the melee hitbox, in px. AttackHitboxShape's
 ## polygon is authored with a 42px reach; this scales it uniformly.
 @export var melee_range: float = 58.0
@@ -34,6 +37,7 @@ var _dash_cooldown_timer: float = 0.0
 var _dash_direction: Vector2 = Vector2.ZERO
 var _last_move_direction: Vector2 = Vector2.DOWN
 var _attack_cooldown_timer: float = 0.0
+var _is_attacking: bool = false
 
 var equipped_weapon: WeaponData = null
 var _armor_reduction: int = 0
@@ -91,6 +95,8 @@ func _physics_process(delta: float) -> void:
 func _start_attack() -> void:
 	var cooldown: float = equipped_weapon.attack_cooldown if equipped_weapon else attack_cooldown
 	_attack_cooldown_timer = cooldown
+	_is_attacking = true
+	get_tree().create_timer(attack_duration).timeout.connect(func() -> void: _is_attacking = false)
 
 	if equipped_weapon and equipped_weapon.attack_type == WeaponData.AttackType.RANGED:
 		_fire_projectile()
@@ -135,7 +141,8 @@ func _process_movement(delta: float) -> void:
 	if input_direction != Vector2.ZERO:
 		_last_move_direction = input_direction
 
-	var target_velocity := input_direction * speed
+	var speed_multiplier := attack_move_speed_multiplier if _is_attacking else 1.0
+	var target_velocity := input_direction * speed * speed_multiplier
 	var rate: float
 	if target_velocity.length() > velocity.length():
 		rate = acceleration
