@@ -9,7 +9,8 @@ extends EnemyBehavior
 func on_event(event_name: String, payload: Dictionary = {}) -> void:
 	if event_name != "physics_tick" or enemy.movement_locked:
 		return
-	if not enemy.player:
+	if not _is_player_aggro():
+		enemy.velocity = Vector2.ZERO
 		return
 	var to_player := enemy.player.global_position - enemy.global_position
 	var distance := to_player.length()
