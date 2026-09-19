@@ -1,4 +1,4 @@
-class_name Popup
+class_name MessagePopup
 extends MenuPanel
 ## Generic dismissible message popup. Shows an arbitrary text string over
 ## whatever scene it's dropped into, auto-dismisses after a delay, and
