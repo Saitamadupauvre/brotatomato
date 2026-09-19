@@ -1,7 +1,9 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scenes/ui/hud.gd" id="1_hud"]
 [ext_resource type="Texture2D" path="res://icon.svg" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scenes/ui/minimap_display.tscn" id="3_minimap"]
+[ext_resource type="PackedScene" path="res://scenes/ui/map_overlay.tscn" id="4_map_overlay"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tomato"]
 bg_color = Color(0.65, 0.15, 0.15, 0.85)
@@ -90,3 +92,26 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 text = "0"
+
+[node name="Minimap" parent="." instance=ExtResource("3_minimap")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -184.0
+offset_top = 64.0
+offset_right = -16.0
+offset_bottom = 232.0
+grow_horizontal = 0
+mode = 0
+
+[node name="MapOverlay" parent="." instance=ExtResource("4_map_overlay")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

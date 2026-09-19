@@ -1,0 +1,102 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/minimap_display.gd" id="1_display"]
+[ext_resource type="Script" path="res://scripts/ui/map_marker_arrow.gd" id="2_marker"]
+[ext_resource type="Shader" path="res://scenes/ui/minimap_mask.gdshader" id="3_shader"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_frame"]
+bg_color = Color(0.2, 0.2, 0.22, 0.95)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.75, 0.75, 0.78, 0.95)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+corner_detail = 8
+shadow_color = Color(0, 0, 0, 0.35)
+shadow_size = 6
+anti_aliasing = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_mask"]
+shader = ExtResource("3_shader")
+shader_parameter/circular = true
+
+[node name="MinimapDisplay" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 180.0
+offset_bottom = 180.0
+script = ExtResource("1_display")
+
+[node name="Background" type="Panel" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_frame")
+
+[node name="Frame" type="SubViewportContainer" parent="."]
+unique_name_in_owner = true
+material = SubResource("ShaderMaterial_mask")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="Frame"]
+unique_name_in_owner = true
+handle_input_locally = false
+transparent_bg = true
+size = Vector2i(164, 164)
+
+[node name="MapRoot" type="Control" parent="Frame/SubViewport"]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="Base" type="TextureRect" parent="Frame/SubViewport/MapRoot"]
+unique_name_in_owner = true
+layout_mode = 0
+texture_filter = 1
+mouse_filter = 2
+
+[node name="Fog" type="TextureRect" parent="Frame/SubViewport/MapRoot"]
+unique_name_in_owner = true
+layout_mode = 0
+texture_filter = 1
+mouse_filter = 2
+
+[node name="ExitMarker" type="ColorRect" parent="Frame/SubViewport/MapRoot"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 1.4
+offset_bottom = 1.4
+pivot_offset = Vector2(0.7, 0.7)
+rotation = 0.785398
+color = Color(0.9, 0.25, 0.2, 1)
+mouse_filter = 2
+
+[node name="PlayerMarker" type="Control" parent="Frame/SubViewport/MapRoot"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 1.6
+offset_bottom = 1.6
+pivot_offset = Vector2(0.8, 0.8)
+mouse_filter = 2
+script = ExtResource("2_marker")

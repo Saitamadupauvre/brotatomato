@@ -21,6 +21,7 @@ const TREE_SCENE: PackedScene = preload("res://scenes/dungeon/tree.tscn")
 var layout: DungeonLayout
 
 @onready var _player: CharacterBody2D = $World/Player
+@onready var _hud: HUD = $UI/HUD
 @onready var _camp_exit: Node2D = $World/CampExit
 @onready var _trees: Node2D = $World/Trees
 @onready var _enemies: Node2D = $World/Enemies
@@ -45,6 +46,7 @@ func _ready() -> void:
 	_build_trees()
 	_build_grass()
 	_place_player()
+	_hud.setup_minimap(layout, _player)
 	_place_exit()
 	_populate()
 
@@ -144,11 +146,15 @@ func _place_exit() -> void:
 ## placed because Enemy looks up the "player" group in _ready.
 func _populate() -> void:
 	var spawns := DungeonPopulator.build(layout, config)
+	var pois: Array[MapPoi] = []
 	for spawn in spawns:
 		var node: Node2D = spawn.scene.instantiate()
 		node.position = spawn.position
 		if node is Enemy:
 			_enemies.add_child(node)
+			pois.append(MapPoi.new(node, MapPoi.Kind.ENEMY))
 		else:
 			_props.add_child(node)
+			pois.append(MapPoi.new(node, MapPoi.Kind.CHEST))
+	_hud.set_points_of_interest(pois)
 	print("Dungeon spawns: ", spawns.size())
