@@ -8,9 +8,16 @@ extends StaticBody2D
 
 func _ready() -> void:
 	_interactable.interacted.connect(_on_interacted)
+	_interactable.player_out_of_range.connect(_on_player_out_of_range)
 
 
 func _on_interacted() -> void:
 	var shop_menu: Node = get_tree().get_first_node_in_group("shop_ui")
 	if shop_menu:
 		shop_menu.open()
+
+
+func _on_player_out_of_range() -> void:
+	var shop_menu: Node = get_tree().get_first_node_in_group("shop_ui")
+	if shop_menu:
+		shop_menu.close()

@@ -11,6 +11,7 @@ extends Area2D
 ## without any of them knowing what kind of entity they're attached to.
 
 signal interacted
+signal player_out_of_range
 
 @onready var _host: BehaviorHost = $Host
 
@@ -38,3 +39,4 @@ func _on_body_exited(body: Node2D) -> void:
 	if body.is_in_group("player"):
 		_player_nearby = false
 		_host.broadcast("player_out_of_range")
+		player_out_of_range.emit()
