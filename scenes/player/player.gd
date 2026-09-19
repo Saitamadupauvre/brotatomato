@@ -10,13 +10,18 @@ extends CharacterBody2D
 @export var attack_damage: int = 1
 @export var attack_duration: float = 0.15
 @export var attack_cooldown: float = 0.3
+## Tip-to-player distance of the melee hitbox, in px. AttackHitboxShape's
+## polygon is authored with a 42px reach; this scales it uniformly.
+@export var melee_range: float = 58.0
 
 ## Emitted at the start of a melee swing with the world-space center and
 ## rough radius of the hitbox, for things that react to a swing without
 ## needing a hurtbox (grass, breakables).
 signal melee_swung(center: Vector2, radius: float)
+## AttackHitboxShape's authored (unscaled) reach, in px.
+const MELEE_SHAPE_REACH: float = 42.0
 ## Distance from the player to the center of the melee arc, and its
-## radius. Approximates AttackHitboxShape's polygon.
+## radius, at the authored (unscaled) reach. Approximates AttackHitboxShape's polygon.
 const MELEE_REACH: float = 24.0
 const MELEE_RADIUS: float = 30.0
 
@@ -43,6 +48,7 @@ func _ready() -> void:
 	_hurtbox.damage_taken.connect(_on_damage_taken)
 	_attack_hitbox.damage = attack_damage
 	_attack_hitbox.monitoring = false
+	_attack_hitbox.scale = Vector2.ONE * (melee_range / MELEE_SHAPE_REACH)
 	GameState.equipment_changed.connect(_on_equipment_changed)
 
 
@@ -98,17 +104,24 @@ func _fire_projectile() -> void:
 	projectile.target_mask = ENEMY_HURTBOX_MASK
 	get_parent().add_child(projectile)
 	projectile.position = position
-	projectile.rotation = _last_move_direction.angle()
+	projectile.rotation = _get_aim_direction().angle()
 
 
 func _swing_melee() -> void:
+	var aim_direction := _get_aim_direction()
+	var range_scale := melee_range / MELEE_SHAPE_REACH
 	_attack_hitbox.damage = equipped_weapon.damage if equipped_weapon else attack_damage
-	_attack_hitbox.rotation = _last_move_direction.angle()
+	_attack_hitbox.rotation = aim_direction.angle()
 	_attack_hitbox.monitoring = true
-	melee_swung.emit(global_position + _last_move_direction * MELEE_REACH, MELEE_RADIUS)
+	melee_swung.emit(global_position + aim_direction * MELEE_REACH * range_scale, MELEE_RADIUS * range_scale)
 	if OS.is_debug_build():
 		_attack_debug_visual.visible = true
 	get_tree().create_timer(attack_duration).timeout.connect(_end_attack)
+
+
+func _get_aim_direction() -> Vector2:
+	var direction := get_global_mouse_position() - global_position
+	return direction.normalized() if direction != Vector2.ZERO else _last_move_direction
 
 
 func _end_attack() -> void:
