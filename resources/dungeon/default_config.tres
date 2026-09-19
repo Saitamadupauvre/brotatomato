@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="DungeonConfig" load_steps=6 format=3 uid="uid://dungeoncfg00001"]
+
+[ext_resource type="Script" path="res://scripts/data/dungeon_config.gd" id="1_cfg"]
+[ext_resource type="Resource" path="res://resources/dungeon/zones/outskirts.tres" id="2_outskirts"]
+[ext_resource type="Resource" path="res://resources/dungeon/zones/woods.tres" id="3_woods"]
+[ext_resource type="Resource" path="res://resources/dungeon/zones/deep_forest.tres" id="4_deep"]
+[ext_resource type="PackedScene" path="res://scenes/entities/container.tscn" id="5_container"]
+
+[resource]
+script = ExtResource("1_cfg")
+zones = Array[Resource]([ExtResource("2_outskirts"), ExtResource("3_woods"), ExtResource("4_deep")])
+container_scene = ExtResource("5_container")

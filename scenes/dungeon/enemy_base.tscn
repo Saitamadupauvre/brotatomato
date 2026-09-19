@@ -37,5 +37,8 @@ shape = SubResource("CircleShape2D_body")
 [node name="Host" type="Node" parent="."]
 script = ExtResource("4_host")
 
+[node name="ScreenEnabler" type="VisibleOnScreenEnabler2D" parent="."]
+rect = Rect2(-256, -256, 512, 512)
+
 [node name="MobInfoBehavior" type="Node" parent="Host"]
 script = ExtResource("5_mob_info")

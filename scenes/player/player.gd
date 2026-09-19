@@ -11,6 +11,15 @@ extends CharacterBody2D
 @export var attack_duration: float = 0.15
 @export var attack_cooldown: float = 0.3
 
+## Emitted at the start of a melee swing with the world-space center and
+## rough radius of the hitbox, for things that react to a swing without
+## needing a hurtbox (grass, breakables).
+signal melee_swung(center: Vector2, radius: float)
+## Distance from the player to the center of the melee arc, and its
+## radius. Approximates AttackHitboxShape's polygon.
+const MELEE_REACH: float = 24.0
+const MELEE_RADIUS: float = 30.0
+
 const PROJECTILE_SCENE: PackedScene = preload("res://scenes/dungeon/projectile.tscn")
 const ENEMY_HURTBOX_MASK: int = 8
 
@@ -96,6 +105,7 @@ func _swing_melee() -> void:
 	_attack_hitbox.damage = equipped_weapon.damage if equipped_weapon else attack_damage
 	_attack_hitbox.rotation = _last_move_direction.angle()
 	_attack_hitbox.monitoring = true
+	melee_swung.emit(global_position + _last_move_direction * MELEE_REACH, MELEE_RADIUS)
 	if OS.is_debug_build():
 		_attack_debug_visual.visible = true
 	get_tree().create_timer(attack_duration).timeout.connect(_end_attack)
