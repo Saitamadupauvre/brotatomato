@@ -57,6 +57,7 @@ func on_event(event_name: String, _payload: Dictionary = {}) -> void:
 				_update_visuals()
 		PlotState.RIPE:
 			GameState.spawn_villager(owner_entity.global_position)
+			GameState.add_item("crop", 1)
 			_state = PlotState.EMPTY
 			_update_visuals()
 		PlotState.GROWING:
