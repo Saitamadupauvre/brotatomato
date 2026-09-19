@@ -47,13 +47,10 @@ z_index = -5
 y_sort_enabled = true
 
 [node name="Trees" type="Node2D" parent="World" unique_id=548025514]
-y_sort_enabled = true
 
 [node name="Enemies" type="Node2D" parent="World" unique_id=1545915825]
-y_sort_enabled = true
 
 [node name="Props" type="Node2D" parent="World" unique_id=1886126030]
-y_sort_enabled = true
 
 [node name="CampExit" parent="World" unique_id=1511090038 instance=ExtResource("5_transition")]
 
