@@ -22,10 +22,14 @@ signal tomato_changed(count: int)
 signal life_lost(remaining: int)
 signal player_died
 signal villager_spawned(villager_id: int, position: Vector2)
+signal plot_placed(plot_id: int, position: Vector2)
 signal item_changed(item_id: String, count: int)
 signal equipment_changed(slot: EquipmentData.EquipSlot, item_id: String)
 
 const STARTING_TOMATOES: int = 3
+## TEMP: grants enough materials to test grid placement without looting
+## the Container first. Remove/tune before ship.
+const STARTING_MATERIALS: int = 30
 
 ## Carried tomatoes = lives. Not an inventory item — has its own
 ## death-trigger semantics, see lose_tomato().
@@ -35,9 +39,13 @@ var _inventory: Dictionary = {} # item_id -> count
 var _item_defs: Dictionary = {} # item_id -> ItemData
 var _equipped: Dictionary = {} # EquipmentData.EquipSlot -> item_id
 
-## Camp plot state, one entry per plot. MVP: 4 plots, index-based.
-## Each entry: { "growth_time": float, "ripe": bool }
-var plots: Array[Dictionary] = []
+## Positions of player-placed plots (beyond the 4 built-in ones), keyed by
+## a stable id (not by position — floats round-tripped through a Node2D
+## transform aren't guaranteed to compare equal), so they can be
+## re-instantiated after Main is freed/reloaded by a scene change.
+var plots: Dictionary = {} # plot_id -> Vector2
+
+var _next_plot_id: int = 0
 
 ## Villager entries spawned from unharvested ripe tomatoes.
 ## MVP: visual only, no role. { "id": int, "position": Vector2 }
@@ -49,6 +57,7 @@ var _next_villager_id: int = 0
 func _ready() -> void:
 	for item_data in ITEM_DEFS:
 		_item_defs[item_data.id] = item_data
+	add_item("materials", STARTING_MATERIALS)
 
 
 func get_item_data(item_id: String) -> ItemData:
@@ -108,6 +117,19 @@ func plant_tomato() -> bool:
 	tomatoes -= 1
 	tomato_changed.emit(tomatoes)
 	return true
+
+
+func add_plot(position: Vector2) -> int:
+	var plot_id := _next_plot_id
+	_next_plot_id += 1
+	plots[plot_id] = position
+	plot_placed.emit(plot_id, position)
+	return plot_id
+
+
+## Relocates an already-recorded plot in place — no new id, no refund.
+func move_plot(plot_id: int, position: Vector2) -> void:
+	plots[plot_id] = position
 
 
 func reset_run() -> void:

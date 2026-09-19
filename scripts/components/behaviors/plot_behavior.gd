@@ -8,7 +8,7 @@ enum PlotState { EMPTY, SEEDED, GROWING, RIPE }
 
 @export var sprite_path: NodePath
 @export var time_label_path: NodePath
-@export var grow_time: float = 150.0 # GDD says 2-3 min; proposed value, tunable
+@export var grow_time: float = 10.0 # TEMP: was 150.0 (GDD 2-3min) — shortened for testing
 @export var color_empty: Color = Color(0.4, 0.3, 0.2)
 @export var color_seeded: Color = Color(0.3, 0.22, 0.15)
 @export var color_growing: Color = Color(0.35, 0.6, 0.3)
@@ -19,6 +19,10 @@ var _grow_timer: float = 0.0
 var _sprite: ColorRect = null
 var _time_label: Label = null
 var _attention_outline: CanvasItem = null
+
+
+func is_empty() -> bool:
+	return _state == PlotState.EMPTY
 
 
 func _setup(p_owner: Node2D, p_host: BehaviorHost) -> void:

@@ -8,18 +8,14 @@
 [ext_resource type="PackedScene" path="res://scenes/entities/container.tscn" id="6_container"]
 [ext_resource type="PackedScene" path="res://scenes/ui/inventory_menu.tscn" id="7_inventory_menu"]
 [ext_resource type="Script" path="res://scenes/main/main.gd" id="8_main"]
-[ext_resource type="PackedScene" path="res://scenes/entities/plot.tscn" id="9_plot"]
-[ext_resource type="PackedScene" path="res://scenes/entities/plot_slot.tscn" id="10_plot_slot"]
 [ext_resource type="PackedScene" path="res://scenes/entities/scene_transition_point.tscn" id="11_transition"]
+[ext_resource type="PackedScene" path="res://scenes/entities/plot_placement_controller.tscn" id="12_plot_placement"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
 size = Vector2(960, 32)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_v"]
 size = Vector2(32, 640)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_obstacle"]
-size = Vector2(96, 96)
 
 [node name="Main" type="Node2D"]
 script = ExtResource("8_main")
@@ -57,12 +53,6 @@ position = Vector2(944, 320)
 [node name="RightWallShape" type="CollisionShape2D" parent="Walls/RightWall"]
 shape = SubResource("RectangleShape2D_wall_v")
 
-[node name="CenterObstacle" type="StaticBody2D" parent="."]
-position = Vector2(680, 220)
-
-[node name="CenterObstacleShape" type="CollisionShape2D" parent="CenterObstacle"]
-shape = SubResource("RectangleShape2D_obstacle")
-
 [node name="Shop" parent="." instance=ExtResource("4_shop")]
 position = Vector2(300, 480)
 
@@ -71,23 +61,7 @@ position = Vector2(700, 480)
 
 [node name="Plots" type="Node2D" parent="."]
 
-[node name="Plot1" parent="Plots" instance=ExtResource("9_plot")]
-position = Vector2(150, 100)
-
-[node name="Plot2" parent="Plots" instance=ExtResource("9_plot")]
-position = Vector2(250, 100)
-
-[node name="Plot3" parent="Plots" instance=ExtResource("9_plot")]
-position = Vector2(350, 100)
-
-[node name="Plot4" parent="Plots" instance=ExtResource("9_plot")]
-position = Vector2(450, 100)
-
-[node name="PlotSlot1" parent="Plots" instance=ExtResource("10_plot_slot")]
-position = Vector2(550, 100)
-
-[node name="PlotSlot2" parent="Plots" instance=ExtResource("10_plot_slot")]
-position = Vector2(650, 100)
+[node name="PlotPlacement" parent="." instance=ExtResource("12_plot_placement")]
 
 [node name="DungeonEntrance" parent="." instance=ExtResource("11_transition")]
 position = Vector2(850, 550)
