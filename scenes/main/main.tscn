@@ -31,24 +31,28 @@ position = Vector2(480, 320)
 
 [node name="TopWall" type="StaticBody2D" parent="Walls"]
 position = Vector2(480, 16)
+collision_layer = 3
 
 [node name="TopWallShape" type="CollisionShape2D" parent="Walls/TopWall"]
 shape = SubResource("RectangleShape2D_wall_h")
 
 [node name="BottomWall" type="StaticBody2D" parent="Walls"]
 position = Vector2(480, 624)
+collision_layer = 3
 
 [node name="BottomWallShape" type="CollisionShape2D" parent="Walls/BottomWall"]
 shape = SubResource("RectangleShape2D_wall_h")
 
 [node name="LeftWall" type="StaticBody2D" parent="Walls"]
 position = Vector2(16, 320)
+collision_layer = 3
 
 [node name="LeftWallShape" type="CollisionShape2D" parent="Walls/LeftWall"]
 shape = SubResource("RectangleShape2D_wall_v")
 
 [node name="RightWall" type="StaticBody2D" parent="Walls"]
 position = Vector2(944, 320)
+collision_layer = 3
 
 [node name="RightWallShape" type="CollisionShape2D" parent="Walls/RightWall"]
 shape = SubResource("RectangleShape2D_wall_v")
