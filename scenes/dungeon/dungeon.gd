@@ -30,6 +30,7 @@ var layout: DungeonLayout
 @onready var _ground: ColorRect = $Ground
 @onready var _grass: GrassField = $Grass
 @onready var _shade: ColorRect = $Shade
+@onready var _wave_bar: Control = $UI/WaveBar
 ## How many floor cells the forest shadow reaches before full brightness.
 @export var shade_falloff_cells: int = 8
 
@@ -46,6 +47,7 @@ func _ready() -> void:
 	_build_grass()
 	_place_player()
 	_place_exit()
+	_place_altar()
 	_populate()
 
 
@@ -138,6 +140,46 @@ func _place_player() -> void:
 
 func _place_exit() -> void:
 	_camp_exit.position = layout.cell_to_world(layout.exit_cell)
+
+
+## Fixed, unique placement (unlike zone-driven _populate below) — picks
+## one altar variant deterministically from the layout's own seed, wires
+## it to the enemy container and wave bar, then paints its clearing so
+## the zone reads as a landmark from a distance, not just a small prop.
+func _place_altar() -> void:
+	if config.altar_scenes.is_empty():
+		return
+	var rng := RandomNumberGenerator.new()
+	rng.seed = layout.seed ^ 0xA17A2
+	var scene: PackedScene = config.altar_scenes[rng.randi_range(0, config.altar_scenes.size() - 1)]
+	var altar: Node2D = scene.instantiate()
+	altar.position = layout.cell_to_world(layout.altar_cell)
+	_props.add_child(altar)
+
+	var altar_behavior: AltarBehavior = altar.get_node("Interactable/Host/AltarBehavior")
+	altar_behavior.enemies_container = _enemies
+	_wave_bar.bind_altar(altar_behavior)
+
+	_build_altar_zone()
+
+
+## Distinct stone-colored clearing floor, layered above ground/grass/shade
+## (so the forest shadow shader never darkens it) but below trees/actors.
+func _build_altar_zone() -> void:
+	var patch := Polygon2D.new()
+	patch.polygon = _circle_points(config.altar_clear_radius * layout.cell_size * 0.9, 24)
+	patch.position = layout.cell_to_world(layout.altar_cell)
+	patch.color = Color(0.4, 0.36, 0.32, 1.0)
+	patch.z_index = -4
+	add_child(patch)
+
+
+static func _circle_points(radius: float, segments: int) -> PackedVector2Array:
+	var pts := PackedVector2Array()
+	for i in segments:
+		var angle := TAU * i / segments
+		pts.append(Vector2(cos(angle), sin(angle)) * radius)
+	return pts
 
 
 ## Enemies and containers from the zone bands. Runs after the player is

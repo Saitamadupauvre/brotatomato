@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://dysh5fj707o0f" path="res://scripts/entities/grass_field.gd" id="6_grass"]
 [ext_resource type="Texture2D" uid="uid://h34eqexr237" path="res://assets/sprites/grass.png" id="7_grass_tex"]
 [ext_resource type="Shader" uid="uid://bn348tfe688vn" path="res://assets/shaders/forest_shade.gdshader" id="8_shade_shader"]
+[ext_resource type="PackedScene" path="res://scenes/ui/wave_bar.tscn" id="9_wave_bar"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_shade"]
 shader = ExtResource("8_shade_shader")
@@ -61,3 +62,5 @@ y_sort_enabled = true
 [node name="UI" type="CanvasLayer" parent="." unique_id=452060986]
 
 [node name="HUD" parent="UI" unique_id=52734484 instance=ExtResource("4_hud")]
+
+[node name="WaveBar" parent="UI" instance=ExtResource("9_wave_bar")]
