@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://c4xjvfnydiyay"]
+
+[ext_resource type="PackedScene" path="res://scenes/components/interactable.tscn" id="1_interactable"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/interact_prompt_behavior.gd" id="2_prompt"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/scene_transition_behavior.gd" id="3_transition"]
+
+[node name="SceneTransitionPoint" type="Node2D"]
+
+[node name="Sprite" type="ColorRect" parent="."]
+offset_left = -24.0
+offset_top = -24.0
+offset_right = 24.0
+offset_bottom = 24.0
+color = Color(0.2, 0.2, 0.25, 1)
+mouse_filter = 2
+
+[node name="Interactable" parent="." instance=ExtResource("1_interactable")]
+
+[node name="Host" parent="Interactable" index="1"]
+owner_entity_path = NodePath("../..")
+
+[node name="PromptBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("2_prompt")
+label_text = "Enter"
+
+[node name="SceneTransitionBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("3_transition")

@@ -1,0 +1,30 @@
+[gd_scene load_steps=3 format=3 uid="uid://cpickup000001"]
+
+[ext_resource type="Script" path="res://scripts/entities/item_pickup.gd" id="1_pickup"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_pickup"]
+radius = 10.0
+
+[node name="ItemPickup" type="Area2D"]
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("1_pickup")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_pickup")
+
+[node name="Shadow" type="ColorRect" parent="."]
+offset_left = -12.0
+offset_top = 4.0
+offset_right = 12.0
+offset_bottom = 14.0
+color = Color(0, 0, 0, 0.35)
+mouse_filter = 2
+
+[node name="Sprite" type="ColorRect" parent="."]
+offset_left = -8.0
+offset_top = -8.0
+offset_right = 8.0
+offset_bottom = 8.0
+color = Color(0.95, 0.8, 0.2, 1)
+mouse_filter = 2
