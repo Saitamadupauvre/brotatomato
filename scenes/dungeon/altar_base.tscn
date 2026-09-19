@@ -1,0 +1,61 @@
+[gd_scene format=3 uid="uid://cvvhqcnisk441"]
+
+[ext_resource type="PackedScene" path="res://scenes/components/interactable.tscn" id="1_interactable"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/outline_behavior.gd" id="2_outline"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/interact_prompt_behavior.gd" id="3_prompt"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/altar_behavior.gd" id="4_altar"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_altar"]
+size = Vector2(80, 80)
+
+[node name="Altar" type="StaticBody2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_altar")
+
+[node name="Sprite" type="ColorRect" parent="."]
+offset_left = -40.0
+offset_top = -40.0
+offset_right = 40.0
+offset_bottom = 40.0
+color = Color(0.5, 0.5, 0.55, 1)
+
+[node name="PillarLeft" type="ColorRect" parent="."]
+offset_left = -48.0
+offset_top = -140.0
+offset_right = -32.0
+offset_bottom = -40.0
+color = Color(0.85, 0.8, 0.55, 1)
+
+[node name="PillarRight" type="ColorRect" parent="."]
+offset_left = 32.0
+offset_top = -140.0
+offset_right = 48.0
+offset_bottom = -40.0
+color = Color(0.85, 0.8, 0.55, 1)
+
+[node name="StatusLabel" type="Label" parent="."]
+offset_left = -70.0
+offset_top = -172.0
+offset_right = 70.0
+offset_bottom = -146.0
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+horizontal_alignment = 1
+visible = false
+
+[node name="Interactable" parent="." instance=ExtResource("1_interactable")]
+
+[node name="Host" parent="Interactable" index="1"]
+owner_entity_path = NodePath("../..")
+
+[node name="OutlineBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("2_outline")
+sprite_path = NodePath("Sprite")
+
+[node name="PromptBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("3_prompt")
+
+[node name="AltarBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("4_altar")
+status_label_path = NodePath("StatusLabel")

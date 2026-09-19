@@ -36,6 +36,7 @@ static func generate(config: DungeonConfig, seed: int) -> DungeonLayout:
 	_pick_spawn(layout, config, rng)
 	_compute_distances(layout)
 	_pick_exit(layout)
+	_pick_altar(layout, config, rng)
 	return layout
 
 
@@ -177,3 +178,38 @@ static func _pick_exit(layout: DungeonLayout) -> void:
 			if layout.get_distance(x, y) == layout.max_distance:
 				layout.exit_cell = Vector2i(x, y)
 				return
+
+
+## Altar: a single fixed floor cell in a mid/far distance band (so it's
+## neither at the player's feet nor overlapping the exit), then a big
+## clear disc around it — same carving technique as _pick_spawn, just
+## bigger, so the clearing itself is a visible landmark. Runs after
+## distances/exit are computed; cells newly cleared here keep whatever
+## distance value (possibly -1/unreached) they had before clearing, which
+## is fine — it only means DungeonPopulator won't drop zone content
+## inside the clearing, never that the clearing itself is invalid.
+static func _pick_altar(layout: DungeonLayout, config: DungeonConfig, rng: RandomNumberGenerator) -> void:
+	var lo := int(config.altar_min_distance_ratio * layout.max_distance)
+	var hi := int(config.altar_max_distance_ratio * layout.max_distance)
+	var candidates: Array[Vector2i] = []
+	for y in layout.height:
+		for x in layout.width:
+			var d := layout.get_distance(x, y)
+			if d < lo or d > hi:
+				continue
+			if Vector2i(x, y) == layout.exit_cell:
+				continue
+			candidates.append(Vector2i(x, y))
+	if candidates.is_empty():
+		layout.altar_cell = layout.exit_cell
+		return
+	layout.altar_cell = candidates[rng.randi_range(0, candidates.size() - 1)]
+
+	var r := config.altar_clear_radius
+	for dy in range(-r, r + 1):
+		for dx in range(-r, r + 1):
+			if dx * dx + dy * dy > r * r:
+				continue
+			var p := layout.altar_cell + Vector2i(dx, dy)
+			if layout.is_inside(p.x, p.y):
+				layout.set_cell(p.x, p.y, DungeonLayout.Cell.FLOOR)
