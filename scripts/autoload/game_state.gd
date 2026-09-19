@@ -25,6 +25,7 @@ signal player_died
 signal villager_spawned(villager_id: int, position: Vector2)
 signal plot_placed(plot_id: int, position: Vector2)
 signal item_changed(item_id: String, count: int)
+signal crop_stored_changed(count: int)
 signal equipment_changed(slot: EquipmentData.EquipSlot, item_id: String)
 
 const STARTING_TOMATOES: int = 3
@@ -53,6 +54,11 @@ var _next_plot_id: int = 0
 var villagers: Array[Dictionary] = []
 
 var _next_villager_id: int = 0
+
+## Crop chest storage — separate from the carried "crop" inventory count,
+## survives scene changes because it lives here rather than on the chest
+## node itself (which is freed on scene transition).
+var crop_stored: int = 0
 
 
 func _ready() -> void:
@@ -151,3 +157,22 @@ func equip_item(item_id: String) -> void:
 func get_equipped(slot: EquipmentData.EquipSlot) -> ItemData:
 	var id: String = _equipped.get(slot, "")
 	return get_item_data(id) if id != "" else null
+
+
+## Moves crop from carried inventory into chest storage.
+func deposit_crop(amount: int = 1) -> bool:
+	if not remove_item("crop", amount):
+		return false
+	crop_stored += amount
+	crop_stored_changed.emit(crop_stored)
+	return true
+
+
+## Moves crop from chest storage back into carried inventory.
+func withdraw_crop(amount: int = 1) -> bool:
+	if crop_stored < amount:
+		return false
+	crop_stored -= amount
+	add_item("crop", amount)
+	crop_stored_changed.emit(crop_stored)
+	return true
