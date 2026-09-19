@@ -45,6 +45,7 @@ var _armor_reduction: int = 0
 @onready var _hurtbox: HurtboxComponent = $Hurtbox
 @onready var _attack_hitbox: HitboxComponent = $AttackHitbox
 @onready var _attack_debug_visual: CanvasItem = $AttackHitbox/DebugVisual
+@onready var _animation_player: AnimationPlayer = $AnimationPlayer
 
 
 func _ready() -> void:
@@ -90,6 +91,12 @@ func _physics_process(delta: float) -> void:
 		_start_attack()
 
 	move_and_slide()
+	if _last_move_direction.x != 0.0:
+		$Sprite.scale.x = 1.0 if _last_move_direction.x < 0.0 else -1.0
+
+	var target_animation := "run" if velocity.length() > 5.0 else "idle"
+	if _animation_player.current_animation != target_animation:
+		_animation_player.play(target_animation)
 
 
 func _start_attack() -> void:
