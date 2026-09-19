@@ -1,12 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://cvillager0001"]
+[gd_scene format=3 uid="uid://cvillager0001"]
 
-[ext_resource type="Script" path="res://scripts/entities/villager.gd" id="1_villager"]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_villager"]
-radius = 14.0
-
-[node name="Villager" type="CharacterBody2D"]
-script = ExtResource("1_villager")
+[node name="Villager" type="Node2D"]
 
 [node name="Sprite" type="ColorRect" parent="."]
 offset_left = -14.0
@@ -15,6 +9,3 @@ offset_right = 14.0
 offset_bottom = 14.0
 color = Color(0.9, 0.55, 0.2, 1)
 mouse_filter = 2
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("CircleShape2D_villager")

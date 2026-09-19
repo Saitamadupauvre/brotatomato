@@ -42,7 +42,7 @@ Both Camp (`scenes/main/main.tscn`) and Dungeon (`scenes/dungeon/dungeon.tscn`) 
 
 **UI reads `GameState` via signals**, per convention — with one deliberate exception: `scenes/ui/shop_menu.gd` calls `GameState.remove_item`/`add_item` directly on a purchase click, rather than routing through a signal to some other system. This was a pragmatic jam-speed call, not an oversight — know it's there before assuming the "UI never mutates state" rule is absolute.
 
-**Villagers** — `scenes/main/main.gd` instances a `Villager` (`scenes/entities/villager.tscn`, `scripts/entities/villager.gd`) wherever `GameState.villager_spawned` fires. `Villager` is a `CharacterBody2D` with a self-contained idle/wander state machine (no `Behavior`/`BehaviorHost`, since it has no interaction or attack logic to compose) — random direction, random timers, clamped to camp bounds by ordinary wall collision like Player/Enemy. Still visual only, no role (matches MVP scope).
+**Villagers are currently static placeholders** — `scenes/main/main.gd` instances a `Villager` wherever `GameState.villager_spawned` fires, but there's no wandering AI yet (visual only, no role — matches MVP scope).
 
 ## Mechanics summary (full detail in GDD)
 
