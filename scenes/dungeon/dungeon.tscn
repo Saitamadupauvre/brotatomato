@@ -1,0 +1,82 @@
+[gd_scene load_steps=12 format=3 uid="uid://cdungeon0000001"]
+
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="1_player"]
+[ext_resource type="NoiseTexture2D" path="res://scenes/dungeon/ground_noise.tres" id="2_ground_noise"]
+[ext_resource type="PackedScene" path="res://scenes/dungeon/enemy_slime.tscn" id="3_slime"]
+[ext_resource type="PackedScene" path="res://scenes/dungeon/enemy_imp.tscn" id="4_imp"]
+[ext_resource type="PackedScene" path="res://scenes/dungeon/enemy_brute.tscn" id="5_brute"]
+[ext_resource type="PackedScene" path="res://scenes/dungeon/enemy_charger.tscn" id="6_charger"]
+[ext_resource type="PackedScene" path="res://scenes/dungeon/enemy_archer.tscn" id="7_archer"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="8_hud"]
+[ext_resource type="PackedScene" path="res://scenes/entities/scene_transition_point.tscn" id="9_transition"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
+size = Vector2(1600, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_v"]
+size = Vector2(32, 1200)
+
+[node name="Dungeon" type="Node2D"]
+
+[node name="Ground" type="Sprite2D" parent="."]
+position = Vector2(800, 600)
+texture = ExtResource("2_ground_noise")
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector2(800, 600)
+
+[node name="Walls" type="Node2D" parent="."]
+
+[node name="TopWall" type="StaticBody2D" parent="Walls"]
+position = Vector2(800, 16)
+
+[node name="TopWallShape" type="CollisionShape2D" parent="Walls/TopWall"]
+shape = SubResource("RectangleShape2D_wall_h")
+
+[node name="BottomWall" type="StaticBody2D" parent="Walls"]
+position = Vector2(800, 1184)
+
+[node name="BottomWallShape" type="CollisionShape2D" parent="Walls/BottomWall"]
+shape = SubResource("RectangleShape2D_wall_h")
+
+[node name="LeftWall" type="StaticBody2D" parent="Walls"]
+position = Vector2(16, 600)
+
+[node name="LeftWallShape" type="CollisionShape2D" parent="Walls/LeftWall"]
+shape = SubResource("RectangleShape2D_wall_v")
+
+[node name="RightWall" type="StaticBody2D" parent="Walls"]
+position = Vector2(1584, 600)
+
+[node name="RightWallShape" type="CollisionShape2D" parent="Walls/RightWall"]
+shape = SubResource("RectangleShape2D_wall_v")
+
+[node name="Enemies" type="Node2D" parent="."]
+
+[node name="Slime1" parent="Enemies" instance=ExtResource("3_slime")]
+position = Vector2(1100, 300)
+
+[node name="Slime2" parent="Enemies" instance=ExtResource("3_slime")]
+position = Vector2(1150, 900)
+
+[node name="Imp1" parent="Enemies" instance=ExtResource("4_imp")]
+position = Vector2(450, 900)
+
+[node name="Brute1" parent="Enemies" instance=ExtResource("5_brute")]
+position = Vector2(250, 300)
+
+[node name="Charger1" parent="Enemies" instance=ExtResource("6_charger")]
+position = Vector2(800, 200)
+
+[node name="Archer1" parent="Enemies" instance=ExtResource("7_archer")]
+position = Vector2(1400, 600)
+
+[node name="CampExit" parent="." instance=ExtResource("9_transition")]
+position = Vector2(800, 1050)
+
+[node name="PromptBehavior" parent="CampExit/Interactable/Host" index="0"]
+label_text = "Camp"
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="UI" instance=ExtResource("8_hud")]

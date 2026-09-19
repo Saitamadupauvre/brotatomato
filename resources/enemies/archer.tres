@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1_archer"]
+
+[resource]
+script = ExtResource("1_archer")
+display_name = "Archer"
+max_hp = 2
+move_speed = 70.0
+damage = 1

@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://cplot0000001"]
+
+[ext_resource type="PackedScene" path="res://scenes/components/interactable.tscn" id="1_interactable"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/interact_prompt_behavior.gd" id="2_prompt"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/plot_behavior.gd" id="3_plot"]
+
+[node name="Plot" type="Node2D"]
+
+[node name="Sprite" type="ColorRect" parent="."]
+offset_left = -28.0
+offset_top = -28.0
+offset_right = 28.0
+offset_bottom = 28.0
+color = Color(0.4, 0.3, 0.2, 1)
+mouse_filter = 2
+
+[node name="TimeLabel" type="Label" parent="."]
+offset_left = -28.0
+offset_top = -50.0
+offset_right = 28.0
+offset_bottom = -28.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+visible = false
+mouse_filter = 2
+text = "0s"
+
+[node name="Interactable" parent="." instance=ExtResource("1_interactable")]
+
+[node name="Host" parent="Interactable" index="1"]
+owner_entity_path = NodePath("../..")
+
+[node name="PromptBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("2_prompt")
+
+[node name="PlotBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("3_plot")
+sprite_path = NodePath("Sprite")
+time_label_path = NodePath("TimeLabel")
