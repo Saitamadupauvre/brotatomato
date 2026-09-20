@@ -1,0 +1,40 @@
+[gd_scene load_steps=6 format=3 uid="uid://cammocraft0001"]
+
+[ext_resource type="PackedScene" path="res://scenes/components/interactable.tscn" id="1_interactable"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/outline_behavior.gd" id="2_outline"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/interact_prompt_behavior.gd" id="3_prompt"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/craft_behavior.gd" id="4_craft"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ammo_crafter"]
+size = Vector2(64, 64)
+
+[node name="AmmoCrafter" type="StaticBody2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_ammo_crafter")
+
+[node name="Sprite" type="ColorRect" parent="."]
+offset_left = -32.0
+offset_top = -32.0
+offset_right = 32.0
+offset_bottom = 32.0
+color = Color(0.3, 0.3, 0.35, 1)
+
+[node name="Interactable" parent="." instance=ExtResource("1_interactable")]
+
+[node name="Host" parent="Interactable" index="1"]
+owner_entity_path = NodePath("../..")
+
+[node name="OutlineBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("2_outline")
+sprite_path = NodePath("Sprite")
+
+[node name="PromptBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("3_prompt")
+
+[node name="CraftBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("4_craft")
+cost_item_id = "materials"
+cost_amount = 3
+output_item_id = "ammo"
+output_amount = 6
