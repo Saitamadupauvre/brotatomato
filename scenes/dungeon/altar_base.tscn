@@ -9,6 +9,9 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_altar"]
 size = Vector2(80, 80)
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_altar_range"]
+radius = 64.0
+
 [node name="Altar" type="StaticBody2D"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -46,6 +49,17 @@ horizontal_alignment = 1
 visible = false
 
 [node name="Interactable" parent="." instance=ExtResource("1_interactable")]
+
+## interactable.tscn's default 40px range shape matches shop/container's
+## smaller 64x64 solid collision (32 half-extent) with room to spare, but
+## the altar's own solid collision is 80x80 (40 half-extent) — exactly
+## equal to that default radius, so the player's own collision (16
+## radius) physically stops them right at the edge where the Area2D
+## should start overlapping, a razor's-edge match Godot's collision
+## margin pushes just outside. Bumped so the altar has the same ~8px
+## slack shop/container get.
+[node name="RangeShape" parent="Interactable" index="0"]
+shape = SubResource("CircleShape2D_altar_range")
 
 [node name="Host" parent="Interactable" index="1"]
 owner_entity_path = NodePath("../..")
