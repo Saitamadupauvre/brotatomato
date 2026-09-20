@@ -132,12 +132,13 @@ shape = SubResource("CircleShape2D_1")
 [node name="Sprite" type="Node2D" parent="." unique_id=1884280128]
 
 [node name="Body" type="Sprite2D" parent="Sprite" unique_id=1782631494]
+modulate = Color(0.7038078, 0.7038079, 0.70380765, 1)
 position = Vector2(0, 3)
 scale = Vector2(0.2, 0.2)
 texture = ExtResource("5_body_idle")
 
 [node name="Head" type="Sprite2D" parent="Sprite/Body" unique_id=1062242764]
-position = Vector2(0, 20)
+position = Vector2(0, 6)
 scale = Vector2(0.99999994, 0.99999994)
 texture = ExtResource("8_head")
 
