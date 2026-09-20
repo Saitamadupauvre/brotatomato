@@ -11,6 +11,8 @@ const FOG_REVEAL_RADIUS: int = 7
 @onready var gold_label: Label = %GoldLabel
 @onready var _minimap: MinimapDisplay = %Minimap
 @onready var _map_overlay: MapOverlay = %MapOverlay
+@onready var _ammo_stat: Control = %AmmoStat
+@onready var _ammo_label: Label = %AmmoLabel
 
 var _layout: DungeonLayout
 var _player: CharacterBody2D
@@ -23,6 +25,11 @@ func _ready() -> void:
 	_on_tomato_changed(GameState.tomatoes)
 	_on_item_changed("gold", GameState.get_item_count("gold"))
 
+	_ammo_stat.visible = false
+	var player := get_tree().get_first_node_in_group("player")
+	if player:
+		player.ammo_changed.connect(_on_ammo_changed)
+		player.reload_started.connect(_on_reload_started)
 
 func _process(_delta: float) -> void:
 	if _layout == null or not is_instance_valid(_player):
@@ -59,3 +66,12 @@ func _on_tomato_changed(count: int) -> void:
 func _on_item_changed(item_id: String, count: int) -> void:
 	if item_id == "gold":
 		gold_label.text = "%d" % count
+
+
+func _on_ammo_changed(current: int, max_ammo: int) -> void:
+	_ammo_stat.visible = max_ammo > 0
+	_ammo_label.text = "%d/%d" % [current, max_ammo]
+
+
+func _on_reload_started() -> void:
+	_ammo_label.text = "Reloading..."

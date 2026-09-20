@@ -33,6 +33,12 @@ signal melee_swung(center: Vector2, radius: float)
 signal teleport_channel_started
 signal teleport_channel_cancelled
 signal teleport_channel_completed
+## Ammo HUD hooks (#66) — max_ammo 0 means the equipped weapon has no
+## magazine (melee, or a RANGED weapon with unlimited ammo like the bow),
+## which the HUD reads as "hide the ammo counter".
+signal ammo_changed(current: int, max_ammo: int)
+signal reload_started
+signal reload_ended
 ## AttackHitboxShape's authored (unscaled) reach, in px.
 const MELEE_SHAPE_REACH: float = 42.0
 ## Distance from the player to the center of the melee arc, and its
@@ -50,6 +56,10 @@ var _dash_direction: Vector2 = Vector2.ZERO
 var _last_move_direction: Vector2 = Vector2.DOWN
 var _attack_cooldown_timer: float = 0.0
 var _is_attacking: bool = false
+## -1 = unlimited (weapon has no magazine, e.g. the bow).
+var _current_ammo: int = -1
+var _is_reloading: bool = false
+var _reload_timer: float = 0.0
 var _invincible_timer: float = 0.0
 var _is_channeling: bool = false
 var _channel_timer: float = 0.0
@@ -82,6 +92,9 @@ func _on_equipment_changed(slot: EquipmentData.EquipSlot, _item_id: String) -> v
 		equipped_weapon = GameState.get_equipped(slot) as WeaponData
 		_held_item.texture = equipped_weapon.icon if equipped_weapon else null
 		_held_item.visible = equipped_weapon != null
+		_current_ammo = equipped_weapon.magazine_size if equipped_weapon and equipped_weapon.magazine_size > 0 else -1
+		_is_reloading = false
+		ammo_changed.emit(max(_current_ammo, 0), equipped_weapon.magazine_size if equipped_weapon else 0)
 	else:
 		_recompute_armor_reduction()
 
@@ -111,6 +124,14 @@ func _physics_process(delta: float) -> void:
 	if _invincible_timer > 0.0:
 		_invincible_timer -= delta
 
+	if _is_reloading:
+		_reload_timer -= delta
+		if _reload_timer <= 0.0:
+			_current_ammo = equipped_weapon.magazine_size
+			_is_reloading = false
+			reload_ended.emit()
+			ammo_changed.emit(_current_ammo, equipped_weapon.magazine_size)
+
 	if _is_channeling:
 		_process_teleport_channel(delta)
 		velocity = Vector2.ZERO
@@ -127,6 +148,9 @@ func _physics_process(delta: float) -> void:
 
 	if Input.is_action_just_pressed("teleport"):
 		_start_teleport_channel()
+
+	if Input.is_action_just_pressed("reload") and _can_reload():
+		_start_reload()
 
 	move_and_slide()
 	if _last_move_direction.x != 0.0:
@@ -181,6 +205,10 @@ func _stop_teleport_vfx() -> void:
 
 
 func _start_attack() -> void:
+	var is_gun := equipped_weapon and equipped_weapon.attack_type == WeaponData.AttackType.RANGED and equipped_weapon.magazine_size > 0
+	if is_gun and (_is_reloading or _current_ammo <= 0):
+		return # empty or mid-reload: attack press does nothing (no cooldown spent)
+
 	var cooldown: float = equipped_weapon.attack_cooldown if equipped_weapon else attack_cooldown
 	_attack_cooldown_timer = cooldown
 	_is_attacking = true
@@ -188,6 +216,11 @@ func _start_attack() -> void:
 
 	if equipped_weapon and equipped_weapon.attack_type == WeaponData.AttackType.RANGED:
 		_fire_projectile()
+		if is_gun:
+			_current_ammo -= 1
+			ammo_changed.emit(_current_ammo, equipped_weapon.magazine_size)
+			if _current_ammo <= 0:
+				_start_reload()
 	else:
 		_swing_melee()
 
@@ -195,10 +228,22 @@ func _start_attack() -> void:
 func _fire_projectile() -> void:
 	var projectile: Projectile = PROJECTILE_SCENE.instantiate()
 	projectile.damage = equipped_weapon.damage
+	projectile.speed = equipped_weapon.projectile_speed
 	projectile.target_mask = ENEMY_HURTBOX_MASK
 	get_parent().add_child(projectile)
 	projectile.position = position
 	projectile.rotation = _get_aim_direction().angle()
+
+
+func _can_reload() -> bool:
+	return equipped_weapon != null and equipped_weapon.magazine_size > 0 \
+		and not _is_reloading and _current_ammo < equipped_weapon.magazine_size
+
+
+func _start_reload() -> void:
+	_is_reloading = true
+	_reload_timer = equipped_weapon.reload_time
+	reload_started.emit()
 
 
 func _swing_melee() -> void:
