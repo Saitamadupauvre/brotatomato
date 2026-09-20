@@ -90,19 +90,33 @@ func _ready() -> void:
 	_attack_hitbox.monitoring = false
 	_attack_hitbox.scale = Vector2.ONE * (melee_range / MELEE_SHAPE_REACH)
 	GameState.equipment_changed.connect(_on_equipment_changed)
-	_on_equipment_changed(EquipmentData.EquipSlot.WEAPON, "") # sync held sprite to whatever's already equipped
+	GameState.active_weapon_changed.connect(_on_active_weapon_changed)
+	_sync_active_weapon() # sync held sprite to whatever's already equipped
 
 
 func _on_equipment_changed(slot: EquipmentData.EquipSlot, _item_id: String) -> void:
-	if slot == EquipmentData.EquipSlot.WEAPON:
-		equipped_weapon = GameState.get_equipped(slot) as WeaponData
-		_held_item.texture = equipped_weapon.icon if equipped_weapon else null
-		_held_item.visible = equipped_weapon != null
-		_current_ammo = equipped_weapon.magazine_size if equipped_weapon and equipped_weapon.magazine_size > 0 else -1
-		_is_reloading = false
-		ammo_changed.emit(max(_current_ammo, 0), equipped_weapon.magazine_size if equipped_weapon else 0)
+	if slot == EquipmentData.EquipSlot.WEAPON or slot == EquipmentData.EquipSlot.WEAPON_2:
+		if slot == GameState.active_weapon_slot:
+			_sync_active_weapon()
 	else:
 		_recompute_armor_reduction()
+
+
+func _on_active_weapon_changed(_slot: EquipmentData.EquipSlot) -> void:
+	_sync_active_weapon()
+
+
+## Refreshes held-item sprite, ammo state and equipped_weapon from
+## whichever weapon slot is currently active (#50) — shared by both the
+## "a weapon slot's contents changed" and "the active slot itself
+## swapped" paths, since either can change what's effectively in hand.
+func _sync_active_weapon() -> void:
+	equipped_weapon = GameState.get_active_weapon() as WeaponData
+	_held_item.texture = equipped_weapon.icon if equipped_weapon else null
+	_held_item.visible = equipped_weapon != null
+	_current_ammo = equipped_weapon.magazine_size if equipped_weapon and equipped_weapon.magazine_size > 0 else -1
+	_is_reloading = false
+	ammo_changed.emit(max(_current_ammo, 0), equipped_weapon.magazine_size if equipped_weapon else 0)
 
 
 func _recompute_armor_reduction() -> void:
@@ -162,6 +176,9 @@ func _physics_process(delta: float) -> void:
 
 	if Input.is_action_just_pressed("reload") and _can_reload():
 		_start_reload()
+
+	if Input.is_action_just_pressed("swap_weapon"):
+		GameState.swap_active_weapon()
 
 	move_and_slide()
 	if _last_move_direction.x != 0.0:
