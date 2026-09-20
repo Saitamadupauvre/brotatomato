@@ -17,6 +17,7 @@ enum PlotState { EMPTY, SEEDED, GROWING, RIPE }
 
 var _state: PlotState = PlotState.EMPTY
 var _grow_timer: float = 0.0
+var _plot_id: int = -1
 var _sprite: CanvasItem = null
 var _plant_sprite: Sprite2D = null
 var _time_label: Label = null
@@ -34,7 +35,26 @@ func _setup(p_owner: Node2D, p_host: BehaviorHost) -> void:
 	_plant_sprite = owner_entity.get_node(plant_sprite_path)
 	_time_label = owner_entity.get_node(time_label_path)
 	_attention_outline = OutlineVisual.create(_sprite, Color(1.0, 0.9, 0.2), 6.0, 1.15)
+	_plot_id = owner_entity.get_meta("plot_id", -1)
+	_restore_progress()
 	_update_visuals()
+
+
+## Plots are freed and reinstanced on every scene change (#91: Camp <->
+## Dungeon), so this behavior itself can't remember planting/growth across
+## a dungeon trip — GameState.get_plot_progress is what's actually alive.
+## grow_end_unix is a real clock timestamp, so growth keeps counting down
+## for real while the player's away, not frozen and resumed on return.
+func _restore_progress() -> void:
+	var progress: Dictionary = GameState.get_plot_progress(_plot_id)
+	if progress.is_empty():
+		return
+	_state = progress["state"] as PlotState
+	if _state == PlotState.GROWING:
+		_grow_timer = progress["grow_end_unix"] - Time.get_unix_time_from_system()
+		if _grow_timer <= 0.0:
+			_state = PlotState.RIPE
+			_persist_progress()
 
 
 ## Item id the next interaction on this plot consumes, or "" if none
@@ -58,6 +78,7 @@ func force_ripen() -> void:
 		return
 	_state = PlotState.RIPE
 	_update_visuals()
+	_persist_progress()
 
 
 func _process(delta: float) -> void:
@@ -67,6 +88,7 @@ func _process(delta: float) -> void:
 		if _grow_timer <= 0.0:
 			_state = PlotState.RIPE
 			_update_visuals()
+			_persist_progress()
 
 
 func on_event(event_name: String, _payload: Dictionary = {}) -> void:
@@ -78,20 +100,30 @@ func on_event(event_name: String, _payload: Dictionary = {}) -> void:
 				AudioManager.play(&"plant_seed")
 				_state = PlotState.SEEDED
 				_update_visuals()
+				_persist_progress()
 		PlotState.SEEDED:
 			if GameState.remove_item("water", 1):
 				AudioManager.play(&"water_plot")
 				_state = PlotState.GROWING
 				_grow_timer = grow_time / GameState.get_passive_multiplier(CardData.Passive.PLOT_GROWTH_SPEED)
 				_update_visuals()
+				_persist_progress()
 		PlotState.RIPE:
 			AudioManager.play(&"harvest")
 			GameState.spawn_villager(owner_entity.global_position)
 			GameState.add_item("crop", 1)
 			_state = PlotState.EMPTY
 			_update_visuals()
+			_persist_progress()
 		PlotState.GROWING:
 			pass
+
+
+func _persist_progress() -> void:
+	var grow_end_unix := 0.0
+	if _state == PlotState.GROWING:
+		grow_end_unix = Time.get_unix_time_from_system() + _grow_timer
+	GameState.set_plot_progress(_plot_id, _state, grow_end_unix)
 
 
 func _update_visuals() -> void:
