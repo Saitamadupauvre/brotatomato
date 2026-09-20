@@ -1,0 +1,74 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/dungeon/enemy_base.tscn" id="1_base"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/chase_movement_behavior.gd" id="2_chase"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/slam_attack_behavior.gd" id="3_slam"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/dash_attack_behavior.gd" id="4_dash"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/burst_ranged_attack_behavior.gd" id="5_burst"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/summon_behavior.gd" id="6_summon"]
+[ext_resource type="Resource" path="res://resources/enemies/boss_grand.tres" id="7_data"]
+[ext_resource type="PackedScene" path="res://scenes/dungeon/enemy_boss_minion_dasher.tscn" id="8_minion_dasher"]
+[ext_resource type="PackedScene" path="res://scenes/dungeon/enemy_slime.tscn" id="9_minion_slime"]
+[ext_resource type="PackedScene" path="res://scenes/dungeon/enemy_archer.tscn" id="10_minion_archer"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_boss_body"]
+radius = 34.0
+
+[node name="EnemyBossGrand" instance=ExtResource("1_base")]
+data = ExtResource("7_data")
+
+[node name="Sprite" parent="." index="0"]
+offset_left = -34.0
+offset_top = -34.0
+offset_right = 34.0
+offset_bottom = 34.0
+color = Color(0.55, 0.05, 0.08, 1)
+
+[node name="CollisionShape2D" parent="." index="1"]
+shape = SubResource("CircleShape2D_boss_body")
+
+[node name="ChaseMovementBehavior" type="Node" parent="Host"]
+script = ExtResource("2_chase")
+
+[node name="SlamAttackBehavior" type="Node" parent="Host"]
+script = ExtResource("3_slam")
+trigger_range = 260.0
+slam_radius = 100.0
+telegraph_duration = 0.6
+slam_active_duration = 0.15
+cooldown = 2.0
+
+[node name="DashAttackBehavior" type="Node" parent="Host"]
+script = ExtResource("4_dash")
+trigger_range = 320.0
+dash_speed = 560.0
+dash_duration = 0.4
+cooldown = 1.2
+
+[node name="BurstRangedAttackBehavior" type="Node" parent="Host"]
+script = ExtResource("5_burst")
+attack_range = 360.0
+cooldown = 1.6
+volley_count = 9
+volley_spread_degrees = 70.0
+
+[node name="SummonDasher" type="Node" parent="Host"]
+script = ExtResource("6_summon")
+minion_scene = ExtResource("8_minion_dasher")
+summon_cooldown = 5.0
+summon_count = 1
+max_minions = 2
+
+[node name="SummonSlime" type="Node" parent="Host"]
+script = ExtResource("6_summon")
+minion_scene = ExtResource("9_minion_slime")
+summon_cooldown = 6.0
+summon_count = 1
+max_minions = 2
+
+[node name="SummonArcher" type="Node" parent="Host"]
+script = ExtResource("6_summon")
+minion_scene = ExtResource("10_minion_archer")
+summon_cooldown = 7.0
+summon_count = 1
+max_minions = 2
