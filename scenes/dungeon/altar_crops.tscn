@@ -1,18 +1,8 @@
 [gd_scene format=3 uid="uid://y3psuaceh0lg"]
 
 [ext_resource type="PackedScene" path="res://scenes/dungeon/altar_base.tscn" id="1_base"]
-[ext_resource type="Script" path="res://scripts/data/loot_entry.gd" id="2_loot_entry"]
-[ext_resource type="Resource" path="res://resources/dungeon/zones/altar_wave_crops.tres" id="3_wave"]
-
-[sub_resource type="Resource" id="LootEntry_materials"]
-script = ExtResource("2_loot_entry")
-item_id = "materials"
-amount = 5
-
-[sub_resource type="Resource" id="LootEntry_water"]
-script = ExtResource("2_loot_entry")
-item_id = "water"
-amount = 4
+[ext_resource type="Resource" path="res://resources/dungeon/zones/altar_wave_crops.tres" id="2_wave"]
+[ext_resource type="Resource" path="res://resources/dungeon/loot_tables/altar_crops_loot.tres" id="3_loot_table"]
 
 [node name="AltarCrops" instance=ExtResource("1_base")]
 
@@ -20,5 +10,5 @@ amount = 4
 color = Color(0.35, 0.55, 0.25, 1)
 
 [node name="AltarBehavior" parent="Interactable/Host"]
-wave_zone = ExtResource("3_wave")
-contents = Array[LootEntry]([SubResource("LootEntry_materials"), SubResource("LootEntry_water")])
+wave_zone = ExtResource("2_wave")
+loot_table = ExtResource("3_loot_table")
