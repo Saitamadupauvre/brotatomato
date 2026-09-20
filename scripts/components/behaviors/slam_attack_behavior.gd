@@ -45,6 +45,11 @@ func on_event(event_name: String, payload: Dictionary = {}) -> void:
 	if _cooldown_timer > 0.0:
 		_cooldown_timer -= payload.get("delta", 0.0)
 		return
+	# Another attack behavior (e.g. DashAttackBehavior on a multi-attack
+	# boss) already owns movement_locked — don't start a telegraph on top
+	# of an ongoing dash.
+	if enemy.movement_locked:
+		return
 	if enemy.player and enemy.global_position.distance_to(enemy.player.global_position) <= trigger_range:
 		_start_telegraph()
 
