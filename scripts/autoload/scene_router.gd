@@ -46,6 +46,7 @@ func go_to_win() -> void:
 ## physics-step signal handler (e.g. player death) in the first place —
 ## Godot forbids freeing CollisionObjects mid physics-step.
 func _change_scene(path: String) -> void:
+	get_tree().paused = false
 	_show_loading()
 	await _loading_layer.fade_in(FADE_DURATION)
 	await get_tree().create_timer(LOADING_MIN_TIME).timeout

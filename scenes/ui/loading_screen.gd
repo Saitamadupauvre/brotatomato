@@ -11,11 +11,13 @@ extends CanvasLayer
 
 func fade_in(duration: float) -> void:
 	var tw := create_tween()
+	tw.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tw.tween_property(_bg, "modulate:a", 1.0, duration)
 	await tw.finished
 
 
 func fade_out(duration: float) -> void:
 	var tw := create_tween()
+	tw.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tw.tween_property(_bg, "modulate:a", 0.0, duration)
 	await tw.finished
