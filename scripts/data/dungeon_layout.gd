@@ -16,7 +16,10 @@ var cells: PackedByteArray = PackedByteArray()
 var distances: PackedInt32Array = PackedInt32Array()
 var spawn_cell: Vector2i = Vector2i.ZERO
 var exit_cell: Vector2i = Vector2i.ZERO
-var altar_cell: Vector2i = Vector2i.ZERO
+## 3 guaranteed boss-altar placements (crops/gold/relic, order shuffled per seed).
+var boss_altar_cells: Array[Vector2i] = []
+## 4th, gated placement — the final boss, unlocked by all 3 keys.
+var final_boss_cell: Vector2i = Vector2i.ZERO
 var max_distance: int = 0
 
 
