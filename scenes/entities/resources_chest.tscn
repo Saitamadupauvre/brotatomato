@@ -1,17 +1,17 @@
-[gd_scene format=3 uid="uid://ccropchest001"]
+[gd_scene format=3 uid="uid://dund061ooft7u"]
 
 [ext_resource type="PackedScene" path="res://scenes/components/chest.tscn" id="1_base"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/container_behavior.gd" id="2_container"]
-[ext_resource type="Resource" path="res://resources/dungeon/loot_tables/crops_loot.tres" id="3_loot_table"]
+[ext_resource type="Resource" path="res://resources/dungeon/loot_tables/resources_loot.tres" id="3_loot_table"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/opened_state_behavior.gd" id="4_opened"]
 
-[node name="CropChest" instance=ExtResource("1_base")]
+[node name="ResourcesChest" instance=ExtResource("1_base")]
 
 [node name="Sprite" parent="." index="1"]
-color = Color(0.8, 0.15, 0.15, 1)
+color = Color(0.55, 0.45, 0.3, 1)
 
 [node name="PromptBehavior" parent="Interactable/Host" index="1"]
-label_text = "Crops Container"
+label_text = "Resources Container"
 
 [node name="ContainerBehavior" type="Node" parent="Interactable/Host" index="2"]
 script = ExtResource("2_container")
