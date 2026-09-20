@@ -10,6 +10,7 @@ extends Node2D
 
 const VILLAGER_SCENE: PackedScene = preload("res://scenes/entities/villager.tscn")
 const PLOT_SCENE: PackedScene = preload("res://scenes/entities/plot.tscn")
+const BREEDING_HOUSE_SCENE: PackedScene = preload("res://scenes/entities/breeding_house.tscn")
 
 const INTERIOR_COLS: int = 20
 const INTERIOR_ROWS: int = 13
@@ -45,8 +46,11 @@ func _ready() -> void:
 	GameState.villager_spawned.connect(_on_villager_spawned)
 	GameState.villager_removed.connect(_on_villager_removed)
 	GameState.plot_placed.connect(_on_plot_placed)
+	GameState.breeding_house_created.connect(_spawn_breeding_house)
 	for plot_id in GameState.plots:
 		_spawn_plot(plot_id, GameState.plots[plot_id])
+	if GameState.breeding_house_placed:
+		_spawn_breeding_house(GameState.breeding_house_position)
 	for villager_entry in GameState.villagers:
 		_on_villager_spawned(villager_entry["id"], villager_entry["position"], villager_entry["name"])
 
@@ -76,3 +80,9 @@ func _spawn_plot(plot_id: int, position: Vector2) -> void:
 	plot.set_meta("plot_id", plot_id)
 	$World/Plots.add_child(plot)
 	plot.global_position = position
+
+
+func _spawn_breeding_house(position: Vector2) -> void:
+	var breeding_house: Node2D = BREEDING_HOUSE_SCENE.instantiate()
+	$World.add_child(breeding_house)
+	breeding_house.global_position = position
