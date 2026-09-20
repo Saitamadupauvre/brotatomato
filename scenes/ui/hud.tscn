@@ -38,6 +38,18 @@ content_margin_top = 6.0
 content_margin_right = 10.0
 content_margin_bottom = 6.0
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_weapon_slot"]
+bg_color = Color(0.2, 0.22, 0.25, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.4, 0.44, 0.5, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
 [node name="HUD" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -115,6 +127,46 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 text = "0/0"
+
+[node name="WeaponBar" type="HBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -132.0
+offset_top = -68.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_constants/separation = 8
+
+[node name="WeaponSlot1Panel" type="PanelContainer" parent="WeaponBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(52, 52)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_weapon_slot")
+
+[node name="WeaponSlot1Icon" type="TextureRect" parent="WeaponBar/WeaponSlot1Panel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+expand_mode = 1
+
+[node name="WeaponSlot2Panel" type="PanelContainer" parent="WeaponBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(52, 52)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_weapon_slot")
+
+[node name="WeaponSlot2Icon" type="TextureRect" parent="WeaponBar/WeaponSlot2Panel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+expand_mode = 1
 
 [node name="Minimap" parent="." instance=ExtResource("3_minimap")]
 unique_name_in_owner = true

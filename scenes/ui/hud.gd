@@ -13,6 +13,18 @@ const FOG_REVEAL_RADIUS: int = 7
 @onready var _map_overlay: MapOverlay = %MapOverlay
 @onready var _ammo_stat: Control = %AmmoStat
 @onready var _ammo_label: Label = %AmmoLabel
+## Bottom-right weapon hotbar (#50) — shows both weapon slots' icons and
+## highlights whichever is active, so the "only the active weapon
+## applies" rule from the acceptance criteria is visible mid-fight, not
+## just in the inventory menu.
+@onready var _weapon_slot_icons: Dictionary = {
+	EquipmentData.EquipSlot.WEAPON: %WeaponSlot1Icon,
+	EquipmentData.EquipSlot.WEAPON_2: %WeaponSlot2Icon,
+}
+@onready var _weapon_slot_panels: Dictionary = {
+	EquipmentData.EquipSlot.WEAPON: %WeaponSlot1Panel,
+	EquipmentData.EquipSlot.WEAPON_2: %WeaponSlot2Panel,
+}
 
 var _layout: DungeonLayout
 var _player: CharacterBody2D
@@ -30,6 +42,13 @@ func _ready() -> void:
 	if player:
 		player.ammo_changed.connect(_on_ammo_changed)
 		player.reload_started.connect(_on_reload_started)
+
+	GameState.equipment_changed.connect(_on_weapon_equipment_changed)
+	GameState.active_weapon_changed.connect(_on_active_weapon_changed)
+	for slot in _weapon_slot_icons:
+		_refresh_weapon_slot_icon(slot)
+	_refresh_active_weapon_highlight()
+
 
 func _process(_delta: float) -> void:
 	if _layout == null or not is_instance_valid(_player):
@@ -75,3 +94,38 @@ func _on_ammo_changed(current: int, max_ammo: int) -> void:
 
 func _on_reload_started() -> void:
 	_ammo_label.text = "Reloading..."
+
+
+func _on_weapon_equipment_changed(slot: EquipmentData.EquipSlot, _item_id: String) -> void:
+	if slot == EquipmentData.EquipSlot.WEAPON or slot == EquipmentData.EquipSlot.WEAPON_2:
+		_refresh_weapon_slot_icon(slot)
+
+
+func _on_active_weapon_changed(_slot: EquipmentData.EquipSlot) -> void:
+	_refresh_active_weapon_highlight()
+
+
+func _refresh_weapon_slot_icon(slot: EquipmentData.EquipSlot) -> void:
+	var data: ItemData = GameState.get_equipped(slot)
+	var icon: TextureRect = _weapon_slot_icons[slot]
+	icon.texture = data.icon if data else null
+
+
+const _ACTIVE_WEAPON_BORDER := Color(0.95, 0.8, 0.3, 1) # gold ring = active weapon slot
+
+
+func _refresh_active_weapon_highlight() -> void:
+	for slot in _weapon_slot_panels:
+		var panel: PanelContainer = _weapon_slot_panels[slot]
+		if slot == GameState.active_weapon_slot:
+			var style := StyleBoxFlat.new()
+			style.bg_color = Color(0.2, 0.22, 0.25, 0.85)
+			style.border_width_left = 3
+			style.border_width_top = 3
+			style.border_width_right = 3
+			style.border_width_bottom = 3
+			style.border_color = _ACTIVE_WEAPON_BORDER
+			style.set_corner_radius_all(8)
+			panel.add_theme_stylebox_override("panel", style)
+		else:
+			panel.remove_theme_stylebox_override("panel")
