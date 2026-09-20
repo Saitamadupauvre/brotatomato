@@ -15,6 +15,7 @@ var movement_locked: bool = false # an attack behavior sets this while it owns v
 
 
 func _ready() -> void:
+	add_to_group("enemy") # Damage Burst card active (#7) targets this group
 	health.configure(data.max_hp)
 	health.died.connect(queue_free)
 	_hurtbox.damage_taken.connect(health.take_damage)
