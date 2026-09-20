@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="1_card"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_card")
+id = "verdant_charm"
+display_name = "Verdant Charm"
+icon = ExtResource("2_icon")
+stackable = false
+max_stack = 1
+price = 60
+passive = 1
+passive_value = 0.25
+active = 1
+active_value = 0.0
+active_cooldown = 15.0
