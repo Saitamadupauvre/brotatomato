@@ -1,15 +1,131 @@
 [gd_scene load_steps=8 format=3 uid="uid://c8y3f0m2q8k4a"]
 
-[ext_resource type="Script" path="res://scenes/player/player.gd" id="1_player_script"]
-[ext_resource type="Script" path="res://scripts/components/hurtbox_component.gd" id="2_hurtbox"]
-[ext_resource type="Script" path="res://scripts/components/hitbox_component.gd" id="3_hitbox"]
-[ext_resource type="Shader" path="res://assets/shaders/teleport_glow.gdshader" id="4_teleport_glow"]
+[ext_resource type="Script" uid="uid://1kyxolsqlocl" path="res://scenes/player/player.gd" id="1_player_script"]
+[ext_resource type="Script" uid="uid://ctngo7stmnw5d" path="res://scripts/components/hurtbox_component.gd" id="2_hurtbox"]
+[ext_resource type="Script" uid="uid://dhf5mfm1ufosy" path="res://scripts/components/hitbox_component.gd" id="3_hitbox"]
+[ext_resource type="Texture2D" uid="uid://cye2t3o6x6nbb" path="res://assets/sprites/player/oreol.png" id="4_oreol"]
+[ext_resource type="Texture2D" uid="uid://qh0mep437xmu" path="res://assets/sprites/player/body_idle.png" id="5_body_idle"]
+[ext_resource type="Texture2D" uid="uid://cqffm8s8r7dmi" path="res://assets/sprites/player/body_run_1.png" id="6_body_run1"]
+[ext_resource type="Texture2D" uid="uid://bk1tr6ytqtr35" path="res://assets/sprites/player/body_run_2.png" id="7_body_run2"]
+[ext_resource type="Texture2D" uid="uid://bnnqk23suauxx" path="res://assets/sprites/player/player_head.png" id="8_head"]
+[ext_resource type="Texture2D" uid="uid://dc7xuqidk87ao" path="res://assets/sprites/player/player_face.png" id="9_face"]
+[ext_resource type="Shader" path="res://assets/shaders/teleport_glow.gdshader" id="10_teleport_glow"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 16.0
 
+[sub_resource type="Animation" id="Animation_idle"]
+resource_name = "idle"
+length = 1.2
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite/Body/Head:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.6, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 6), Vector2(0, 20), Vector2(0, 6)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite/Body:texture")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("5_body_idle")]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite/Body:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 3)]
+}
+
+[sub_resource type="Animation" id="Animation_run"]
+resource_name = "run"
+length = 0.8
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite/Body:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.4, 0.7),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [ExtResource("6_body_run1"), ExtResource("5_body_idle"), ExtResource("7_body_run2"), ExtResource("5_body_idle")]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite/Body/Head:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 6), Vector2(0, 4.5), Vector2(0, 6), Vector2(0, 4.5), Vector2(0, 6)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite/Body:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.4, 0.7, 0.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, 3), Vector2(0, 0), Vector2(0, 3), Vector2(0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_body"]
+_data = {
+&"idle": SubResource("Animation_idle"),
+&"run": SubResource("Animation_run")
+}
+
+[sub_resource type="Animation" id="Animation_halo_float"]
+resource_name = "halo_float"
+length = 1.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite/Body/Head/Oreol:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.8, 1.6),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, -6), Vector2(0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_halo"]
+_data = {
+&"halo_float": SubResource("Animation_halo_float")
+}
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_teleport_glow"]
-shader = ExtResource("4_teleport_glow")
+shader = ExtResource("10_teleport_glow")
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_teleport"]
 direction = Vector3(0, -1, 0)
@@ -21,43 +137,65 @@ scale_min = 2.0
 scale_max = 4.0
 color = Color(0.4, 0.85, 1.0, 1.0)
 
-[node name="Player" type="CharacterBody2D"]
+[node name="Player" type="CharacterBody2D" unique_id=1595004106]
 script = ExtResource("1_player_script")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=563864023]
 shape = SubResource("CircleShape2D_1")
 
-[node name="Sprite" type="ColorRect" parent="."]
-offset_left = -16.0
-offset_top = -16.0
-offset_right = 16.0
-offset_bottom = 16.0
-color = Color(0.85, 0.2, 0.2, 1)
+[node name="Sprite" type="Node2D" parent="." unique_id=1884280128]
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Body" type="Sprite2D" parent="Sprite" unique_id=1782631494]
+modulate = Color(0.7038078, 0.7038079, 0.70380765, 1)
+position = Vector2(0, 3)
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("5_body_idle")
+
+[node name="Head" type="Sprite2D" parent="Sprite/Body" unique_id=1062242764]
+position = Vector2(0, 6)
+scale = Vector2(0.99999994, 0.99999994)
+texture = ExtResource("8_head")
+
+[node name="Face" type="Sprite2D" parent="Sprite/Body/Head" unique_id=130556607]
+scale = Vector2(0.99999994, 0.99999994)
+texture = ExtResource("9_face")
+
+[node name="Oreol" type="Sprite2D" parent="Sprite/Body/Head" unique_id=1132845337]
+scale = Vector2(1.0000001, 1.0000001)
+texture = ExtResource("4_oreol")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1091508352]
+libraries/ = SubResource("AnimationLibrary_body")
+autoplay = &"idle"
+
+[node name="HaloAnimationPlayer" type="AnimationPlayer" parent="." unique_id=1452028696]
+libraries/ = SubResource("AnimationLibrary_halo")
+autoplay = &"halo_float"
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1840951259]
 position_smoothing_enabled = true
 
-[node name="Hurtbox" type="Area2D" parent="."]
+[node name="Hurtbox" type="Area2D" parent="." unique_id=952955520]
 collision_layer = 4
 collision_mask = 0
 script = ExtResource("2_hurtbox")
 
-[node name="HurtboxShape" type="CollisionShape2D" parent="Hurtbox"]
+[node name="HurtboxShape" type="CollisionShape2D" parent="Hurtbox" unique_id=1790048884]
 shape = SubResource("CircleShape2D_1")
 
-[node name="AttackHitbox" type="Area2D" parent="."]
+[node name="AttackHitbox" type="Area2D" parent="." unique_id=1906529252]
 collision_layer = 0
 collision_mask = 8
 monitoring = false
 script = ExtResource("3_hitbox")
 
-[node name="AttackHitboxShape" type="CollisionPolygon2D" parent="AttackHitbox"]
+[node name="AttackHitboxShape" type="CollisionPolygon2D" parent="AttackHitbox" unique_id=618112662]
 polygon = PackedVector2Array(0, 0, 16.07, -38.8, 34.92, -23.33, 42, 0, 34.92, 23.33, 16.07, 38.8)
 
-[node name="DebugVisual" type="Polygon2D" parent="AttackHitbox"]
-polygon = PackedVector2Array(0, 0, 16.07, -38.8, 34.92, -23.33, 42, 0, 34.92, 23.33, 16.07, 38.8)
-color = Color(1, 1, 0, 0.4)
+[node name="DebugVisual" type="Polygon2D" parent="AttackHitbox" unique_id=735610771]
 visible = false
+color = Color(1, 1, 0, 0.4)
+polygon = PackedVector2Array(0, 0, 16.07, -38.8, 34.92, -23.33, 42, 0, 34.92, 23.33, 16.07, 38.8)
 
 [node name="ChannelBar" type="ProgressBar" parent="."]
 visible = false

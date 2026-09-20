@@ -26,6 +26,7 @@ signal villager_spawned(villager_id: int, position: Vector2, villager_name: Stri
 signal villager_removed(villager_id: int)
 signal plot_placed(plot_id: int, position: Vector2)
 signal item_changed(item_id: String, count: int)
+signal crop_stored_changed(count: int)
 signal equipment_changed(slot: EquipmentData.EquipSlot, item_id: String)
 
 ## TEMP: grants enough materials to test grid placement without looting
@@ -47,6 +48,7 @@ const STARTING_VILLAGER_POSITIONS: Array[Vector2] = [
 	Vector2(400, 300), Vector2(480, 300), Vector2(560, 300),
 ]
 
+var crop_stored: int = 0
 var _inventory: Dictionary = {} # item_id -> count
 var _item_defs: Dictionary = {} # item_id -> ItemData
 var _equipped: Dictionary = {} # EquipmentData.EquipSlot -> item_id
@@ -191,3 +193,22 @@ func equip_item(item_id: String) -> void:
 func get_equipped(slot: EquipmentData.EquipSlot) -> ItemData:
 	var id: String = _equipped.get(slot, "")
 	return get_item_data(id) if id != "" else null
+
+
+## Moves crop from carried inventory into chest storage.
+func deposit_crop(amount: int = 1) -> bool:
+	if not remove_item("crop", amount):
+		return false
+	crop_stored += amount
+	crop_stored_changed.emit(crop_stored)
+	return true
+
+
+## Moves crop from chest storage back into carried inventory.
+func withdraw_crop(amount: int = 1) -> bool:
+	if crop_stored < amount:
+		return false
+	crop_stored -= amount
+	add_item("crop", amount)
+	crop_stored_changed.emit(crop_stored)
+	return true
