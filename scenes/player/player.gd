@@ -33,6 +33,12 @@ signal melee_swung(center: Vector2, radius: float)
 signal teleport_channel_started
 signal teleport_channel_cancelled
 signal teleport_channel_completed
+## Ammo HUD hooks (#66) — max_ammo 0 means the equipped weapon has no
+## magazine (melee, or a RANGED weapon with unlimited ammo like the bow),
+## which the HUD reads as "hide the ammo counter".
+signal ammo_changed(current: int, max_ammo: int)
+signal reload_started
+signal reload_ended
 ## AttackHitboxShape's authored (unscaled) reach, in px.
 const MELEE_SHAPE_REACH: float = 42.0
 ## Distance from the player to the center of the melee arc, and its
@@ -88,6 +94,7 @@ func _on_equipment_changed(slot: EquipmentData.EquipSlot, _item_id: String) -> v
 		_held_item.visible = equipped_weapon != null
 		_current_ammo = equipped_weapon.magazine_size if equipped_weapon and equipped_weapon.magazine_size > 0 else -1
 		_is_reloading = false
+		ammo_changed.emit(max(_current_ammo, 0), equipped_weapon.magazine_size if equipped_weapon else 0)
 	else:
 		_recompute_armor_reduction()
 
@@ -122,6 +129,8 @@ func _physics_process(delta: float) -> void:
 		if _reload_timer <= 0.0:
 			_current_ammo = equipped_weapon.magazine_size
 			_is_reloading = false
+			reload_ended.emit()
+			ammo_changed.emit(_current_ammo, equipped_weapon.magazine_size)
 
 	if _is_channeling:
 		_process_teleport_channel(delta)
@@ -209,6 +218,7 @@ func _start_attack() -> void:
 		_fire_projectile()
 		if is_gun:
 			_current_ammo -= 1
+			ammo_changed.emit(_current_ammo, equipped_weapon.magazine_size)
 			if _current_ammo <= 0:
 				_start_reload()
 	else:
@@ -233,6 +243,7 @@ func _can_reload() -> bool:
 func _start_reload() -> void:
 	_is_reloading = true
 	_reload_timer = equipped_weapon.reload_time
+	reload_started.emit()
 
 
 func _swing_melee() -> void:
