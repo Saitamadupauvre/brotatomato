@@ -5,6 +5,7 @@
 [ext_resource type="Script" path="res://scripts/components/behaviors/interact_prompt_behavior.gd" id="3_prompt"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/breeding_behavior.gd" id="4_breeding"]
 [ext_resource type="Shader" path="res://assets/shaders/teleport_glow.gdshader" id="5_glow_shader"]
+[ext_resource type="Texture2D" path="res://assets/sprites/props/breeding_house.png" id="6_sprite"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_breeding"]
 size = Vector2(64, 64)
@@ -19,12 +20,10 @@ shader_parameter/pulse_speed = 2.0
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_breeding")
 
-[node name="Sprite" type="ColorRect" parent="."]
-offset_left = -32.0
-offset_top = -32.0
-offset_right = 32.0
-offset_bottom = 32.0
-color = Color(0.75, 0.35, 0.2, 1)
+[node name="Sprite" type="Sprite2D" parent="."]
+position = Vector2(0, -16)
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("6_sprite")
 
 [node name="GlowRect" type="ColorRect" parent="."]
 visible = false

@@ -42,6 +42,7 @@ signal equipment_changed(slot: EquipmentData.EquipSlot, item_id: String)
 signal active_weapon_changed(slot: EquipmentData.EquipSlot)
 signal breeding_started
 signal card_equipped_changed(slot: int, item_id: String)
+signal breeding_house_created(position: Vector2)
 
 ## TEMP: grants enough materials to test grid placement without looting
 ## the Container first. Remove/tune before ship.
@@ -106,9 +107,18 @@ const VILLAGER_NAMES: Array[String] = [
 const BREEDING_COST: int = 2
 const BREEDING_INTERVAL: float = 20.0
 
+## Breeding House creation (#87): gold, not materials — decided after
+## team discussion that crafting-material cost is out of scope for this
+## pass. GDD doesn't fix a value — TEMP-tuned like BREEDING_COST.
+const BREEDING_HOUSE_GOLD_COST: int = 50
+
 var breeding_active: bool = false
 var breeding_timer: float = 0.0
 var breeding_house_position: Vector2 = Vector2.ZERO
+## Whether the player has spent gold to place the Breeding House yet (#87)
+## — it no longer exists in Camp until this is true, unlike the always
+## -present Shop/Chest.
+var breeding_house_placed: bool = false
 
 
 func _ready() -> void:
@@ -212,6 +222,24 @@ func spawn_villager(at_position: Vector2) -> void:
 	villager_spawned.emit(villager_id, at_position, villager_name)
 	tomatoes += 1
 	tomato_changed.emit(tomatoes)
+
+
+func can_create_breeding_house() -> bool:
+	return not breeding_house_placed and get_item_count("gold") >= BREEDING_HOUSE_GOLD_COST
+
+
+## Placement flow mirrors add_plot()'s data-first pattern (Main just
+## reacts to the signal), but this is a one-shot singleton, not a
+## dictionary of many — see breeding_house_placed.
+func create_breeding_house(position: Vector2) -> bool:
+	if not can_create_breeding_house():
+		return false
+	if not remove_item("gold", BREEDING_HOUSE_GOLD_COST):
+		return false
+	breeding_house_placed = true
+	breeding_house_position = position
+	breeding_house_created.emit(position)
+	return true
 
 
 func can_start_breeding() -> bool:
