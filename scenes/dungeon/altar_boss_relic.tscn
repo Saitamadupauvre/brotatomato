@@ -7,13 +7,7 @@
 [node name="AltarBossRelic" instance=ExtResource("1_base")]
 
 [node name="Sprite" parent="."]
-color = Color(0.2, 0.2, 0.28, 1)
-
-[node name="PillarLeft" parent="."]
-color = Color(0.55, 0.1, 0.1, 1)
-
-[node name="PillarRight" parent="."]
-color = Color(0.55, 0.1, 0.1, 1)
+modulate = Color(0.2, 0.2, 0.28, 1)
 
 [node name="AltarBehavior" parent="Interactable/Host"]
 wave_zone = ExtResource("2_wave")
