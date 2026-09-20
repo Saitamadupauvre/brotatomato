@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cchest0000001"]
 
-[ext_resource type="Script" path="res://scripts/entities/chest.gd" id="1_chest"]
+[ext_resource type="Script" path="res://scripts/entities/storage_chest.gd" id="1_chest"]
 [ext_resource type="PackedScene" path="res://scenes/components/interactable.tscn" id="2_interactable"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/outline_behavior.gd" id="3_outline"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/interact_prompt_behavior.gd" id="4_prompt"]

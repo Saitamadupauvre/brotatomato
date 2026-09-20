@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://ccropchest001"]
+
+[ext_resource type="PackedScene" path="res://scenes/components/chest.tscn" id="1_base"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/container_behavior.gd" id="2_container"]
+[ext_resource type="Script" path="res://scripts/data/loot_entry.gd" id="3_loot_entry"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/opened_state_behavior.gd" id="4_opened"]
+
+[sub_resource type="Resource" id="LootEntry_crop_1"]
+script = ExtResource("3_loot_entry")
+item_id = "crop"
+amount = 1
+
+[sub_resource type="Resource" id="LootEntry_crop_2"]
+script = ExtResource("3_loot_entry")
+item_id = "crop"
+amount = 1
+
+[sub_resource type="Resource" id="LootEntry_crop_3"]
+script = ExtResource("3_loot_entry")
+item_id = "crop"
+amount = 1
+
+[node name="CropChest" instance=ExtResource("1_base")]
+
+[node name="Sprite" parent="." index="1"]
+color = Color(0.8, 0.15, 0.15, 1)
+
+[node name="ContainerBehavior" type="Node" parent="Interactable/Host" index="2"]
+script = ExtResource("2_container")
+contents = Array[LootEntry]([SubResource("LootEntry_crop_1"), SubResource("LootEntry_crop_2"), SubResource("LootEntry_crop_3")])
+
+[node name="OpenedStateBehavior" type="Node" parent="Interactable/Host" index="3"]
+script = ExtResource("4_opened")
+sprite_path = NodePath("Sprite")

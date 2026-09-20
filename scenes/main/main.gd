@@ -16,13 +16,14 @@ func _ready() -> void:
 	for plot_id in GameState.plots:
 		_spawn_plot(plot_id, GameState.plots[plot_id])
 	for villager_entry in GameState.villagers:
-		_on_villager_spawned(villager_entry["id"], villager_entry["position"])
+		_on_villager_spawned(villager_entry["id"], villager_entry["position"], villager_entry["name"])
 
 
-func _on_villager_spawned(villager_id: int, position: Vector2) -> void:
-	var villager: Node2D = VILLAGER_SCENE.instantiate()
+func _on_villager_spawned(villager_id: int, position: Vector2, villager_name: String) -> void:
+	var villager: Villager = VILLAGER_SCENE.instantiate()
 	add_child(villager)
 	villager.global_position = position
+	villager.set_villager_name(villager_name)
 	_villager_nodes[villager_id] = villager
 
 

@@ -47,7 +47,7 @@ func on_event(event_name: String, _payload: Dictionary = {}) -> void:
 		return
 	match _state:
 		PlotState.EMPTY:
-			if GameState.plant_tomato():
+			if GameState.plant_crop():
 				_state = PlotState.SEEDED
 				_update_visuals()
 		PlotState.SEEDED:
