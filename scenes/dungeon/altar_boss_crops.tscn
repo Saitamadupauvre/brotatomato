@@ -20,3 +20,4 @@ wave_zone = ExtResource("2_wave")
 wave_size = 1
 loot_table = ExtResource("3_loot_table")
 is_boss = true
+grants_key = true

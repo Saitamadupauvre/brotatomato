@@ -20,6 +20,13 @@ enum AltarState { IDLE, ACTIVE, CLEARED }
 ## Swaps the status label wording so a boss fight reads as higher stakes
 ## than a regular wave — purely cosmetic, no behavior difference.
 @export var is_boss: bool = false
+## Boss altars grant one "key" on clear — the currency that unlocks the
+## final-boss altar (see required_key_count below).
+@export var grants_key: bool = false
+## >0 gates this altar: interacting requires GameState to hold at least
+## this many "key" items, which are spent (not just checked) before the
+## wave starts. Used by the final-boss altar only.
+@export var required_key_count: int = 0
 
 signal wave_started(count: int)
 signal wave_progress(remaining: int)
@@ -43,8 +50,27 @@ func _setup(p_owner: Node2D, p_host: BehaviorHost) -> void:
 
 
 func on_event(event_name: String, _payload: Dictionary = {}) -> void:
-	if event_name == "interacted" and _state == AltarState.IDLE:
-		_start_wave()
+	if event_name != "interacted" or _state != AltarState.IDLE:
+		return
+	if required_key_count > 0 and GameState.get_item_count("key") < required_key_count:
+		_show_insufficient_keys()
+		return
+	if required_key_count > 0:
+		GameState.remove_item("key", required_key_count)
+	_start_wave()
+
+
+func _show_insufficient_keys() -> void:
+	if _status_label == null:
+		return
+	_status_label.visible = true
+	_status_label.text = "Need %d keys (have %d)" % [required_key_count, GameState.get_item_count("key")]
+	owner_entity.get_tree().create_timer(1.5).timeout.connect(_hide_insufficient_keys)
+
+
+func _hide_insufficient_keys() -> void:
+	if _state == AltarState.IDLE:
+		_status_label.visible = false
 
 
 func _start_wave() -> void:
@@ -80,6 +106,8 @@ func _on_wave_cleared() -> void:
 	_state = AltarState.CLEARED
 	var contents: Array[LootEntry] = loot_table.roll(_rng) if loot_table != null else []
 	LootSpawner.spawn(contents, owner_entity)
+	if grants_key:
+		GameState.add_item("key", 1)
 	_update_visuals()
 	wave_cleared.emit()
 	host.broadcast("contents_emptied")
