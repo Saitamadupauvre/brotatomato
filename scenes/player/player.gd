@@ -16,6 +16,10 @@ extends CharacterBody2D
 ## Tip-to-player distance of the melee hitbox, in px. AttackHitboxShape's
 ## polygon is authored with a 42px reach; this scales it uniformly.
 @export var melee_range: float = 58.0
+## Brief window after taking a hit where further damage is ignored —
+## without it, overlapping hitboxes (or one that lingers across physics
+## frames) can strip several lives from a single hit.
+@export var invincibility_duration: float = 0.4
 
 ## Emitted at the start of a melee swing with the world-space center and
 ## rough radius of the hitbox, for things that react to a swing without
@@ -38,6 +42,7 @@ var _dash_direction: Vector2 = Vector2.ZERO
 var _last_move_direction: Vector2 = Vector2.DOWN
 var _attack_cooldown_timer: float = 0.0
 var _is_attacking: bool = false
+var _invincible_timer: float = 0.0
 
 var equipped_weapon: WeaponData = null
 var _armor_reduction: int = 0
@@ -72,7 +77,10 @@ func _recompute_armor_reduction() -> void:
 
 
 func _on_damage_taken(amount: int) -> void:
+	if _invincible_timer > 0.0:
+		return
 	GameState.lose_tomato(max(amount - _armor_reduction, 0))
+	_invincible_timer = invincibility_duration
 
 
 func _physics_process(delta: float) -> void:
@@ -80,6 +88,8 @@ func _physics_process(delta: float) -> void:
 		_dash_cooldown_timer -= delta
 	if _attack_cooldown_timer > 0.0:
 		_attack_cooldown_timer -= delta
+	if _invincible_timer > 0.0:
+		_invincible_timer -= delta
 
 	if _is_dashing:
 		_process_dash(delta)
