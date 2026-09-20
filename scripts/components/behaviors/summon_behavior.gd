@@ -10,16 +10,45 @@ extends EnemyBehavior
 @export var summon_count: int = 2
 @export var max_minions: int = 4
 @export var spawn_radius: float = 60.0
+## Fires an immediate wave as soon as this behavior is set up, instead of
+## waiting for the first cooldown tick + aggro (which is instant anyway,
+## but this also doesn't require aggro).
+@export var summon_on_start: bool = false
+## >0: fires one bonus wave the first time HP drops to this fraction of
+## max (e.g. 0.5 = half health), on top of the normal periodic summons —
+## a "phase 2" beat. <=0 disables.
+@export var summon_at_health_fraction: float = 0.0
 
 var _cooldown_timer: float = 0.0
 var _minions: Array[Node] = []
 var _rng := RandomNumberGenerator.new()
+var _health_wave_triggered: bool = false
 
 
 func _setup(p_owner: Node2D, p_host: BehaviorHost) -> void:
 	super(p_owner, p_host)
 	_rng.randomize()
 	enemy.tree_exiting.connect(_despawn_minions)
+	# Host._setup runs before Enemy._ready() assigns its @onready `health`
+	# (children ready before parent) — enemy.health is still null here.
+	# Defer so this runs after the whole subtree, including Enemy itself,
+	# has finished _ready().
+	_connect_health.call_deferred()
+	if summon_on_start:
+		_summon.call_deferred()
+
+
+func _connect_health() -> void:
+	if summon_at_health_fraction > 0.0:
+		enemy.health.health_changed.connect(_on_health_changed)
+
+
+func _on_health_changed(current: int, max_hp: int) -> void:
+	if _health_wave_triggered or max_hp <= 0:
+		return
+	if float(current) / float(max_hp) <= summon_at_health_fraction:
+		_health_wave_triggered = true
+		_summon.call_deferred()
 
 
 func on_event(event_name: String, payload: Dictionary = {}) -> void:
