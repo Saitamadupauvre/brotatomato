@@ -84,7 +84,6 @@ func _check_placement_tutorial_proximity() -> void:
 		TutorialManager.trigger("plot_placement", PLOT_PLACEMENT_DIALOGUE)
 
 
-func _try_start_placing() -> void:
 ## Public: also called by the Shop's Plot card, not just the place_plot key.
 func start_placing() -> void:
 	if GameState.get_item_count("gold") < GOLD_COST:
