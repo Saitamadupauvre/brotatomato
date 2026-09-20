@@ -75,14 +75,17 @@ func on_event(event_name: String, _payload: Dictionary = {}) -> void:
 	match _state:
 		PlotState.EMPTY:
 			if GameState.plant_crop():
+				AudioManager.play(&"plant_seed")
 				_state = PlotState.SEEDED
 				_update_visuals()
 		PlotState.SEEDED:
 			if GameState.remove_item("water", 1):
+				AudioManager.play(&"water_plot")
 				_state = PlotState.GROWING
 				_grow_timer = grow_time / GameState.get_passive_multiplier(CardData.Passive.PLOT_GROWTH_SPEED)
 				_update_visuals()
 		PlotState.RIPE:
+			AudioManager.play(&"harvest")
 			GameState.spawn_villager(owner_entity.global_position)
 			GameState.add_item("crop", 1)
 			_state = PlotState.EMPTY

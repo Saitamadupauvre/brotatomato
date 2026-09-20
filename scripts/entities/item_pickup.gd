@@ -44,5 +44,6 @@ func _start_floating() -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
+		AudioManager.play(&"harvest")
 		GameState.add_item(item_id, amount)
 		queue_free()

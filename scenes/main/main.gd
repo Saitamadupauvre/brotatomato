@@ -32,6 +32,7 @@ var _villager_nodes: Dictionary = {} # villager_id -> Node2D
 
 
 func _ready() -> void:
+	AudioManager.play_music(&"camp")
 	var layout := CampLayoutBuilder.build(INTERIOR_COLS, INTERIOR_ROWS, FOREST_DEPTH, CELL_SIZE, ENTRANCE_GAP_CELLS)
 	ForestSceneKit.build_ground(_ground, layout)
 	ForestSceneKit.build_shade(_shade, layout, SHADE_FALLOFF_CELLS)
