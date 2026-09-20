@@ -32,6 +32,7 @@ var layout: DungeonLayout
 @onready var _grass: GrassField = $Grass
 @onready var _shade: ColorRect = $Shade
 @onready var _wave_bar: Control = $UI/WaveBar
+@onready var _popup: PopupModal = $UI/Popup
 ## How many floor cells the forest shadow reaches before full brightness.
 @export var shade_falloff_cells: int = 8
 
@@ -51,6 +52,15 @@ func _ready() -> void:
 	_place_exit()
 	_place_altar()
 	_populate()
+	GameState.life_lost.connect(_on_life_lost)
+
+
+## Names the villager just lost (#37) — doesn't gate the 0-tomatoes
+## auto-route in SceneRouter, which listens to player_died independently.
+func _on_life_lost(_remaining: int, villager_names: Array[String]) -> void:
+	if villager_names.is_empty():
+		return
+	_popup.show_message("%s died" % ", ".join(villager_names))
 
 
 func _build_ground() -> void:
