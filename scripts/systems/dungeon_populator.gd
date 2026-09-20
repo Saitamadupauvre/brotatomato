@@ -32,9 +32,11 @@ static func build(layout: DungeonLayout, config: DungeonConfig) -> Array[Spawn]:
 				result.append(_spawn(scene, layout, cells[i], zone))
 			i += 1
 		for n in container_count:
-			if i >= cells.size() or config.container_scene == null:
+			if i >= cells.size():
 				break
-			result.append(_spawn(config.container_scene, layout, cells[i], zone))
+			var scene := config.pick_container(rng)
+			if scene:
+				result.append(_spawn(scene, layout, cells[i], zone))
 			i += 1
 	return result
 

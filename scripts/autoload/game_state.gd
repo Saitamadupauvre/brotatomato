@@ -22,21 +22,30 @@ const ITEM_DEFS: Array[ItemData] = [
 signal tomato_changed(count: int)
 signal life_lost(remaining: int)
 signal player_died
-signal villager_spawned(villager_id: int, position: Vector2)
+signal villager_spawned(villager_id: int, position: Vector2, villager_name: String)
 signal villager_removed(villager_id: int)
 signal plot_placed(plot_id: int, position: Vector2)
 signal item_changed(item_id: String, count: int)
-signal crop_stored_changed(count: int)
 signal equipment_changed(slot: EquipmentData.EquipSlot, item_id: String)
 
-const STARTING_TOMATOES: int = 3
 ## TEMP: grants enough materials to test grid placement without looting
 ## the Container first. Remove/tune before ship.
 const STARTING_MATERIALS: int = 30
+## TEMP: enough carried crop to seed the starting plots before the first
+## harvest comes in. Remove/tune before ship.
+const STARTING_CROP: int = 4
 
-## Carried tomatoes = lives. Not an inventory item — has its own
-## death-trigger semantics, see lose_tomato().
-var tomatoes: int = STARTING_TOMATOES
+## Carried tomatoes = lives = villagers.size(), always — see #36. Never
+## set directly; only spawn_villager()/lose_tomato() change it, keeping it
+## in lockstep with the villager roster. Not an inventory item.
+var tomatoes: int = 0
+
+const STARTING_VILLAGERS: int = 3
+## Camp-space spawn points for the starting villager roster, one per
+## STARTING_VILLAGERS entry — arbitrary but inside Camp's walls.
+const STARTING_VILLAGER_POSITIONS: Array[Vector2] = [
+	Vector2(400, 300), Vector2(480, 300), Vector2(560, 300),
+]
 
 var _inventory: Dictionary = {} # item_id -> count
 var _item_defs: Dictionary = {} # item_id -> ItemData
@@ -51,21 +60,35 @@ var plots: Dictionary = {} # plot_id -> Vector2
 var _next_plot_id: int = 0
 
 ## Villager entries spawned from unharvested ripe tomatoes.
-## MVP: visual only, no role. { "id": int, "position": Vector2 }
+## MVP: visual only, no role. { "id": int, "position": Vector2, "name": String }
 var villagers: Array[Dictionary] = []
 
 var _next_villager_id: int = 0
 
-## Crop chest storage — separate from the carried "crop" inventory count,
-## survives scene changes because it lives here rather than on the chest
-## node itself (which is freed on scene transition).
-var crop_stored: int = 0
+## Name pool for spawned villagers (#36) — flavor/identity only, no
+## mechanical effect. Picked at random on spawn, not guaranteed unique.
+const VILLAGER_NAMES: Array[String] = [
+	"Basil", "Rosemary", "Sage", "Clove", "Pepper", "Saffron", "Ginger",
+	"Marjoram", "Thyme", "Chive", "Fennel", "Cumin", "Paprika", "Dill",
+	"Mustard", "Nutmeg", "Cinnamon", "Anise", "Coriander", "Tarragon",
+]
 
 
 func _ready() -> void:
 	for item_data in ITEM_DEFS:
 		_item_defs[item_data.id] = item_data
 	add_item("materials", STARTING_MATERIALS)
+	add_item("crop", STARTING_CROP)
+	_spawn_starting_villagers()
+
+
+## Villagers ARE the tomato/life count (#36) — spawning the starting
+## roster is what gives the player their starting lives, rather than
+## setting `tomatoes` directly and risking it drift out of sync with
+## villagers.size().
+func _spawn_starting_villagers() -> void:
+	for i in STARTING_VILLAGERS:
+		spawn_villager(STARTING_VILLAGER_POSITIONS[i % STARTING_VILLAGER_POSITIONS.size()])
 
 
 func get_item_data(item_id: String) -> ItemData:
@@ -117,21 +140,18 @@ func lose_tomato(amount: int = 1) -> void:
 func spawn_villager(at_position: Vector2) -> void:
 	var villager_id := _next_villager_id
 	_next_villager_id += 1
-	villagers.append({"id": villager_id, "position": at_position})
-	villager_spawned.emit(villager_id, at_position)
+	var villager_name: String = VILLAGER_NAMES[randi() % VILLAGER_NAMES.size()]
+	villagers.append({"id": villager_id, "position": at_position, "name": villager_name})
+	villager_spawned.emit(villager_id, at_position, villager_name)
 	tomatoes += 1
 	tomato_changed.emit(tomatoes)
 
 
-## Spends one tomato to plant a seed. Blocks at the last tomato — never
-## reaches 0 through planting, deliberately separate from lose_tomato's
-## death-trigger path (planting in camp isn't a death condition).
-func plant_tomato() -> bool:
-	if tomatoes <= 1:
-		return false
-	tomatoes -= 1
-	tomato_changed.emit(tomatoes)
-	return true
+## Spends one carried crop to plant a seed — never tomatoes (#36):
+## tomatoes are lives, always == villagers.size(), and planting isn't a
+## death condition.
+func plant_crop() -> bool:
+	return remove_item("crop", 1)
 
 
 func add_plot(position: Vector2) -> int:
@@ -147,9 +167,13 @@ func move_plot(plot_id: int, position: Vector2) -> void:
 	plots[plot_id] = position
 
 
+## Death already popped villagers down to 0 in lockstep with tomatoes
+## (see lose_tomato) — respawning the starting roster restores both at
+## once, rather than resetting `tomatoes` on its own (see #36).
 func reset_run() -> void:
-	tomatoes = STARTING_TOMATOES
-	tomato_changed.emit(tomatoes)
+	villagers.clear()
+	tomatoes = 0
+	_spawn_starting_villagers()
 
 
 ## Equipping doesn't remove the item from the counted inventory — no
@@ -165,22 +189,3 @@ func equip_item(item_id: String) -> void:
 func get_equipped(slot: EquipmentData.EquipSlot) -> ItemData:
 	var id: String = _equipped.get(slot, "")
 	return get_item_data(id) if id != "" else null
-
-
-## Moves crop from carried inventory into chest storage.
-func deposit_crop(amount: int = 1) -> bool:
-	if not remove_item("crop", amount):
-		return false
-	crop_stored += amount
-	crop_stored_changed.emit(crop_stored)
-	return true
-
-
-## Moves crop from chest storage back into carried inventory.
-func withdraw_crop(amount: int = 1) -> bool:
-	if crop_stored < amount:
-		return false
-	crop_stored -= amount
-	add_item("crop", amount)
-	crop_stored_changed.emit(crop_stored)
-	return true

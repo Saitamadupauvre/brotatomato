@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://cchestbase001"]
+
+[ext_resource type="PackedScene" path="res://scenes/components/interactable.tscn" id="1_interactable"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/outline_behavior.gd" id="2_outline"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/interact_prompt_behavior.gd" id="3_prompt"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_chest"]
+size = Vector2(64, 64)
+
+[node name="Chest" type="StaticBody2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_chest")
+
+[node name="Sprite" type="ColorRect" parent="."]
+offset_left = -32.0
+offset_top = -32.0
+offset_right = 32.0
+offset_bottom = 32.0
+color = Color(0.55, 0.35, 0.2, 1)
+
+[node name="Interactable" parent="." instance=ExtResource("1_interactable")]
+
+[node name="Host" parent="Interactable" index="1"]
+owner_entity_path = NodePath("../..")
+
+[node name="OutlineBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("2_outline")
+sprite_path = NodePath("Sprite")
+
+[node name="PromptBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("3_prompt")
+label_text = "Chest"
