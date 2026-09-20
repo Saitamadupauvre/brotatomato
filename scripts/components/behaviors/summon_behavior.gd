@@ -59,10 +59,20 @@ func on_event(event_name: String, payload: Dictionary = {}) -> void:
 		return
 	if not _is_player_aggro():
 		return
-	_minions = _minions.filter(func(m: Node) -> bool: return is_instance_valid(m))
+	_prune_minions()
 	if _minions.size() >= max_minions:
 		return
 	_summon()
+
+
+## Array.filter() returns an untyped Array, which can't assign back into
+## an Array[Node] var — build the pruned list by hand instead.
+func _prune_minions() -> void:
+	var alive: Array[Node] = []
+	for m in _minions:
+		if is_instance_valid(m):
+			alive.append(m)
+	_minions = alive
 
 
 func _summon() -> void:
