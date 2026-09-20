@@ -3,7 +3,9 @@ extends Resource
 ## Tunables for procedural forest generation. Edited in the inspector,
 ## consumed by DungeonGenerator. Grid = logic cells; visuals scatter on top.
 
-## Logic grid size in cells.
+## Logic grid size in cells. Needs room for 5 altar placements (3 boss +
+## 1 regular + 1 final boss) spaced altar_min_separation apart, plus the
+## usual zone population.
 @export var grid_width: int = 120
 @export var grid_height: int = 120
 ## World-space size of one cell in pixels.
@@ -37,16 +39,42 @@ extends Resource
 @export var container_weights: Array[float] = []
 
 @export_group("Altar")
-## One fixed-placement altar per dungeon, scene picked at random from this
-## pool (each entry its own reward type/loot table) — not zone/density
-## driven, since exactly one unique object is placed, not scattered copies.
-@export var altar_scenes: Array[PackedScene] = []
-## Floor cells cleared around the altar (bigger than spawn's, so the
+## Exactly 3 boss altars, always placed, one per dungeon each (see #27) —
+## each grants a key on clear. Not zone/density driven: 4 unique objects
+## are placed (these 3 plus final_boss_altar_scene), not scattered copies.
+@export var boss_altar_scenes: Array[PackedScene] = []
+## Locked altar placed at the cell farthest from spawn; requires all 3 keys
+## from boss_altar_scenes to open.
+@export var final_boss_altar_scene: PackedScene
+## Regular (#5) altar — a normal wave, no key, picked at random from this
+## pool same as before boss altars existed. Still guaranteed to spawn
+## (one placement, scene picked randomly), just not a boss fight.
+@export var regular_altar_scenes: Array[PackedScene] = []
+## Parallel to regular_altar_scenes. Missing entries count as 1.0.
+@export var regular_altar_weights: Array[float] = []
+## Floor cells cleared around each altar (bigger than spawn's, so each
 ## altar clearing reads as a distinct, recognizable zone from a distance).
 @export var altar_clear_radius: int = 8
 ## Band bounds as a fraction of DungeonLayout.max_distance, [min, max].
 @export_range(0.0, 1.0) var altar_min_distance_ratio: float = 0.4
 @export_range(0.0, 1.0) var altar_max_distance_ratio: float = 0.8
+## Minimum grid-cell distance kept between any two of the 5 altar
+## placements, so they read as separate landmarks rather than a cluster.
+@export var altar_min_separation: int = 20
+
+
+func pick_regular_altar(rng: RandomNumberGenerator) -> PackedScene:
+	if regular_altar_scenes.is_empty():
+		return null
+	var total := 0.0
+	for i in regular_altar_scenes.size():
+		total += regular_altar_weights[i] if i < regular_altar_weights.size() else 1.0
+	var roll := rng.randf() * total
+	for i in regular_altar_scenes.size():
+		roll -= regular_altar_weights[i] if i < regular_altar_weights.size() else 1.0
+		if roll <= 0.0:
+			return regular_altar_scenes[i]
+	return regular_altar_scenes[-1]
 
 
 func pick_container(rng: RandomNumberGenerator) -> PackedScene:

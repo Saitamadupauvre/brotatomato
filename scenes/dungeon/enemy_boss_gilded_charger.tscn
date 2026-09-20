@@ -1,0 +1,37 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/dungeon/enemy_base.tscn" id="1_base"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/chase_movement_behavior.gd" id="2_chase"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/dash_attack_behavior.gd" id="3_dash"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/summon_behavior.gd" id="4_summon"]
+[ext_resource type="Resource" path="res://resources/enemies/boss_gilded_charger.tres" id="5_data"]
+[ext_resource type="PackedScene" path="res://scenes/dungeon/enemy_boss_minion_dasher.tscn" id="6_minion"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_boss_body"]
+radius = 20.0
+
+[node name="EnemyBossGildedCharger" instance=ExtResource("1_base")]
+data = ExtResource("5_data")
+
+[node name="Sprite" parent="." index="0"]
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+color = Color(0.95, 0.75, 0.1, 1)
+
+[node name="CollisionShape2D" parent="." index="1"]
+shape = SubResource("CircleShape2D_boss_body")
+
+[node name="ChaseMovementBehavior" type="Node" parent="Host"]
+script = ExtResource("2_chase")
+
+[node name="DashAttackBehavior" type="Node" parent="Host"]
+script = ExtResource("3_dash")
+trigger_range = 280.0
+dash_speed = 480.0
+cooldown = 1.6
+
+[node name="SummonBehavior" type="Node" parent="Host"]
+script = ExtResource("4_summon")
+minion_scene = ExtResource("6_minion")

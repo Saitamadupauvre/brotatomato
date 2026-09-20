@@ -36,7 +36,7 @@ static func generate(config: DungeonConfig, seed: int) -> DungeonLayout:
 	_pick_spawn(layout, config, rng)
 	_compute_distances(layout)
 	_pick_exit(layout)
-	_pick_altar(layout, config, rng)
+	_pick_altars(layout, config, rng)
 	return layout
 
 
@@ -180,15 +180,19 @@ static func _pick_exit(layout: DungeonLayout) -> void:
 				return
 
 
-## Altar: a single fixed floor cell in a mid/far distance band (so it's
-## neither at the player's feet nor overlapping the exit), then a big
+## Altars: 5 guaranteed fixed floor cells in a mid/far distance band (so
+## none sits at the player's feet or overlaps the exit), each with a big
 ## clear disc around it — same carving technique as _pick_spawn, just
-## bigger, so the clearing itself is a visible landmark. Runs after
+## bigger, so each clearing is a visible landmark. Runs after
 ## distances/exit are computed; cells newly cleared here keep whatever
 ## distance value (possibly -1/unreached) they had before clearing, which
 ## is fine — it only means DungeonPopulator won't drop zone content
 ## inside the clearing, never that the clearing itself is invalid.
-static func _pick_altar(layout: DungeonLayout, config: DungeonConfig, rng: RandomNumberGenerator) -> void:
+## The farthest-from-spawn cell becomes the final boss's, so that fight
+## always reads as "the deepest room"; of the remaining 4 (shuffled),
+## 3 are the boss altars and 1 is the regular (#5) altar.
+static func _pick_altars(layout: DungeonLayout, config: DungeonConfig, rng: RandomNumberGenerator) -> void:
+	const ALTAR_COUNT := 5
 	var lo := int(config.altar_min_distance_ratio * layout.max_distance)
 	var hi := int(config.altar_max_distance_ratio * layout.max_distance)
 	var candidates: Array[Vector2i] = []
@@ -201,15 +205,58 @@ static func _pick_altar(layout: DungeonLayout, config: DungeonConfig, rng: Rando
 				continue
 			candidates.append(Vector2i(x, y))
 	if candidates.is_empty():
-		layout.altar_cell = layout.exit_cell
+		var fallback := layout.exit_cell
+		layout.boss_altar_cells = [fallback, fallback, fallback]
+		layout.regular_altar_cell = fallback
+		layout.final_boss_cell = fallback
+		_clear_altar_disc(layout, fallback, config.altar_clear_radius)
 		return
-	layout.altar_cell = candidates[rng.randi_range(0, candidates.size() - 1)]
 
-	var r := config.altar_clear_radius
-	for dy in range(-r, r + 1):
-		for dx in range(-r, r + 1):
-			if dx * dx + dy * dy > r * r:
+	candidates.shuffle()
+	var picked: Array[Vector2i] = []
+	for c in candidates:
+		if picked.size() >= ALTAR_COUNT:
+			break
+		var far_enough := true
+		for p in picked:
+			if Vector2(p).distance_to(Vector2(c)) < config.altar_min_separation:
+				far_enough = false
+				break
+		if far_enough:
+			picked.append(c)
+	# Small maps may not fit ALTAR_COUNT well-separated cells — fill the
+	# rest ignoring separation rather than leaving a placement unset.
+	var i := 0
+	while picked.size() < ALTAR_COUNT and i < candidates.size():
+		if not picked.has(candidates[i]):
+			picked.append(candidates[i])
+		i += 1
+
+	var final_index := 0
+	var final_distance := -1
+	for j in picked.size():
+		var d := layout.get_distance(picked[j].x, picked[j].y)
+		if d > final_distance:
+			final_distance = d
+			final_index = j
+
+	layout.final_boss_cell = picked[final_index]
+	var rest: Array[Vector2i] = []
+	for j in picked.size():
+		if j != final_index:
+			rest.append(picked[j])
+	layout.boss_altar_cells = rest.slice(0, 3)
+	layout.regular_altar_cell = rest[3] if rest.size() > 3 else layout.final_boss_cell
+
+	for cell in picked:
+		_clear_altar_disc(layout, cell, config.altar_clear_radius)
+
+
+static func _clear_altar_disc(layout: DungeonLayout, center: Vector2i, radius: int) -> void:
+	for dy in range(-radius, radius + 1):
+		for dx in range(-radius, radius + 1):
+			if dx * dx + dy * dy > radius * radius:
 				continue
-			var p := layout.altar_cell + Vector2i(dx, dy)
+			var p := center + Vector2i(dx, dy)
 			if layout.is_inside(p.x, p.y):
 				layout.set_cell(p.x, p.y, DungeonLayout.Cell.FLOOR)
