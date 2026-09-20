@@ -344,13 +344,13 @@ func _start_attack() -> void:
 
 	if equipped_weapon and equipped_weapon.attack_type == WeaponData.AttackType.RANGED:
 		_fire_projectile()
-	elif equipped_weapon and equipped_weapon.attack_type == WeaponData.AttackType.DASH:
-		_start_dash_attack()
 		if is_gun:
 			_current_ammo -= 1
 			ammo_changed.emit(_current_ammo, equipped_weapon.magazine_size)
 			if _current_ammo <= 0:
 				_start_reload()
+	elif equipped_weapon and equipped_weapon.attack_type == WeaponData.AttackType.DASH:
+		_start_dash_attack()
 	else:
 		_swing_melee()
 
