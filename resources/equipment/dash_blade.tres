@@ -1,16 +1,15 @@
-[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://cdh854jkiudp"]
 
-[ext_resource type="Script" path="res://scripts/data/weapon_data.gd" id="1_dash_blade"]
-[ext_resource type="Texture2D" path="res://icon.svg" id="2_icon"]
+[ext_resource type="Script" uid="uid://3i15tds7efwe" path="res://scripts/data/weapon_data.gd" id="1_dash_blade"]
+[ext_resource type="Texture2D" uid="uid://c14obkdskmk0e" path="res://assets/sprites/item/sword.png" id="2_icon"]
 
 [resource]
 script = ExtResource("1_dash_blade")
+attack_type = 2
+damage = 2
+attack_cooldown = 0.6
 id = "dash_blade"
 display_name = "Dash Blade"
 icon = ExtResource("2_icon")
 stackable = false
 max_stack = 1
-slot = 0
-attack_type = 2
-damage = 2
-attack_cooldown = 0.6

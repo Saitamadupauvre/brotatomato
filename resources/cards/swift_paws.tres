@@ -1,17 +1,15 @@
-[gd_resource type="Resource" script_class="CardData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://byt7opnac0nkl"]
 
-[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="1_card"]
-[ext_resource type="Texture2D" path="res://icon.svg" id="2_icon"]
+[ext_resource type="Script" uid="uid://gaoxcu8es06i" path="res://scripts/data/card_data.gd" id="1_card"]
+[ext_resource type="Texture2D" uid="uid://ddf7y6e6tbqsa" path="res://assets/sprites/item/card.png" id="2_icon"]
 
 [resource]
 script = ExtResource("1_card")
+passive = 3
+passive_value = 0.2
+active = 3
 id = "swift_paws"
 display_name = "Swift Paws"
 icon = ExtResource("2_icon")
 stackable = false
 max_stack = 1
-passive = 3
-passive_value = 0.2
-active = 3
-active_value = 0.0
-active_cooldown = 10.0
