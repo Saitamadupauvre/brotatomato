@@ -12,10 +12,21 @@ extends CharacterBody2D
 
 var _state_timer: float = 0.0
 var _is_moving: bool = false
+var villager_name: String = ""
+
+@onready var _name_label: Label = $NameLabel
 
 
 func _ready() -> void:
 	_enter_idle()
+	_name_label.text = villager_name
+
+
+## Identity label (#36) — cosmetic only, no mechanical effect.
+func set_villager_name(new_name: String) -> void:
+	villager_name = new_name
+	if is_inside_tree():
+		_name_label.text = villager_name
 
 
 func _physics_process(delta: float) -> void:
