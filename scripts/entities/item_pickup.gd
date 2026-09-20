@@ -5,13 +5,15 @@ extends Area2D
 ## item_id/amount are set by whatever spawns this (see ContainerBehavior),
 ## not authored in the inspector.
 
+const RENDER_SIZE: float = 26.0
+
 @export var float_amplitude: float = 3.0
 @export var float_speed: float = 4.0
 
 var item_id: String = ""
 var amount: int = 1
 
-@onready var _sprite: CanvasItem = $Sprite
+@onready var _sprite: Sprite2D = $Sprite
 
 var _floating: bool = false
 var _float_time: float = 0.0
@@ -20,6 +22,13 @@ var _float_base_y: float = 0.0
 
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
+	## item_id is set by the spawner (LootSpawner) before add_child, so it's
+	## already valid here — the sprite used to be hardcoded to coin.png
+	## regardless of what actually dropped (#pickup-icon-bug).
+	var data: ItemData = GameState.get_item_data(item_id)
+	if data:
+		_sprite.texture = data.icon
+		SpriteScale.fit(_sprite, RENDER_SIZE)
 
 
 func _process(delta: float) -> void:

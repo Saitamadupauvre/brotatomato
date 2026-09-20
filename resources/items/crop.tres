@@ -1,12 +1,10 @@
-[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://dx28p7savlj6k"]
 
-[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1_crop"]
-[ext_resource type="Texture2D" path="res://icon.svg" id="2_icon"]
+[ext_resource type="Script" uid="uid://c1eyjc84x05t2" path="res://scripts/data/item_data.gd" id="1_crop"]
+[ext_resource type="Texture2D" uid="uid://bntupyxs2y6a8" path="res://assets/sprites/item/tomato_seed.png" id="2_icon"]
 
 [resource]
 script = ExtResource("1_crop")
 id = "crop"
 display_name = "Tomato Crop"
 icon = ExtResource("2_icon")
-stackable = true
-max_stack = -1
