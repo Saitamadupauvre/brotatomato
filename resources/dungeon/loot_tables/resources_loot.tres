@@ -1,14 +1,7 @@
-[gd_resource type="Resource" script_class="LootTable" load_steps=11 format=3]
+[gd_resource type="Resource" script_class="LootTable" load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/data/loot_table.gd" id="1_table"]
 [ext_resource type="Script" path="res://scripts/data/loot_table_entry.gd" id="2_entry"]
-
-[sub_resource type="Resource" id="LootTableEntry_materials"]
-script = ExtResource("2_entry")
-item_id = "materials"
-min_amount = 2
-max_amount = 4
-weight = 10.0
 
 [sub_resource type="Resource" id="LootTableEntry_sword"]
 script = ExtResource("2_entry")
@@ -68,5 +61,5 @@ weight = 0.3
 
 [resource]
 script = ExtResource("1_table")
-entries = Array[LootTableEntry]([SubResource("LootTableEntry_materials"), SubResource("LootTableEntry_sword"), SubResource("LootTableEntry_bow"), SubResource("LootTableEntry_dash_blade"), SubResource("LootTableEntry_pistol"), SubResource("LootTableEntry_leather_helmet"), SubResource("LootTableEntry_leather_chestplate"), SubResource("LootTableEntry_leather_leggings"), SubResource("LootTableEntry_leather_boots")])
+entries = Array[LootTableEntry]([SubResource("LootTableEntry_sword"), SubResource("LootTableEntry_bow"), SubResource("LootTableEntry_dash_blade"), SubResource("LootTableEntry_pistol"), SubResource("LootTableEntry_leather_helmet"), SubResource("LootTableEntry_leather_chestplate"), SubResource("LootTableEntry_leather_leggings"), SubResource("LootTableEntry_leather_boots")])
 roll_count = 2

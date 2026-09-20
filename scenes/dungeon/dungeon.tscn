@@ -10,6 +10,8 @@
 [ext_resource type="Shader" uid="uid://bn348tfe688vn" path="res://assets/shaders/forest_shade.gdshader" id="8_shade_shader"]
 [ext_resource type="PackedScene" path="res://scenes/ui/wave_bar.tscn" id="9_wave_bar"]
 [ext_resource type="PackedScene" path="res://scenes/ui/popup.tscn" id="10_popup"]
+[ext_resource type="PackedScene" uid="uid://cs7u6iyl5d4nc" path="res://scenes/ui/dialogue_box.tscn" id="11_dialogue_box"]
+[ext_resource type="Resource" path="res://resources/dialogue/teleport_back.tres" id="12_teleport_dialogue"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_shade"]
 shader = ExtResource("8_shade_shader")
@@ -57,6 +59,10 @@ y_sort_enabled = true
 
 [node name="CampExit" parent="World" unique_id=1511090038 instance=ExtResource("5_transition")]
 
+[node name="TutorialTriggerBehavior" parent="World/CampExit/Interactable/Host" index="2"]
+tutorial_id = "camp_exit_point"
+dialogue = ExtResource("12_teleport_dialogue")
+
 [node name="Player" parent="World" unique_id=734373218 instance=ExtResource("3_player")]
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=452060986]
@@ -66,3 +72,5 @@ y_sort_enabled = true
 [node name="WaveBar" parent="UI" instance=ExtResource("9_wave_bar")]
 
 [node name="Popup" parent="UI" instance=ExtResource("10_popup")]
+
+[node name="DialogueBox" parent="UI" instance=ExtResource("11_dialogue_box")]

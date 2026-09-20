@@ -7,9 +7,7 @@
 [ext_resource type="PackedScene" path="res://scenes/entities/card_shop.tscn" id="19_card_shop"]
 [ext_resource type="PackedScene" path="res://scenes/ui/card_shop_menu.tscn" id="20_card_shop_menu"]
 [ext_resource type="PackedScene" path="res://scenes/ui/inventory_menu.tscn" id="7_inventory_menu"]
-[ext_resource type="PackedScene" path="res://scenes/entities/storage_chest.tscn" id="9_chest"]
 [ext_resource type="PackedScene" path="res://scenes/entities/breeding_house_placement_controller.tscn" id="18_breeding_house_placement"]
-[ext_resource type="PackedScene" path="res://scenes/ui/chest_menu.tscn" id="10_chest_menu"]
 [ext_resource type="Script" uid="uid://c80uoyn25pvrk" path="res://scenes/main/main.gd" id="8_main"]
 [ext_resource type="PackedScene" uid="uid://c4xjvfnydiyay" path="res://scenes/entities/scene_transition_point.tscn" id="11_transition"]
 [ext_resource type="PackedScene" uid="uid://osr6vkqm54ei" path="res://scenes/entities/plot_placement_controller.tscn" id="12_plot_placement"]
@@ -135,9 +133,6 @@ position = Vector2(524, 924)
 [node name="CardShop" parent="World" instance=ExtResource("19_card_shop")]
 position = Vector2(400, 800)
 
-[node name="Chest" parent="World" unique_id=1231121261 instance=ExtResource("9_chest")]
-position = Vector2(774, 1004)
-
 [node name="BreedingHousePlacement" parent="World" instance=ExtResource("18_breeding_house_placement")]
 
 [node name="Plots" type="Node2D" parent="World" unique_id=449040098]
@@ -164,7 +159,5 @@ destination = 1
 [node name="InventoryMenu" parent="UI" unique_id=1940431405 instance=ExtResource("7_inventory_menu")]
 
 [node name="DialogueBox" parent="UI" unique_id=2090921002 instance=ExtResource("13_dialogue_box")]
-
-[node name="ChestMenu" parent="UI" instance=ExtResource("10_chest_menu")]
 
 [node name="Popup" parent="UI" instance=ExtResource("14_popup")]

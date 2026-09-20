@@ -22,6 +22,7 @@ DisplayManager="*res://scripts/autoload/display_manager.gd"
 SceneRouter="*res://scripts/autoload/scene_router.gd"
 AudioManager="*res://scripts/autoload/audio_manager.gd"
 CombatFx="*res://scripts/autoload/combat_fx.gd"
+TutorialManager="*res://scripts/autoload/tutorial_manager.gd"
 
 [display]
 

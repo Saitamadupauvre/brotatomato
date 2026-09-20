@@ -11,6 +11,10 @@ extends Node2D
 const VILLAGER_SCENE: PackedScene = preload("res://scenes/entities/villager.tscn")
 const PLOT_SCENE: PackedScene = preload("res://scenes/entities/plot.tscn")
 const BREEDING_HOUSE_SCENE: PackedScene = preload("res://scenes/entities/breeding_house.tscn")
+## Camp-intro tutorial (#91) is the one dialogue not tied to an
+## Interactable's proximity — it's the very first thing a new run sees, so
+## Main triggers it directly instead of via TutorialTriggerBehavior.
+const CAMP_INTRO_DIALOGUE: DialogueData = preload("res://resources/dialogue/camp_intro.tres")
 
 const INTERIOR_COLS: int = 20
 const INTERIOR_ROWS: int = 13
@@ -53,6 +57,7 @@ func _ready() -> void:
 		_spawn_breeding_house(GameState.breeding_house_position)
 	for villager_entry in GameState.villagers:
 		_on_villager_spawned(villager_entry["id"], villager_entry["position"], villager_entry["name"])
+	TutorialManager.trigger("camp_intro", CAMP_INTRO_DIALOGUE)
 
 
 func _on_villager_spawned(villager_id: int, position: Vector2, villager_name: String) -> void:

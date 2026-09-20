@@ -8,6 +8,8 @@
 [ext_resource type="Script" path="res://scripts/components/behaviors/opened_state_behavior.gd" id="6_opened"]
 [ext_resource type="Texture2D" path="res://assets/sprites/props/barrel.png" id="7_barrel"]
 [ext_resource type="Texture2D" path="res://assets/sprites/props/barrel_open.png" id="8_barrel_open"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/tutorial_trigger_behavior.gd" id="9_tutorial"]
+[ext_resource type="Resource" path="res://resources/dialogue/container_intro.tres" id="10_tutorial_dialogue"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_container"]
 size = Vector2(64, 64)
@@ -42,3 +44,8 @@ loot_table = ExtResource("5_loot_table")
 script = ExtResource("6_opened")
 sprite_path = NodePath("Sprite")
 opened_texture = ExtResource("8_barrel_open")
+
+[node name="TutorialTriggerBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("9_tutorial")
+tutorial_id = "container_intro"
+dialogue = ExtResource("10_tutorial_dialogue")

@@ -5,7 +5,9 @@
 [ext_resource type="Script" path="res://scripts/components/behaviors/interact_prompt_behavior.gd" id="3_prompt"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/altar_behavior.gd" id="4_altar"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/opened_state_behavior.gd" id="5_opened"]
-[ext_resource type="Texture2D" path="res://assets/sprites/props/altar.png" id="6_altar"]
+[ext_resource type="Texture2D" path="res://assets/sprites/props/altar.png" id="8_altar"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/tutorial_trigger_behavior.gd" id="6_tutorial"]
+[ext_resource type="Resource" path="res://resources/dialogue/altar_intro.tres" id="7_tutorial_dialogue"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_altar"]
 size = Vector2(80, 80)
@@ -20,7 +22,7 @@ shape = SubResource("RectangleShape2D_altar")
 
 [node name="Sprite" type="Sprite2D" parent="."]
 scale = Vector2(0.2, 0.2)
-texture = ExtResource("6_altar")
+texture = ExtResource("8_altar")
 modulate = Color(0.5, 0.5, 0.55, 1)
 
 [node name="StatusLabel" type="Label" parent="."]
@@ -55,3 +57,8 @@ status_label_path = NodePath("StatusLabel")
 [node name="OpenedStateBehavior" type="Node" parent="Interactable/Host"]
 script = ExtResource("5_opened")
 sprite_path = NodePath("Sprite")
+
+[node name="TutorialTriggerBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("6_tutorial")
+tutorial_id = "altar_intro"
+dialogue = ExtResource("7_tutorial_dialogue")

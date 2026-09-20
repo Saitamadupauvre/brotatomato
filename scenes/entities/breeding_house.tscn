@@ -6,6 +6,8 @@
 [ext_resource type="Script" path="res://scripts/components/behaviors/breeding_behavior.gd" id="4_breeding"]
 [ext_resource type="Shader" path="res://assets/shaders/teleport_glow.gdshader" id="5_glow_shader"]
 [ext_resource type="Texture2D" path="res://assets/sprites/props/breeding_house.png" id="6_sprite"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/tutorial_trigger_behavior.gd" id="7_tutorial"]
+[ext_resource type="Resource" path="res://resources/dialogue/breeding_intro.tres" id="8_tutorial_dialogue"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_breeding"]
 size = Vector2(64, 64)
@@ -64,3 +66,8 @@ label_text = "Breeding House"
 script = ExtResource("4_breeding")
 time_label_path = NodePath("TimeLabel")
 glow_rect_path = NodePath("GlowRect")
+
+[node name="TutorialTriggerBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("7_tutorial")
+tutorial_id = "breeding_intro"
+dialogue = ExtResource("8_tutorial_dialogue")

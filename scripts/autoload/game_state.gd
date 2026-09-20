@@ -7,7 +7,6 @@ extends Node
 ## Add a new item: create its .tres in resources/items/, preload it here.
 const ITEM_DEFS: Array[ItemData] = [
 	preload("res://resources/items/gold.tres"),
-	preload("res://resources/items/materials.tres"),
 	preload("res://resources/items/water.tres"),
 	preload("res://resources/items/crop.tres"),
 	preload("res://resources/items/dungeon_loot.tres"),
@@ -35,7 +34,6 @@ signal villager_spawned(villager_id: int, position: Vector2, villager_name: Stri
 signal villager_removed(villager_id: int)
 signal plot_placed(plot_id: int, position: Vector2)
 signal item_changed(item_id: String, count: int)
-signal crop_stored_changed(count: int)
 signal equipment_changed(slot: EquipmentData.EquipSlot, item_id: String)
 ## Fired when the active weapon toggles between WEAPON/WEAPON_2 (#50) —
 ## distinct from equipment_changed, since swapping active slot changes
@@ -45,9 +43,6 @@ signal breeding_started
 signal card_equipped_changed(slot: int, item_id: String)
 signal breeding_house_created(position: Vector2)
 
-## TEMP: grants enough materials to test grid placement without looting
-## the Container first. Remove/tune before ship.
-const STARTING_MATERIALS: int = 30
 ## TEMP: enough carried crop to seed the starting plots before the first
 ## harvest comes in. Remove/tune before ship.
 const STARTING_CROP: int = 4
@@ -69,7 +64,6 @@ const STARTING_VILLAGER_POSITIONS: Array[Vector2] = [
 	Vector2(400, 300), Vector2(480, 300), Vector2(560, 300),
 ]
 
-var crop_stored: int = 0
 var _inventory: Dictionary = {} # item_id -> count
 var _item_defs: Dictionary = {} # item_id -> ItemData
 var _equipped: Dictionary = {} # EquipmentData.EquipSlot -> item_id
@@ -108,9 +102,9 @@ const VILLAGER_NAMES: Array[String] = [
 const BREEDING_COST: int = 2
 const BREEDING_INTERVAL: float = 20.0
 
-## Breeding House creation (#87): gold, not materials — decided after
-## team discussion that crafting-material cost is out of scope for this
-## pass. GDD doesn't fix a value — TEMP-tuned like BREEDING_COST.
+## Breeding House creation (#87): gold cost, purchased like everything else
+## in Camp — the materials/crafting loop was cut as out of scope. GDD
+## doesn't fix a value — TEMP-tuned like BREEDING_COST.
 const BREEDING_HOUSE_GOLD_COST: int = 50
 
 var breeding_active: bool = false
@@ -125,7 +119,6 @@ var breeding_house_placed: bool = false
 func _ready() -> void:
 	for item_data in ITEM_DEFS:
 		_item_defs[item_data.id] = item_data
-	add_item("materials", STARTING_MATERIALS)
 	add_item("crop", STARTING_CROP)
 	add_item("gold", STARTING_GOLD)
 	_spawn_starting_villagers()
@@ -402,22 +395,3 @@ func swap_active_weapon() -> void:
 
 func get_active_weapon() -> ItemData:
 	return get_equipped(active_weapon_slot)
-
-
-## Moves crop from carried inventory into chest storage.
-func deposit_crop(amount: int = 1) -> bool:
-	if not remove_item("crop", amount):
-		return false
-	crop_stored += amount
-	crop_stored_changed.emit(crop_stored)
-	return true
-
-
-## Moves crop from chest storage back into carried inventory.
-func withdraw_crop(amount: int = 1) -> bool:
-	if crop_stored < amount:
-		return false
-	crop_stored -= amount
-	add_item("crop", amount)
-	crop_stored_changed.emit(crop_stored)
-	return true
