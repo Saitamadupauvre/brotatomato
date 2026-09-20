@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://cammocraft0001"]
+[gd_scene format=3 uid="uid://cwovbsm48k441"]
 
 [ext_resource type="PackedScene" path="res://scenes/components/interactable.tscn" id="1_interactable"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/outline_behavior.gd" id="2_outline"]
@@ -18,7 +18,7 @@ offset_left = -32.0
 offset_top = -32.0
 offset_right = 32.0
 offset_bottom = 32.0
-color = Color(0.3, 0.3, 0.35, 1)
+color = Color(0.75, 0.6, 0.15, 1)
 
 [node name="Interactable" parent="." instance=ExtResource("1_interactable")]
 
@@ -31,6 +31,7 @@ sprite_path = NodePath("Sprite")
 
 [node name="PromptBehavior" type="Node" parent="Interactable/Host"]
 script = ExtResource("3_prompt")
+label_text = "Craft Ammo"
 
 [node name="CraftBehavior" type="Node" parent="Interactable/Host"]
 script = ExtResource("4_craft")
