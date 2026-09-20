@@ -58,6 +58,9 @@ const ENEMY_HURTBOX_MASK: int = 8
 ## Distance from the player's hand pivot to the held-item sprite, kept
 ## constant while it orbits to face the aim direction.
 const HELD_ITEM_OFFSET: float = 17.9
+## Extra rotation swept on top of the aim direction during a melee swing,
+## to sell a fast slash rather than a static poke.
+const SWORD_SWING_ARC: float = deg_to_rad(70.0)
 
 var _is_dashing: bool = false
 var _dash_timer: float = 0.0
@@ -83,6 +86,10 @@ var _card_cooldowns: Array[float] = [0.0, 0.0, 0.0]
 const CARD_DAMAGE_BURST_RADIUS: float = 150.0
 
 var equipped_weapon: WeaponData = null
+## Extra rotation added on top of the aim direction while a melee swing is
+## in flight (tweened by _swing_held_item, back to 0 by its own tail).
+var _held_item_swing_offset: float = 0.0
+var _held_item_swing_tween: Tween = null
 
 @onready var _hurtbox: HurtboxComponent = $Hurtbox
 @onready var _attack_hitbox: HitboxComponent = $AttackHitbox
@@ -382,7 +389,22 @@ func _swing_melee() -> void:
 	_attack_hitbox.rotation = aim_direction.angle()
 	_attack_hitbox.monitoring = true
 	melee_swung.emit(global_position + aim_direction * MELEE_REACH * range_scale, MELEE_RADIUS * range_scale)
+	_swing_held_item(attack_duration)
+	SwordSwing.flash(_held_item, attack_duration)
 	get_tree().create_timer(attack_duration).timeout.connect(_end_attack)
+
+
+## Fast rotation sweep of the held sword through SWORD_SWING_ARC and back,
+## layered on top of _update_held_item_orientation's aim-tracking rotation.
+func _swing_held_item(duration: float) -> void:
+	if _held_item_swing_tween and _held_item_swing_tween.is_valid():
+		_held_item_swing_tween.kill()
+	_held_item_swing_offset = -SWORD_SWING_ARC * 0.5
+	_held_item_swing_tween = create_tween()
+	_held_item_swing_tween.set_trans(Tween.TRANS_CUBIC)
+	_held_item_swing_tween.set_ease(Tween.EASE_OUT)
+	_held_item_swing_tween.tween_property(self, "_held_item_swing_offset", SWORD_SWING_ARC * 0.5, duration)
+	_held_item_swing_tween.tween_callback(func() -> void: _held_item_swing_offset = 0.0)
 
 
 func _start_dash_attack() -> void:
@@ -416,7 +438,7 @@ func _update_held_item_orientation() -> void:
 	if not _held_item.visible:
 		return
 	var aim_direction := _get_aim_direction()
-	var angle := aim_direction.angle()
+	var angle := aim_direction.angle() + _held_item_swing_offset
 	_held_item.position = Vector2(0, -43) + Vector2.RIGHT.rotated(angle) * HELD_ITEM_OFFSET
 	_held_item.rotation = angle
 	_held_item.flip_v = aim_direction.x < 0.0

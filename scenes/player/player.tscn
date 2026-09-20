@@ -12,6 +12,7 @@
 [ext_resource type="Shader" uid="uid://d16qjiq1dosmv" path="res://assets/shaders/teleport_glow.gdshader" id="10_teleport_glow"]
 [ext_resource type="Shader" uid="uid://rm5qcbrhnve8" path="res://assets/shaders/hit_flash.gdshader" id="11_hit_flash"]
 [ext_resource type="Script" uid="uid://b6jimn48st2vt" path="res://scripts/components/shadow_caster.gd" id="12_shadow_caster"]
+[ext_resource type="Shader" uid="uid://dk56jg68uygf7" path="res://assets/shaders/sword_swing.gdshader" id="13_sword_swing"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 16.0
@@ -19,6 +20,10 @@ radius = 16.0
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hit_flash"]
 shader = ExtResource("11_hit_flash")
 shader_parameter/flash_amount = 0.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sword_swing"]
+shader = ExtResource("13_sword_swing")
+shader_parameter/swing_amount = 0.0
 
 [sub_resource type="Animation" id="Animation_idle"]
 resource_name = "idle"
@@ -201,6 +206,7 @@ position_smoothing_enabled = true
 
 [node name="HeldItem" type="Sprite2D" parent="." unique_id=2143008457]
 visible = false
+material = SubResource("ShaderMaterial_sword_swing")
 position = Vector2(16, -35)
 scale = Vector2(0.15, 0.15)
 
