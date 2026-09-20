@@ -4,6 +4,8 @@
 [ext_resource type="PackedScene" path="res://scenes/components/interactable.tscn" id="2_interactable"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/outline_behavior.gd" id="3_outline"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/interact_prompt_behavior.gd" id="4_prompt"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/tutorial_trigger_behavior.gd" id="5_tutorial"]
+[ext_resource type="Resource" path="res://resources/dialogue/gambling_intro.tres" id="6_tutorial_dialogue"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_card_shop"]
 size = Vector2(64, 64)
@@ -32,3 +34,8 @@ sprite_path = NodePath("Sprite")
 
 [node name="PromptBehavior" type="Node" parent="Interactable/Host"]
 script = ExtResource("4_prompt")
+
+[node name="TutorialTriggerBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("5_tutorial")
+tutorial_id = "gambling_intro"
+dialogue = ExtResource("6_tutorial_dialogue")

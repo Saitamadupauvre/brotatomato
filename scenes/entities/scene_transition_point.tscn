@@ -3,6 +3,8 @@
 [ext_resource type="PackedScene" path="res://scenes/components/interactable.tscn" id="1_interactable"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/interact_prompt_behavior.gd" id="2_prompt"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/scene_transition_behavior.gd" id="3_transition"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/tutorial_trigger_behavior.gd" id="4_tutorial"]
+[ext_resource type="Resource" path="res://resources/dialogue/dungeon_entrance.tres" id="5_tutorial_dialogue"]
 
 [sub_resource type="Gradient" id="Gradient_shadow"]
 offsets = PackedFloat32Array(0, 0.35, 0.7, 1)
@@ -42,3 +44,8 @@ label_text = "Enter"
 
 [node name="SceneTransitionBehavior" type="Node" parent="Interactable/Host"]
 script = ExtResource("3_transition")
+
+[node name="TutorialTriggerBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("4_tutorial")
+tutorial_id = "dungeon_entrance"
+dialogue = ExtResource("5_tutorial_dialogue")

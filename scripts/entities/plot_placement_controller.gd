@@ -16,6 +16,10 @@ const MIN_PLOT_SPACING: float = CELL_SIZE * 0.9
 const PICK_RADIUS: float = 40.0
 const FEEDBACK_DURATION: float = 1.5
 const PLOT_BEHAVIOR_PATH: NodePath = ^"Interactable/Host/PlotBehavior"
+## Placement (#91) has no Interactable to hang a TutorialTriggerBehavior
+## off of — it's a global input-mode toggle, not proximity-based — so it's
+## triggered directly, same exception as Main's camp-intro dialogue.
+const PLOT_PLACEMENT_DIALOGUE: DialogueData = preload("res://resources/dialogue/plot_placement.tres")
 
 @export var plots_container_path: NodePath = ^"../Plots"
 @onready var _preview: ColorRect = $Preview
@@ -68,6 +72,7 @@ func _try_start_placing() -> void:
 		return
 	_mode = Mode.PLACING
 	_preview.visible = true
+	TutorialManager.trigger("plot_placement", PLOT_PLACEMENT_DIALOGUE)
 
 
 func _try_confirm_placing() -> void:
