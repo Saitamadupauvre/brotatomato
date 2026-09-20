@@ -36,6 +36,7 @@ var layout: DungeonLayout
 
 
 func _ready() -> void:
+	AudioManager.play_music(&"dungeon")
 	var seed := seed_override if seed_override != 0 else randi()
 	layout = DungeonGenerator.generate(config, seed)
 	print("Dungeon seed: ", seed, " size ", layout.width, "x", layout.height, " max_distance ", layout.max_distance)

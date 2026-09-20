@@ -26,6 +26,10 @@ extends CharacterBody2D
 ## How long the teleport-to-camp channel takes to complete (#38). Moving
 ## or taking damage during the channel cancels it.
 @export var teleport_channel_duration: float = 5.0
+@export var footstep_interval: float = 0.35
+## Radius around the player's feet checked against GrassField for
+## standing grass, to pick footsteps_grass vs footsteps_dirt per step.
+@export var footstep_grass_check_radius: float = 32.0
 
 ## Emitted at the start of a melee swing with the world-space center and
 ## rough radius of the hitbox, for things that react to a swing without
@@ -69,6 +73,7 @@ var _reload_timer: float = 0.0
 var _invincible_timer: float = 0.0
 var _is_channeling: bool = false
 var _channel_timer: float = 0.0
+var _footstep_timer: float = 0.0
 
 var equipped_weapon: WeaponData = null
 var _armor_reduction: int = 0
@@ -132,6 +137,7 @@ func _on_damage_taken(amount: int) -> void:
 		_cancel_teleport_channel()
 	if _invincible_timer > 0.0:
 		return
+	AudioManager.play(&"hit_impact")
 	GameState.lose_tomato(max(amount - _armor_reduction, 0))
 	_invincible_timer = invincibility_duration
 
@@ -187,6 +193,20 @@ func _physics_process(delta: float) -> void:
 	var target_animation := "run" if velocity.length() > 5.0 else "idle"
 	if _animation_player.current_animation != target_animation:
 		_animation_player.play(target_animation)
+
+	_process_footsteps(delta, target_animation == "run")
+
+
+func _process_footsteps(delta: float, is_moving: bool) -> void:
+	if not is_moving or _is_dashing or _is_dash_attacking or _is_channeling:
+		_footstep_timer = 0.0
+		return
+	_footstep_timer -= delta
+	if _footstep_timer <= 0.0:
+		var grass_field: GrassField = get_tree().get_first_node_in_group("grass_field")
+		var on_grass := grass_field != null and grass_field.has_grass_near(global_position, footstep_grass_check_radius)
+		AudioManager.play(&"footsteps_grass" if on_grass else &"footsteps_dirt")
+		_footstep_timer = footstep_interval
 
 
 func _start_teleport_channel() -> void:
@@ -256,6 +276,7 @@ func _start_attack() -> void:
 
 
 func _fire_projectile() -> void:
+	AudioManager.play(&"ranged_fire")
 	var projectile: Projectile = PROJECTILE_SCENE.instantiate()
 	projectile.damage = equipped_weapon.damage
 	projectile.speed = equipped_weapon.projectile_speed
@@ -276,12 +297,14 @@ func _can_reload() -> bool:
 func _start_reload() -> void:
 	if GameState.get_item_count("ammo") <= 0:
 		return
+	AudioManager.play(&"reload")
 	_is_reloading = true
 	_reload_timer = equipped_weapon.reload_time
 	reload_started.emit()
 
 
 func _swing_melee() -> void:
+	AudioManager.play(&"melee_swing")
 	var aim_direction := _get_aim_direction()
 	var range_scale := melee_range / MELEE_SHAPE_REACH
 	_attack_hitbox.damage = equipped_weapon.damage if equipped_weapon else attack_damage
@@ -294,6 +317,7 @@ func _swing_melee() -> void:
 
 
 func _start_dash_attack() -> void:
+	AudioManager.play(&"dash_attack")
 	var aim_direction := _get_aim_direction()
 	_is_dash_attacking = true
 	_dash_attack_timer = attack_duration
@@ -353,6 +377,7 @@ func _process_dash(delta: float) -> void:
 
 
 func _start_dash(input_direction: Vector2) -> void:
+	AudioManager.play(&"player_dash")
 	_dash_direction = input_direction if input_direction != Vector2.ZERO else _last_move_direction
 	_is_dashing = true
 	_dash_timer = dash_duration

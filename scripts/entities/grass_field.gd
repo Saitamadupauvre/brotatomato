@@ -29,6 +29,7 @@ var _material: ShaderMaterial
 
 
 func _ready() -> void:
+	add_to_group("grass_field")
 	_material = ShaderMaterial.new()
 	_material.shader = GRASS_SHADER
 	material = _material
@@ -81,6 +82,24 @@ func build(placements: Array[ForestDecorator.Placement], cell_size: float) -> vo
 			_buckets[cell] = [] as Array[int]
 		_buckets[cell].append(i)
 	multimesh = mm
+
+
+## Read-only check for footstep sound selection: true if any standing
+## (uncut, or regrown) tuft is within radius of a world position. Reuses
+## cut_around's cell-bucket lookup but never mutates tuft state.
+func has_grass_near(world_pos: Vector2, radius: float) -> bool:
+	var local_pos := to_local(world_pos)
+	var cell := Vector2i((local_pos / _cell_size).floor())
+	var reach := int(ceil(radius / _cell_size))
+	for dy in range(-reach, reach + 1):
+		for dx in range(-reach, reach + 1):
+			var indices: Array = _buckets.get(cell + Vector2i(dx, dy), [])
+			for i in indices:
+				if _clock - _cut_at[i] < regrow_time:
+					continue
+				if _positions[i].distance_squared_to(local_pos) <= radius * radius:
+					return true
+	return false
 
 
 ## Cuts every standing tuft within radius of a world position. Emits
