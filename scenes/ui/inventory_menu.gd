@@ -37,6 +37,8 @@ var _held_icon: TextureRect = null
 	EquipmentData.EquipSlot.WEAPON: %WeaponSlot.get_parent(),
 	EquipmentData.EquipSlot.WEAPON_2: %WeaponSlot2.get_parent(),
 }
+## Card (#7) loadout slots, index -> InventorySlot, parallel to _slot_rects.
+@onready var _card_slot_rects: Array = [%CardSlot1, %CardSlot2, %CardSlot3]
 
 
 func _ready() -> void:
@@ -45,11 +47,17 @@ func _ready() -> void:
 	_slot_order.fill("")
 	GameState.equipment_changed.connect(_on_equipment_changed)
 	GameState.active_weapon_changed.connect(_on_active_weapon_changed)
+	GameState.card_equipped_changed.connect(_on_card_equipped_changed)
 	for slot in EquipmentData.ALL_SLOTS:
 		var slot_rect = _slot_rects[slot]
 		slot_rect.equip_slot = slot
 		slot_rect.clicked.connect(_on_slot_clicked)
 		_refresh_slot(slot)
+	for i in _card_slot_rects.size():
+		var card_slot_rect = _card_slot_rects[i]
+		card_slot_rect.card_slot_index = i
+		card_slot_rect.clicked.connect(_on_slot_clicked)
+		_refresh_card_slot(i)
 	_refresh_active_weapon_highlight()
 
 
@@ -106,6 +114,19 @@ func _refresh_slot(slot: EquipmentData.EquipSlot) -> void:
 	var slot_rect = _slot_rects[slot]
 	slot_rect.texture = data.icon if data else null
 	slot_rect.item_id = data.id if data else ""
+
+
+func _on_card_equipped_changed(slot: int, _item_id: String) -> void:
+	_refresh_card_slot(slot)
+
+
+func _refresh_card_slot(slot: int) -> void:
+	var item_id: String = GameState.equipped_cards[slot]
+	var data: CardData = GameState.get_item_data(item_id) as CardData
+	var slot_rect = _card_slot_rects[slot]
+	slot_rect.texture = data.icon if data else null
+	slot_rect.item_id = data.id if data else ""
+	slot_rect.tooltip_text = data.describe() if data else ""
 
 
 func _refresh() -> void:
@@ -171,6 +192,12 @@ func _try_place(target: InventorySlot) -> void:
 		GameState.equip_item(_held_item_id, target.equip_slot)
 	elif _held_origin.equip_slot != -1:
 		GameState.unequip_item(_held_origin.equip_slot)
+	elif target.card_slot_index != -1:
+		if not (GameState.get_item_data(_held_item_id) is CardData):
+			return
+		GameState.equip_card(_held_item_id, target.card_slot_index)
+	elif _held_origin.card_slot_index != -1:
+		GameState.unequip_card(_held_origin.card_slot_index)
 	else:
 		_swap_grid_slots(_held_origin, target)
 
@@ -266,7 +293,7 @@ func _make_empty_slot():
 
 func _make_card(item_data: ItemData, count: int):
 	var card = _make_slot_shell()
-	card.tooltip_text = item_data.display_name
+	card.tooltip_text = item_data.describe() if item_data is CardData else item_data.display_name
 	card.item_id = item_data.id
 
 	var style := StyleBoxFlat.new()

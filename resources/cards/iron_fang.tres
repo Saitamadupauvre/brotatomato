@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="1_card"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_card")
+id = "iron_fang"
+display_name = "Iron Fang"
+icon = ExtResource("2_icon")
+stackable = false
+max_stack = 1
+passive = 2
+passive_value = 0.25
+active = 2
+active_value = 2.0
+active_cooldown = 8.0

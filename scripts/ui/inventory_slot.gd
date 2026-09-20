@@ -6,12 +6,16 @@ extends Control
 ## state and deciding what a click means (pick up, place, swap, cancel).
 ## `equip_slot` of -1 means a generic inventory cell (accepts anything);
 ## any other value is an EquipmentData.EquipSlot the menu only allows a
-## matching item to be placed into.
+## matching item to be placed into. `card_slot_index` is a parallel,
+## independent slot kind (-1 = not a card slot) for CardData items (#7) —
+## kept separate from equip_slot rather than overloading it, since card
+## slots are indices into GameState.equipped_cards, not an EquipSlot enum.
 
 signal clicked(slot: InventorySlot)
 
 var item_id: String = ""
 var equip_slot: int = -1
+var card_slot_index: int = -1
 
 
 func _gui_input(event: InputEvent) -> void:
