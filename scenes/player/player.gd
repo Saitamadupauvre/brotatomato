@@ -61,6 +61,8 @@ var _armor_reduction: int = 0
 @onready var _attack_hitbox: HitboxComponent = $AttackHitbox
 @onready var _attack_debug_visual: CanvasItem = $AttackHitbox/DebugVisual
 @onready var _channel_bar: ProgressBar = $ChannelBar
+@onready var _teleport_glow: ColorRect = $TeleportGlow
+@onready var _teleport_particles: GPUParticles2D = $TeleportParticles
 
 
 func _ready() -> void:
@@ -130,6 +132,8 @@ func _start_teleport_channel() -> void:
 	_channel_bar.max_value = teleport_channel_duration
 	_channel_bar.value = 0.0
 	_channel_bar.visible = true
+	_teleport_glow.visible = true
+	_teleport_particles.emitting = true
 	teleport_channel_started.emit()
 
 
@@ -148,14 +152,21 @@ func _process_teleport_channel(delta: float) -> void:
 func _cancel_teleport_channel() -> void:
 	_is_channeling = false
 	_channel_bar.visible = false
+	_stop_teleport_vfx()
 	teleport_channel_cancelled.emit()
 
 
 func _complete_teleport_channel() -> void:
 	_is_channeling = false
 	_channel_bar.visible = false
+	_stop_teleport_vfx()
 	teleport_channel_completed.emit()
 	SceneRouter.go_to_camp()
+
+
+func _stop_teleport_vfx() -> void:
+	_teleport_glow.visible = false
+	_teleport_particles.emitting = false
 
 
 func _start_attack() -> void:

@@ -1,11 +1,25 @@
-[gd_scene load_steps=5 format=3 uid="uid://c8y3f0m2q8k4a"]
+[gd_scene load_steps=8 format=3 uid="uid://c8y3f0m2q8k4a"]
 
 [ext_resource type="Script" path="res://scenes/player/player.gd" id="1_player_script"]
 [ext_resource type="Script" path="res://scripts/components/hurtbox_component.gd" id="2_hurtbox"]
 [ext_resource type="Script" path="res://scripts/components/hitbox_component.gd" id="3_hitbox"]
+[ext_resource type="Shader" path="res://assets/shaders/teleport_glow.gdshader" id="4_teleport_glow"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 16.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_teleport_glow"]
+shader = ExtResource("4_teleport_glow")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_teleport"]
+direction = Vector3(0, -1, 0)
+spread = 180.0
+gravity = Vector3(0, -20, 0)
+initial_velocity_min = 10.0
+initial_velocity_max = 30.0
+scale_min = 2.0
+scale_max = 4.0
+color = Color(0.4, 0.85, 1.0, 1.0)
 
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_player_script")
@@ -52,3 +66,21 @@ offset_top = -46.0
 offset_right = 30.0
 offset_bottom = -30.0
 show_percentage = false
+
+[node name="TeleportGlow" type="ColorRect" parent="."]
+visible = false
+offset_left = -40.0
+offset_top = -40.0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+material = SubResource("ShaderMaterial_teleport_glow")
+color = Color(1, 1, 1, 1)
+
+[node name="TeleportParticles" type="GPUParticles2D" parent="."]
+emitting = false
+amount = 24
+lifetime = 0.8
+one_shot = false
+explosiveness = 0.0
+process_material = SubResource("ParticleProcessMaterial_teleport")
