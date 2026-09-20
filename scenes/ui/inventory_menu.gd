@@ -122,10 +122,11 @@ func _on_card_equipped_changed(slot: int, _item_id: String) -> void:
 
 func _refresh_card_slot(slot: int) -> void:
 	var item_id: String = GameState.equipped_cards[slot]
-	var data: ItemData = GameState.get_item_data(item_id) if item_id != "" else null
+	var data: CardData = GameState.get_item_data(item_id) as CardData
 	var slot_rect = _card_slot_rects[slot]
 	slot_rect.texture = data.icon if data else null
 	slot_rect.item_id = data.id if data else ""
+	slot_rect.tooltip_text = data.describe() if data else ""
 
 
 func _refresh() -> void:
@@ -292,7 +293,7 @@ func _make_empty_slot():
 
 func _make_card(item_data: ItemData, count: int):
 	var card = _make_slot_shell()
-	card.tooltip_text = item_data.display_name
+	card.tooltip_text = item_data.describe() if item_data is CardData else item_data.display_name
 	card.item_id = item_data.id
 
 	var style := StyleBoxFlat.new()

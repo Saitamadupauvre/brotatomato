@@ -17,3 +17,31 @@ enum Active { NONE, INSTANT_HARVEST, DAMAGE_BURST, DASH_RESET, GOLD_RUSH }
 ## Magnitude interpreted per Active type (damage amount, gold amount, ...).
 @export var active_value: float = 0.0
 @export var active_cooldown: float = 10.0
+
+
+## Human-readable passive/active blurbs, shared by every place a card
+## needs to describe itself (inventory tooltips, gamble draw result) so
+## the wording only lives in one place.
+func describe_passive() -> String:
+	var pct := "+%d%%" % int(passive_value * 100)
+	match passive:
+		Passive.PLOT_GROWTH_SPEED: return "%s plot growth speed" % pct
+		Passive.PLAYER_DAMAGE: return "%s attack damage" % pct
+		Passive.PLAYER_SPEED: return "%s move speed" % pct
+		Passive.GOLD_GAIN: return "%s gold gained" % pct
+		_: return "None"
+
+
+func describe_active() -> String:
+	match active:
+		Active.INSTANT_HARVEST: return "Instant Harvest (ripen nearest plot)"
+		Active.DAMAGE_BURST: return "Damage Burst (%d dmg nearby)" % int(active_value)
+		Active.DASH_RESET: return "Dash Reset"
+		Active.GOLD_RUSH: return "Gold Rush (+%d gold)" % int(active_value)
+		_: return "None"
+
+
+func describe() -> String:
+	return "%s\nPassive: %s\nActive: %s (%ds cooldown)" % [
+		display_name, describe_passive(), describe_active(), int(active_cooldown),
+	]

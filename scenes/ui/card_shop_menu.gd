@@ -8,6 +8,7 @@ const GAMBLE_LOOT_TABLE: LootTable = preload("res://resources/cards/card_gamble_
 
 @onready var _gamble_button: Button = %GambleButton
 @onready var _result_label: Label = %ResultLabel
+@onready var _pool_row: HBoxContainer = %PoolRow
 
 
 func _ready() -> void:
@@ -15,6 +16,23 @@ func _ready() -> void:
 	add_to_group("card_shop_ui")
 	_gamble_button.text = "Draw a card — %d gold" % GAMBLE_COST
 	_gamble_button.pressed.connect(_on_gamble_pressed)
+	_build_pool_preview()
+
+
+## Hoverable preview of every card in the draw pool, so the player can
+## check odds/abilities before spending gold.
+func _build_pool_preview() -> void:
+	for entry in GAMBLE_LOOT_TABLE.entries:
+		var card: CardData = GameState.get_item_data(entry.item_id) as CardData
+		if card == null:
+			continue
+		var icon_rect := TextureRect.new()
+		icon_rect.texture = card.icon
+		icon_rect.custom_minimum_size = Vector2(40, 40)
+		icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon_rect.tooltip_text = card.describe()
+		icon_rect.mouse_filter = Control.MOUSE_FILTER_STOP
+		_pool_row.add_child(icon_rect)
 
 
 func open() -> void:
@@ -34,4 +52,4 @@ func _on_gamble_pressed() -> void:
 		return
 	var card: CardData = GameState.get_item_data(rolled[0].item_id) as CardData
 	GameState.add_item(rolled[0].item_id, rolled[0].amount)
-	_result_label.text = "You got: %s!" % card.display_name
+	_result_label.text = "You got: %s\n%s\n%s" % [card.display_name, card.describe_passive(), card.describe_active()]

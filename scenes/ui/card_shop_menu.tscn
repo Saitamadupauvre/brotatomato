@@ -53,9 +53,15 @@ horizontal_alignment = 1
 [node name="Blurb" type="Label" parent="Panel/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.35, 0.2, 0.45, 1)
-text = "Pay gold, draw a random card. No picking."
+text = "Pay gold, draw a random card. No picking. Hover a card below to see its ability."
 horizontal_alignment = 1
 autowrap_mode = 2
+
+[node name="PoolRow" type="HBoxContainer" parent="Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 12
 
 [node name="GambleButton" type="Button" parent="Panel/VBox"]
 unique_name_in_owner = true
