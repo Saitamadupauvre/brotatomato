@@ -10,7 +10,6 @@ display_name = "Swift Paws"
 icon = ExtResource("2_icon")
 stackable = false
 max_stack = 1
-price = 70
 passive = 3
 passive_value = 0.2
 active = 3

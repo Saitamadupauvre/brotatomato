@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://ccardshop0001"]
+[gd_scene format=3 uid="uid://ccardshop0001"]
 
 [ext_resource type="Script" path="res://scripts/entities/card_shop.gd" id="1_card_shop"]
 [ext_resource type="PackedScene" path="res://scenes/components/interactable.tscn" id="2_interactable"]

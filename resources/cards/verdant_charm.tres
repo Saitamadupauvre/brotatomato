@@ -10,7 +10,6 @@ display_name = "Verdant Charm"
 icon = ExtResource("2_icon")
 stackable = false
 max_stack = 1
-price = 60
 passive = 1
 passive_value = 0.25
 active = 1

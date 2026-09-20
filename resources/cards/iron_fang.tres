@@ -10,7 +10,6 @@ display_name = "Iron Fang"
 icon = ExtResource("2_icon")
 stackable = false
 max_stack = 1
-price = 80
 passive = 2
 passive_value = 0.25
 active = 2

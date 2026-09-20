@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://ccardshopmenu001"]
+[gd_scene format=3 uid="uid://bnwpon68sct8c"]
 
 [ext_resource type="Script" path="res://scenes/ui/card_shop_menu.gd" id="1_card_shop_menu"]
 
@@ -47,20 +47,30 @@ theme_override_constants/separation = 16
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 theme_override_colors/font_color = Color(0.25, 0.1, 0.35, 1)
-text = "Cards"
+text = "Card Gamble"
 horizontal_alignment = 1
 
-[node name="Scroll" type="ScrollContainer" parent="Panel/VBox"]
+[node name="Blurb" type="Label" parent="Panel/VBox"]
 layout_mode = 2
-size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.35, 0.2, 0.45, 1)
+text = "Pay gold, draw a random card. No picking."
+horizontal_alignment = 1
+autowrap_mode = 2
 
-[node name="ItemGrid" type="GridContainer" parent="Panel/VBox/Scroll"]
+[node name="GambleButton" type="Button" parent="Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/h_separation = 12
-theme_override_constants/v_separation = 12
-columns = 3
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 20
+text = "Draw a card"
+
+[node name="ResultLabel" type="Label" parent="Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.25, 0.1, 0.35, 1)
+horizontal_alignment = 1
+autowrap_mode = 2
 
 [node name="CloseHint" type="Label" parent="Panel/VBox"]
 layout_mode = 2

@@ -10,7 +10,6 @@ display_name = "Golden Touch"
 icon = ExtResource("2_icon")
 stackable = false
 max_stack = 1
-price = 50
 passive = 4
 passive_value = 0.2
 active = 4
