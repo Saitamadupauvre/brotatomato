@@ -164,6 +164,11 @@ texture = ExtResource("9_face")
 scale = Vector2(1.0000001, 1.0000001)
 texture = ExtResource("4_oreol")
 
+[node name="HeldItem" type="Sprite2D" parent="Sprite" unique_id=2143008457]
+visible = false
+position = Vector2(16, 8)
+scale = Vector2(0.15, 0.15)
+
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1091508352]
 libraries/ = SubResource("AnimationLibrary_body")
 autoplay = &"idle"
