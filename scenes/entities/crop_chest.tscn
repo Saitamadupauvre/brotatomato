@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://scripts/components/behaviors/container_behavior.gd" id="2_container"]
 [ext_resource type="Resource" path="res://resources/dungeon/loot_tables/crops_loot.tres" id="3_loot_table"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/opened_state_behavior.gd" id="4_opened"]
+[ext_resource type="Texture2D" path="res://assets/sprites/props/barrel_open.png" id="5_barrel_open"]
 
 [node name="CropChest" instance=ExtResource("1_base")]
 
@@ -20,3 +21,4 @@ loot_table = ExtResource("3_loot_table")
 [node name="OpenedStateBehavior" type="Node" parent="Interactable/Host" index="3"]
 script = ExtResource("4_opened")
 sprite_path = NodePath("Sprite")
+opened_texture = ExtResource("5_barrel_open")
