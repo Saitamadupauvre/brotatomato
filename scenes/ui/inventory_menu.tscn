@@ -199,6 +199,25 @@ theme_override_colors/font_color = Color(0.6, 0.68, 0.75, 1)
 text = "Weapon"
 horizontal_alignment = 1
 
+[node name="WeaponSlot2Panel" type="PanelContainer" parent="Panel/VBox/EquipSlots/WeaponColumn"]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
+
+[node name="WeaponSlot2" type="TextureRect" parent="Panel/VBox/EquipSlots/WeaponColumn/WeaponSlot2Panel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+expand_mode = 1
+script = ExtResource("2_drag_slot")
+
+[node name="WeaponLabel2" type="Label" parent="Panel/VBox/EquipSlots/WeaponColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.6, 0.68, 0.75, 1)
+text = "Weapon 2"
+horizontal_alignment = 1
+
 [node name="Scroll" type="ScrollContainer" parent="Panel/VBox"]
 layout_mode = 2
 size_flags_vertical = 3
