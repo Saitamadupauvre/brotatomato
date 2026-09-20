@@ -26,6 +26,16 @@ mouse_filter = 2
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_villager")
 
+[node name="NameLabel" type="Label" parent="."]
+offset_left = -40.0
+offset_top = -34.0
+offset_right = 40.0
+offset_bottom = -18.0
+mouse_filter = 2
+horizontal_alignment = 1
+vertical_alignment = 2
+theme_override_font_sizes/font_size = 12
+
 [node name="Interactable" parent="." instance=ExtResource("2_interactable")]
 
 [node name="Host" parent="Interactable" index="1"]
