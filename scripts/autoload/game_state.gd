@@ -14,6 +14,7 @@ const ITEM_DEFS: Array[ItemData] = [
 	preload("res://resources/items/ammo.tres"),
 	preload("res://resources/equipment/sword.tres"),
 	preload("res://resources/equipment/bow.tres"),
+	preload("res://resources/equipment/dash_blade.tres"),
 	preload("res://resources/equipment/pistol.tres"),
 	preload("res://resources/equipment/leather_helmet.tres"),
 	preload("res://resources/equipment/leather_chestplate.tres"),
@@ -88,6 +89,10 @@ func _ready() -> void:
 	# show without going through the shop first. Remove/tune before ship.
 	add_item("sword", 1)
 	equip_item("sword")
+	# TEMP: dash-strike weapon in inventory for manual testing of #65
+	# (equip via inventory drag-drop, not equipped by default). Remove
+	# before ship.
+	add_item("dash_blade", 1)
 
 
 ## Villagers ARE the tomato/life count (#36) — spawning the starting

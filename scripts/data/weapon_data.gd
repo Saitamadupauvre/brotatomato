@@ -1,7 +1,7 @@
 class_name WeaponData
 extends EquipmentData
 
-enum AttackType { MELEE, RANGED }
+enum AttackType { MELEE, RANGED, DASH }
 
 @export var attack_type: AttackType
 @export var damage: int = 1

@@ -16,6 +16,9 @@ extends CharacterBody2D
 ## Tip-to-player distance of the melee hitbox, in px. AttackHitboxShape's
 ## polygon is authored with a 42px reach; this scales it uniformly.
 @export var melee_range: float = 58.0
+## Burst speed for the dash-strike attack. Separate from the evasion
+## dash's dash_speed so combat and movement tuning don't collide.
+@export var dash_attack_speed: float = 700.0
 ## Brief window after taking a hit where further damage is ignored —
 ## without it, overlapping hitboxes (or one that lingers across physics
 ## frames) can strip several lives from a single hit.
@@ -56,6 +59,9 @@ var _dash_direction: Vector2 = Vector2.ZERO
 var _last_move_direction: Vector2 = Vector2.DOWN
 var _attack_cooldown_timer: float = 0.0
 var _is_attacking: bool = false
+var _is_dash_attacking: bool = false
+var _dash_attack_timer: float = 0.0
+var _dash_attack_direction: Vector2 = Vector2.ZERO
 ## -1 = unlimited (weapon has no magazine, e.g. the bow).
 var _current_ammo: int = -1
 var _is_reloading: bool = false
@@ -141,7 +147,9 @@ func _physics_process(delta: float) -> void:
 		move_and_slide()
 		return
 
-	if _is_dashing:
+	if _is_dash_attacking:
+		_process_dash_attack(delta)
+	elif _is_dashing:
 		_process_dash(delta)
 	else:
 		_process_movement(delta)
@@ -219,6 +227,8 @@ func _start_attack() -> void:
 
 	if equipped_weapon and equipped_weapon.attack_type == WeaponData.AttackType.RANGED:
 		_fire_projectile()
+	elif equipped_weapon and equipped_weapon.attack_type == WeaponData.AttackType.DASH:
+		_start_dash_attack()
 		if is_gun:
 			_current_ammo -= 1
 			ammo_changed.emit(_current_ammo, equipped_weapon.magazine_size)
@@ -264,6 +274,26 @@ func _swing_melee() -> void:
 	if OS.is_debug_build():
 		_attack_debug_visual.visible = true
 	get_tree().create_timer(attack_duration).timeout.connect(_end_attack)
+
+
+func _start_dash_attack() -> void:
+	var aim_direction := _get_aim_direction()
+	_is_dash_attacking = true
+	_dash_attack_timer = attack_duration
+	_dash_attack_direction = aim_direction
+	_attack_hitbox.damage = equipped_weapon.damage if equipped_weapon else attack_damage
+	_attack_hitbox.rotation = aim_direction.angle()
+	_attack_hitbox.monitoring = true
+	if OS.is_debug_build():
+		_attack_debug_visual.visible = true
+	get_tree().create_timer(attack_duration).timeout.connect(_end_attack)
+
+
+func _process_dash_attack(delta: float) -> void:
+	_dash_attack_timer -= delta
+	velocity = _dash_attack_direction * dash_attack_speed
+	if _dash_attack_timer <= 0.0:
+		_is_dash_attacking = false
 
 
 func _get_aim_direction() -> Vector2:
