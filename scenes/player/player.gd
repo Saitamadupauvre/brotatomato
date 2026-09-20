@@ -64,6 +64,7 @@ var _armor_reduction: int = 0
 @onready var _channel_bar: ProgressBar = $ChannelBar
 @onready var _teleport_glow: ColorRect = $TeleportGlow
 @onready var _teleport_particles: GPUParticles2D = $TeleportParticles
+@onready var _held_item: Sprite2D = $Sprite/HeldItem
 
 
 func _ready() -> void:
@@ -73,11 +74,14 @@ func _ready() -> void:
 	_attack_hitbox.monitoring = false
 	_attack_hitbox.scale = Vector2.ONE * (melee_range / MELEE_SHAPE_REACH)
 	GameState.equipment_changed.connect(_on_equipment_changed)
+	_on_equipment_changed(EquipmentData.EquipSlot.WEAPON, "") # sync held sprite to whatever's already equipped
 
 
 func _on_equipment_changed(slot: EquipmentData.EquipSlot, _item_id: String) -> void:
 	if slot == EquipmentData.EquipSlot.WEAPON:
 		equipped_weapon = GameState.get_equipped(slot) as WeaponData
+		_held_item.texture = equipped_weapon.icon if equipped_weapon else null
+		_held_item.visible = equipped_weapon != null
 	else:
 		_recompute_armor_reduction()
 
