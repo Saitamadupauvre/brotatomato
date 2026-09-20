@@ -5,6 +5,7 @@
 [ext_resource type="Script" path="res://scripts/components/behaviors/dodge_hop_behavior.gd" id="3_dodge"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/burst_ranged_attack_behavior.gd" id="4_burst"]
 [ext_resource type="Resource" path="res://resources/enemies/boss_archwarden.tres" id="5_data"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemy/ghost.png" id="6_ghost"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_boss_body"]
 radius = 22.0
@@ -15,6 +16,7 @@ data = ExtResource("5_data")
 [node name="Sprite" parent="." index="1"]
 modulate = Color(0.2, 0.55, 0.55, 1)
 scale = Vector2(0.275, 0.275)
+texture = ExtResource("6_ghost")
 
 [node name="Shadow" parent="." index="0"]
 offset_factor = 0.6

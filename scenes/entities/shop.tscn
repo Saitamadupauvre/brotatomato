@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://scripts/components/behaviors/interact_prompt_behavior.gd" id="4_prompt"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/tutorial_trigger_behavior.gd" id="5_tutorial"]
 [ext_resource type="Resource" path="res://resources/dialogue/shop_intro.tres" id="6_tutorial_dialogue"]
+[ext_resource type="Texture2D" path="res://assets/sprites/props/altar.png" id="7_altar"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_shop"]
 size = Vector2(64, 64)
@@ -16,12 +17,10 @@ script = ExtResource("1_shop")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_shop")
 
-[node name="Sprite" type="ColorRect" parent="."]
-offset_left = -32.0
-offset_top = -32.0
-offset_right = 32.0
-offset_bottom = 32.0
-color = Color(0.3, 0.55, 0.85, 1)
+[node name="Sprite" type="Sprite2D" parent="."]
+modulate = Color(0.3, 0.55, 0.85, 1)
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("7_altar")
 
 [node name="Interactable" parent="." instance=ExtResource("2_interactable")]
 
