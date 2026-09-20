@@ -4,8 +4,6 @@ extends Node2D
 ## (DungeonGenerator); this script is the only place nodes get created
 ## from that data. Transitions still go through SceneRouter.
 
-const TREE_SCENE: PackedScene = preload("res://scenes/dungeon/tree.tscn")
-
 @export var config: DungeonConfig
 ## 0 = random seed each run. Set non-zero to reproduce a layout.
 @export var seed_override: int = 0
@@ -64,7 +62,7 @@ func _on_life_lost(_remaining: int, villager_names: Array[String]) -> void:
 
 
 func _build_ground() -> void:
-	_ground.size = layout.world_size()
+	ForestSceneKit.build_ground(_ground, layout)
 
 
 ## One StaticBody2D, one CollisionPolygon2D per contour loop in SEGMENTS
@@ -109,15 +107,7 @@ func _add_debug_loop(pts: PackedVector2Array) -> void:
 ## puts the player under the canopy. One node per tree; only cells
 ## near the floor get one, so count stays in the low thousands.
 func _build_trees() -> void:
-	var placements := ForestDecorator.build(layout, tree_depth, trees_per_cell)
-	for p in placements:
-		var tree: Node2D = TREE_SCENE.instantiate()
-		tree.position = p.position
-		tree.scale *= p.scale
-		if p.flip:
-			tree.scale.x = -tree.scale.x
-		tree.modulate = Color(p.shade, p.shade, p.shade)
-		_trees.add_child(tree)
+	ForestSceneKit.build_trees(_trees, layout, tree_depth, trees_per_cell)
 
 
 ## Cartoon forest shadow: a one-pixel-per-cell density texture stretched
@@ -125,29 +115,21 @@ func _build_trees() -> void:
 ## actors (z_index between Grass and World). The shader
 ## quantizes it into hard bands (see forest_shade.gdshader).
 func _build_shade() -> void:
-	_shade.size = layout.world_size()
-	var tex := ImageTexture.create_from_image(ForestDecorator.build_shade_image(layout, shade_falloff_cells))
-	(_shade.material as ShaderMaterial).set_shader_parameter("density", tex)
+	ForestSceneKit.build_shade(_shade, layout, shade_falloff_cells)
 
 
 ## Grass is flat ground decoration under everything that moves, so it
 ## needs no Y-sort: GrassField draws every tuft in one call and handles
 ## sway/push/cut. Player swings cut it.
 func _build_grass() -> void:
-	_grass.build(ForestDecorator.build_floor_scatter(layout, grass_density, 0x6A55), layout.cell_size)
-	_player.melee_swung.connect(_grass.cut_around)
+	ForestSceneKit.build_grass(_grass, layout, grass_density, 0x6A55, _player)
 
 
 func _place_player() -> void:
 	_player.position = layout.cell_to_world(layout.spawn_cell)
 	var camera: Camera2D = _player.get_node_or_null("Camera2D")
 	if camera:
-		var size := layout.world_size()
-		camera.limit_left = 0
-		camera.limit_top = 0
-		camera.limit_right = int(size.x)
-		camera.limit_bottom = int(size.y)
-		camera.reset_smoothing()
+		ForestSceneKit.limit_camera_to_layout(camera, layout)
 
 
 func _place_exit() -> void:

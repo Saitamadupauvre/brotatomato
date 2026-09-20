@@ -2,14 +2,45 @@ extends Node2D
 ## Scene-specific glue: instantiates a visual Villager whenever GameState
 ## reports one spawned (from a harvested plot). GameState itself stays
 ## scene-agnostic — it only tracks data, this scene owns the world node.
+##
+## Ground/shade/trees/grass are built through ForestSceneKit on a
+## trivial one-room CampLayoutBuilder layout, so the camp gets the exact
+## same forest pipeline (and cuttable grass) as the procedural dungeon
+## instead of a hand-rolled copy.
 
 const VILLAGER_SCENE: PackedScene = preload("res://scenes/entities/villager.tscn")
 const PLOT_SCENE: PackedScene = preload("res://scenes/entities/plot.tscn")
+
+const INTERIOR_COLS: int = 20
+const INTERIOR_ROWS: int = 13
+const CELL_SIZE: float = 64.0
+## How many cells deep the forest ring is drawn beyond the walls.
+const FOREST_DEPTH: int = 4
+const TREES_PER_CELL: float = 1.0
+const GRASS_DENSITY: float = 0.6
+const SHADE_FALLOFF_CELLS: int = 4
+## Treeless hole in the north canopy the dungeon entrance sits in.
+const ENTRANCE_GAP_CELLS: int = 4
+
+@onready var _ground: ColorRect = $Ground
+@onready var _shade: ColorRect = $Shade
+@onready var _grass: GrassField = $Grass
+@onready var _trees: Node2D = $World/Trees
+@onready var _player: CharacterBody2D = $World/Player
 
 var _villager_nodes: Dictionary = {} # villager_id -> Node2D
 
 
 func _ready() -> void:
+	var layout := CampLayoutBuilder.build(INTERIOR_COLS, INTERIOR_ROWS, FOREST_DEPTH, CELL_SIZE, ENTRANCE_GAP_CELLS)
+	ForestSceneKit.build_ground(_ground, layout)
+	ForestSceneKit.build_shade(_shade, layout, SHADE_FALLOFF_CELLS)
+	ForestSceneKit.build_trees(_trees, layout, FOREST_DEPTH, TREES_PER_CELL)
+	ForestSceneKit.build_grass(_grass, layout, GRASS_DENSITY, 0x6A55, _player)
+	var camera: Camera2D = _player.get_node_or_null("Camera2D")
+	if camera:
+		ForestSceneKit.limit_camera_to_layout(camera, layout)
+
 	GameState.villager_spawned.connect(_on_villager_spawned)
 	GameState.villager_removed.connect(_on_villager_removed)
 	GameState.plot_placed.connect(_on_plot_placed)
@@ -21,7 +52,7 @@ func _ready() -> void:
 
 func _on_villager_spawned(villager_id: int, position: Vector2, villager_name: String) -> void:
 	var villager: Villager = VILLAGER_SCENE.instantiate()
-	add_child(villager)
+	$World.add_child(villager)
 	villager.global_position = position
 	villager.set_villager_name(villager_name)
 	_villager_nodes[villager_id] = villager
@@ -41,5 +72,5 @@ func _on_plot_placed(plot_id: int, position: Vector2) -> void:
 func _spawn_plot(plot_id: int, position: Vector2) -> void:
 	var plot: Node2D = PLOT_SCENE.instantiate()
 	plot.set_meta("plot_id", plot_id)
-	$Plots.add_child(plot)
+	$World/Plots.add_child(plot)
 	plot.global_position = position
