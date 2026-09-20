@@ -11,8 +11,11 @@ const ITEM_DEFS: Array[ItemData] = [
 	preload("res://resources/items/water.tres"),
 	preload("res://resources/items/crop.tres"),
 	preload("res://resources/items/dungeon_loot.tres"),
+	preload("res://resources/items/ammo.tres"),
 	preload("res://resources/equipment/sword.tres"),
 	preload("res://resources/equipment/bow.tres"),
+	preload("res://resources/equipment/dash_blade.tres"),
+	preload("res://resources/equipment/pistol.tres"),
 	preload("res://resources/equipment/leather_helmet.tres"),
 	preload("res://resources/equipment/leather_chestplate.tres"),
 	preload("res://resources/equipment/leather_leggings.tres"),
@@ -82,6 +85,19 @@ func _ready() -> void:
 	add_item("materials", STARTING_MATERIALS)
 	add_item("crop", STARTING_CROP)
 	_spawn_starting_villagers()
+	# TEMP: starting weapon so the held-item sprite (#47) has something to
+	# show without going through the shop first. Remove/tune before ship.
+	add_item("sword", 1)
+	equip_item("sword")
+	# TEMP: gun + reserve ammo in inventory for manual testing of #66/#67
+	# (equip via the inventory drag-drop, not equipped by default). Remove
+	# before ship.
+	add_item("pistol", 1)
+	add_item("ammo", 20)
+	# TEMP: dash-strike weapon in inventory for manual testing of #65
+	# (equip via inventory drag-drop, not equipped by default). Remove
+	# before ship.
+	add_item("dash_blade", 1)
 
 
 ## Villagers ARE the tomato/life count (#36) — spawning the starting
@@ -180,14 +196,33 @@ func reset_run() -> void:
 	_spawn_starting_villagers()
 
 
-## Equipping doesn't remove the item from the counted inventory — no
-## per-instance item modeling this pass, just a "which owned id is
-## equipped" pointer per slot.
+## Equipping consumes one unit of the item from the counted inventory
+## (so it stops also showing there), swapping any previous occupant of
+## the slot back into the inventory first. No-ops if the item isn't
+## owned, or is already equipped in its slot.
 func equip_item(item_id: String) -> void:
 	var data: ItemData = get_item_data(item_id)
-	if data is EquipmentData:
-		_equipped[data.slot] = item_id
-		equipment_changed.emit(data.slot, item_id)
+	if not (data is EquipmentData) or get_item_count(item_id) <= 0:
+		return
+	var current_id: String = _equipped.get(data.slot, "")
+	if current_id == item_id:
+		return
+	if current_id != "":
+		add_item(current_id, 1)
+	remove_item(item_id, 1)
+	_equipped[data.slot] = item_id
+	equipment_changed.emit(data.slot, item_id)
+
+
+## Returns a slot's item to the counted inventory. No-op if the slot is
+## empty.
+func unequip_item(slot: EquipmentData.EquipSlot) -> void:
+	var id: String = _equipped.get(slot, "")
+	if id == "":
+		return
+	_equipped.erase(slot)
+	add_item(id, 1)
+	equipment_changed.emit(slot, "")
 
 
 func get_equipped(slot: EquipmentData.EquipSlot) -> ItemData:

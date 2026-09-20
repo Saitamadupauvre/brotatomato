@@ -16,6 +16,9 @@ extends CharacterBody2D
 ## Tip-to-player distance of the melee hitbox, in px. AttackHitboxShape's
 ## polygon is authored with a 42px reach; this scales it uniformly.
 @export var melee_range: float = 58.0
+## Burst speed for the dash-strike attack. Separate from the evasion
+## dash's dash_speed so combat and movement tuning don't collide.
+@export var dash_attack_speed: float = 700.0
 ## Brief window after taking a hit where further damage is ignored —
 ## without it, overlapping hitboxes (or one that lingers across physics
 ## frames) can strip several lives from a single hit.
@@ -33,6 +36,12 @@ signal melee_swung(center: Vector2, radius: float)
 signal teleport_channel_started
 signal teleport_channel_cancelled
 signal teleport_channel_completed
+## Ammo HUD hooks (#66) — max_ammo 0 means the equipped weapon has no
+## magazine (melee, or a RANGED weapon with unlimited ammo like the bow),
+## which the HUD reads as "hide the ammo counter".
+signal ammo_changed(current: int, max_ammo: int)
+signal reload_started
+signal reload_ended
 ## AttackHitboxShape's authored (unscaled) reach, in px.
 const MELEE_SHAPE_REACH: float = 42.0
 ## Distance from the player to the center of the melee arc, and its
@@ -50,6 +59,13 @@ var _dash_direction: Vector2 = Vector2.ZERO
 var _last_move_direction: Vector2 = Vector2.DOWN
 var _attack_cooldown_timer: float = 0.0
 var _is_attacking: bool = false
+var _is_dash_attacking: bool = false
+var _dash_attack_timer: float = 0.0
+var _dash_attack_direction: Vector2 = Vector2.ZERO
+## -1 = unlimited (weapon has no magazine, e.g. the bow).
+var _current_ammo: int = -1
+var _is_reloading: bool = false
+var _reload_timer: float = 0.0
 var _invincible_timer: float = 0.0
 var _is_channeling: bool = false
 var _channel_timer: float = 0.0
@@ -64,6 +80,7 @@ var _armor_reduction: int = 0
 @onready var _channel_bar: ProgressBar = $ChannelBar
 @onready var _teleport_glow: ColorRect = $TeleportGlow
 @onready var _teleport_particles: GPUParticles2D = $TeleportParticles
+@onready var _held_item: Sprite2D = $Sprite/HeldItem
 
 
 func _ready() -> void:
@@ -73,11 +90,17 @@ func _ready() -> void:
 	_attack_hitbox.monitoring = false
 	_attack_hitbox.scale = Vector2.ONE * (melee_range / MELEE_SHAPE_REACH)
 	GameState.equipment_changed.connect(_on_equipment_changed)
+	_on_equipment_changed(EquipmentData.EquipSlot.WEAPON, "") # sync held sprite to whatever's already equipped
 
 
 func _on_equipment_changed(slot: EquipmentData.EquipSlot, _item_id: String) -> void:
 	if slot == EquipmentData.EquipSlot.WEAPON:
 		equipped_weapon = GameState.get_equipped(slot) as WeaponData
+		_held_item.texture = equipped_weapon.icon if equipped_weapon else null
+		_held_item.visible = equipped_weapon != null
+		_current_ammo = equipped_weapon.magazine_size if equipped_weapon and equipped_weapon.magazine_size > 0 else -1
+		_is_reloading = false
+		ammo_changed.emit(max(_current_ammo, 0), equipped_weapon.magazine_size if equipped_weapon else 0)
 	else:
 		_recompute_armor_reduction()
 
@@ -107,13 +130,26 @@ func _physics_process(delta: float) -> void:
 	if _invincible_timer > 0.0:
 		_invincible_timer -= delta
 
+	if _is_reloading:
+		_reload_timer -= delta
+		if _reload_timer <= 0.0:
+			var needed: int = equipped_weapon.magazine_size - _current_ammo
+			var taken: int = min(needed, GameState.get_item_count("ammo"))
+			GameState.remove_item("ammo", taken)
+			_current_ammo += taken
+			_is_reloading = false
+			reload_ended.emit()
+			ammo_changed.emit(_current_ammo, equipped_weapon.magazine_size)
+
 	if _is_channeling:
 		_process_teleport_channel(delta)
 		velocity = Vector2.ZERO
 		move_and_slide()
 		return
 
-	if _is_dashing:
+	if _is_dash_attacking:
+		_process_dash_attack(delta)
+	elif _is_dashing:
 		_process_dash(delta)
 	else:
 		_process_movement(delta)
@@ -123,6 +159,9 @@ func _physics_process(delta: float) -> void:
 
 	if Input.is_action_just_pressed("teleport"):
 		_start_teleport_channel()
+
+	if Input.is_action_just_pressed("reload") and _can_reload():
+		_start_reload()
 
 	move_and_slide()
 	if _last_move_direction.x != 0.0:
@@ -177,6 +216,10 @@ func _stop_teleport_vfx() -> void:
 
 
 func _start_attack() -> void:
+	var is_gun := equipped_weapon and equipped_weapon.attack_type == WeaponData.AttackType.RANGED and equipped_weapon.magazine_size > 0
+	if is_gun and (_is_reloading or _current_ammo <= 0):
+		return # empty or mid-reload: attack press does nothing (no cooldown spent)
+
 	var cooldown: float = equipped_weapon.attack_cooldown if equipped_weapon else attack_cooldown
 	_attack_cooldown_timer = cooldown
 	_is_attacking = true
@@ -184,6 +227,13 @@ func _start_attack() -> void:
 
 	if equipped_weapon and equipped_weapon.attack_type == WeaponData.AttackType.RANGED:
 		_fire_projectile()
+	elif equipped_weapon and equipped_weapon.attack_type == WeaponData.AttackType.DASH:
+		_start_dash_attack()
+		if is_gun:
+			_current_ammo -= 1
+			ammo_changed.emit(_current_ammo, equipped_weapon.magazine_size)
+			if _current_ammo <= 0:
+				_start_reload()
 	else:
 		_swing_melee()
 
@@ -191,10 +241,27 @@ func _start_attack() -> void:
 func _fire_projectile() -> void:
 	var projectile: Projectile = PROJECTILE_SCENE.instantiate()
 	projectile.damage = equipped_weapon.damage
+	projectile.speed = equipped_weapon.projectile_speed
 	projectile.target_mask = ENEMY_HURTBOX_MASK
 	get_parent().add_child(projectile)
 	projectile.position = position
 	projectile.rotation = _get_aim_direction().angle()
+
+
+func _can_reload() -> bool:
+	return equipped_weapon != null and equipped_weapon.magazine_size > 0 \
+		and not _is_reloading and _current_ammo < equipped_weapon.magazine_size \
+		and GameState.get_item_count("ammo") > 0
+
+
+## No-ops if the reserve ammo pool is empty — weapon just stays dry until
+## a pickup restocks it, rather than refilling for free.
+func _start_reload() -> void:
+	if GameState.get_item_count("ammo") <= 0:
+		return
+	_is_reloading = true
+	_reload_timer = equipped_weapon.reload_time
+	reload_started.emit()
 
 
 func _swing_melee() -> void:
@@ -207,6 +274,26 @@ func _swing_melee() -> void:
 	if OS.is_debug_build():
 		_attack_debug_visual.visible = true
 	get_tree().create_timer(attack_duration).timeout.connect(_end_attack)
+
+
+func _start_dash_attack() -> void:
+	var aim_direction := _get_aim_direction()
+	_is_dash_attacking = true
+	_dash_attack_timer = attack_duration
+	_dash_attack_direction = aim_direction
+	_attack_hitbox.damage = equipped_weapon.damage if equipped_weapon else attack_damage
+	_attack_hitbox.rotation = aim_direction.angle()
+	_attack_hitbox.monitoring = true
+	if OS.is_debug_build():
+		_attack_debug_visual.visible = true
+	get_tree().create_timer(attack_duration).timeout.connect(_end_attack)
+
+
+func _process_dash_attack(delta: float) -> void:
+	_dash_attack_timer -= delta
+	velocity = _dash_attack_direction * dash_attack_speed
+	if _dash_attack_timer <= 0.0:
+		_is_dash_attacking = false
 
 
 func _get_aim_direction() -> Vector2:
