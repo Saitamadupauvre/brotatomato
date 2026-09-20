@@ -16,8 +16,8 @@
 
 [resource]
 script = ExtResource("1_cfg")
-grid_width = 160
-grid_height = 160
+grid_width = 128
+grid_height = 128
 zones = Array[Resource]([ExtResource("2_outskirts"), ExtResource("3_woods"), ExtResource("4_deep")])
 container_scenes = Array[PackedScene]([ExtResource("5_container"), ExtResource("8_crop_chest"), ExtResource("9_resources_chest")])
 container_weights = Array[float]([1.0, 1.0, 1.0])
