@@ -11,7 +11,7 @@ text = "Welcome to the camp! Every tomato you carry is a life — lose them all 
 [sub_resource type="Resource" id="Resource_line2"]
 script = ExtResource("2_line")
 speaker = "Tomato Villager"
-text = "Plant, water and harvest tomatoes here to grow your numbers. Go poke around — I'll chime in when you find something new."
+text = "Plant, water and harvest tomatoes here to grow your numbers. Out of plots? Press G to place a new one. Go poke around — I'll chime in when you find something new."
 
 [resource]
 script = ExtResource("1_data")

@@ -75,6 +75,15 @@ var active_weapon_slot: EquipmentData.EquipSlot = EquipmentData.EquipSlot.WEAPON
 ## re-instantiated after Main is freed/reloaded by a scene change.
 var plots: Dictionary = {} # plot_id -> Vector2
 
+## Plot state/growth (#91 dungeon-trip bug): PlotBehavior itself is freed
+## and reinstanced on every scene change, so it can't remember its own
+## progress — GameState is the only thing alive across Camp <-> Dungeon.
+## Keyed like `plots`; value is {state: PlotBehavior.PlotState, grow_end_unix: float}.
+## grow_end_unix is an absolute Time.get_unix_time_from_system() timestamp
+## so growth keeps counting down for real while the player is off in the
+## dungeon, not just frozen and resumed.
+var _plot_progress: Dictionary = {} # plot_id -> Dictionary
+
 var _next_plot_id: int = 0
 
 ## Villager entries spawned from unharvested ripe tomatoes.
@@ -277,6 +286,17 @@ func move_plot(plot_id: int, position: Vector2) -> void:
 	plots[plot_id] = position
 
 
+## Called by PlotBehavior on every state change so its progress survives
+## the scene reload it doesn't survive itself (#91).
+func set_plot_progress(plot_id: int, state: int, grow_end_unix: float) -> void:
+	_plot_progress[plot_id] = {"state": state, "grow_end_unix": grow_end_unix}
+
+
+## Empty dict if the plot has never seen a state change (fresh plot).
+func get_plot_progress(plot_id: int) -> Dictionary:
+	return _plot_progress.get(plot_id, {})
+
+
 ## Death already popped villagers down to 0 in lockstep with tomatoes
 ## (see lose_tomato) — respawning the starting roster restores both at
 ## once, rather than resetting `tomatoes` on its own (see #36).
@@ -289,6 +309,11 @@ func reset_run() -> void:
 	villagers.clear()
 	tomatoes = 0
 	breeding_active = false
+	breeding_timer = 0.0
+	breeding_house_placed = false
+	breeding_house_position = Vector2.ZERO
+	plots.clear()
+	_plot_progress.clear()
 	_spawn_starting_villagers()
 
 

@@ -19,8 +19,10 @@ const PICK_RADIUS: float = 40.0
 const FEEDBACK_DURATION: float = 1.5
 const PLOT_BEHAVIOR_PATH: NodePath = ^"Interactable/Host/PlotBehavior"
 ## Placement (#91) has no Interactable to hang a TutorialTriggerBehavior
-## off of — it's a global input-mode toggle, not proximity-based — so it's
-## triggered directly, same exception as Main's camp-intro dialogue.
+## off of — it's a global input-mode toggle, not proximity-based like every
+## other tutorial — so it's triggered directly here, checked every frame
+## against the player's own position instead of an Area2D signal, same
+## exception as Main's camp-intro dialogue.
 const PLOT_PLACEMENT_DIALOGUE: DialogueData = preload("res://resources/dialogue/plot_placement.tres")
 
 @export var plots_container_path: NodePath = ^"../Plots"
@@ -60,6 +62,7 @@ func _input(event: InputEvent) -> void:
 
 
 func _process(_delta: float) -> void:
+	_check_placement_tutorial_proximity()
 	if _mode == Mode.IDLE:
 		return
 	_preview_position = (get_global_mouse_position() / CELL_SIZE).round() * CELL_SIZE
@@ -68,6 +71,20 @@ func _process(_delta: float) -> void:
 	_preview.color = Color(0.3, 0.9, 0.3, 0.6) if valid else Color(0.9, 0.3, 0.3, 0.6)
 
 
+## Fires the G-to-place hint the first time the player stands close to an
+## open, placeable spot — not the first time they happen to press G — so
+## the player learns the key exists before they'd need to already know it.
+func _check_placement_tutorial_proximity() -> void:
+	if TutorialManager.has_seen("plot_placement"):
+		return
+	var player := get_tree().get_first_node_in_group("player") as Node2D
+	if player == null:
+		return
+	if _is_valid_position((player.global_position / CELL_SIZE).round() * CELL_SIZE):
+		TutorialManager.trigger("plot_placement", PLOT_PLACEMENT_DIALOGUE)
+
+
+func _try_start_placing() -> void:
 ## Public: also called by the Shop's Plot card, not just the place_plot key.
 func start_placing() -> void:
 	if GameState.get_item_count("gold") < GOLD_COST:
@@ -75,7 +92,6 @@ func start_placing() -> void:
 		return
 	_mode = Mode.PLACING
 	_preview.visible = true
-	TutorialManager.trigger("plot_placement", PLOT_PLACEMENT_DIALOGUE)
 
 
 func _try_confirm_placing() -> void:
