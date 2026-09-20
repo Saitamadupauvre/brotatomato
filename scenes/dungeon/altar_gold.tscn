@@ -1,18 +1,8 @@
 [gd_scene format=3 uid="uid://cvvhqh2brk441"]
 
 [ext_resource type="PackedScene" path="res://scenes/dungeon/altar_base.tscn" id="1_base"]
-[ext_resource type="Script" path="res://scripts/data/loot_entry.gd" id="2_loot_entry"]
-[ext_resource type="Resource" path="res://resources/dungeon/zones/altar_wave_gold.tres" id="3_wave"]
-
-[sub_resource type="Resource" id="LootEntry_gold"]
-script = ExtResource("2_loot_entry")
-item_id = "gold"
-amount = 15
-
-[sub_resource type="Resource" id="LootEntry_loot"]
-script = ExtResource("2_loot_entry")
-item_id = "dungeon_loot"
-amount = 2
+[ext_resource type="Resource" path="res://resources/dungeon/zones/altar_wave_gold.tres" id="2_wave"]
+[ext_resource type="Resource" path="res://resources/dungeon/loot_tables/altar_gold_loot.tres" id="3_loot_table"]
 
 [node name="AltarGold" instance=ExtResource("1_base")]
 
@@ -20,5 +10,5 @@ amount = 2
 color = Color(0.75, 0.62, 0.15, 1)
 
 [node name="AltarBehavior" parent="Interactable/Host"]
-wave_zone = ExtResource("3_wave")
-contents = Array[LootEntry]([SubResource("LootEntry_gold"), SubResource("LootEntry_loot")])
+wave_zone = ExtResource("2_wave")
+loot_table = ExtResource("3_loot_table")

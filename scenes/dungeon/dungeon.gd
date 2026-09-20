@@ -188,6 +188,9 @@ func _populate() -> void:
 			_enemies.add_child(node)
 			pois.append(MapPoi.new(node, MapPoi.Kind.ENEMY))
 		else:
+			var container: ContainerBehavior = node.get_node_or_null("Interactable/Host/ContainerBehavior")
+			if container != null:
+				container.loot_seed = spawn.loot_seed
 			_props.add_child(node)
 			pois.append(MapPoi.new(node, MapPoi.Kind.CHEST))
 	_hud.set_points_of_interest(pois)

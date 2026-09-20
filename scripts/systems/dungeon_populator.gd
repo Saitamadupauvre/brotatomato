@@ -12,6 +12,9 @@ class Spawn:
 	var scene: PackedScene
 	var position: Vector2
 	var zone: ZoneData
+	## Drawn from this same build's rng stream; containers hand it to their
+	## ContainerBehavior so loot rolls are deterministic per dungeon run.
+	var loot_seed: int = 0
 
 
 static func build(layout: DungeonLayout, config: DungeonConfig) -> Array[Spawn]:
@@ -36,7 +39,9 @@ static func build(layout: DungeonLayout, config: DungeonConfig) -> Array[Spawn]:
 				break
 			var scene := config.pick_container(rng)
 			if scene:
-				result.append(_spawn(scene, layout, cells[i], zone))
+				var spawn := _spawn(scene, layout, cells[i], zone)
+				spawn.loot_seed = rng.randi()
+				result.append(spawn)
 			i += 1
 	return result
 

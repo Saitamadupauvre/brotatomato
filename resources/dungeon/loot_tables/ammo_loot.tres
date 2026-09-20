@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="LootTable" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/loot_table.gd" id="1_table"]
+[ext_resource type="Script" path="res://scripts/data/loot_table_entry.gd" id="2_entry"]
+
+[sub_resource type="Resource" id="LootTableEntry_ammo"]
+script = ExtResource("2_entry")
+item_id = "ammo"
+min_amount = 4
+max_amount = 8
+weight = 1.0
+
+[resource]
+script = ExtResource("1_table")
+entries = Array[LootTableEntry]([SubResource("LootTableEntry_ammo")])
+roll_count = 1

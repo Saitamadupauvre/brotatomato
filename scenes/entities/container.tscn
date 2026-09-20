@@ -1,41 +1,16 @@
-[gd_scene load_steps=9 format=3 uid="uid://ccontainer0001"]
+[gd_scene load_steps=8 format=3 uid="uid://ccontainer0001"]
 
 [ext_resource type="PackedScene" path="res://scenes/components/interactable.tscn" id="1_interactable"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/outline_behavior.gd" id="2_outline"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/interact_prompt_behavior.gd" id="3_prompt"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/container_behavior.gd" id="4_container"]
-[ext_resource type="Script" path="res://scripts/data/loot_entry.gd" id="5_loot_entry"]
+[ext_resource type="Resource" path="res://resources/dungeon/loot_tables/ammo_loot.tres" id="5_loot_table"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/opened_state_behavior.gd" id="6_opened"]
 [ext_resource type="Texture2D" path="res://assets/sprites/props/barrel.png" id="7_barrel"]
 [ext_resource type="Texture2D" path="res://assets/sprites/props/barrel_open.png" id="8_barrel_open"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_container"]
 size = Vector2(64, 64)
-
-[sub_resource type="Resource" id="LootEntry_loot"]
-script = ExtResource("5_loot_entry")
-item_id = "dungeon_loot"
-amount = 3
-
-[sub_resource type="Resource" id="LootEntry_water"]
-script = ExtResource("5_loot_entry")
-item_id = "water"
-amount = 2
-
-[sub_resource type="Resource" id="LootEntry_materials"]
-script = ExtResource("5_loot_entry")
-item_id = "materials"
-amount = 2
-
-[sub_resource type="Resource" id="LootEntry_gold"]
-script = ExtResource("5_loot_entry")
-item_id = "gold"
-amount = 5
-
-[sub_resource type="Resource" id="LootEntry_ammo"]
-script = ExtResource("5_loot_entry")
-item_id = "ammo"
-amount = 6
 
 [node name="Container" type="StaticBody2D"]
 
@@ -57,10 +32,11 @@ sprite_path = NodePath("Sprite")
 
 [node name="PromptBehavior" type="Node" parent="Interactable/Host"]
 script = ExtResource("3_prompt")
+label_text = "Ammo Container"
 
 [node name="ContainerBehavior" type="Node" parent="Interactable/Host"]
 script = ExtResource("4_container")
-contents = Array[LootEntry]([SubResource("LootEntry_loot"), SubResource("LootEntry_water"), SubResource("LootEntry_materials"), SubResource("LootEntry_gold"), SubResource("LootEntry_ammo")])
+loot_table = ExtResource("5_loot_table")
 
 [node name="OpenedStateBehavior" type="Node" parent="Interactable/Host"]
 script = ExtResource("6_opened")

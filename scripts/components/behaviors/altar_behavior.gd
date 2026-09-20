@@ -14,7 +14,7 @@ enum AltarState { IDLE, ACTIVE, CLEARED }
 ## convenient existing weighted-pick source for wave composition.
 @export var wave_zone: ZoneData
 @export var wave_size: int = 4
-@export var contents: Array[LootEntry] = []
+@export var loot_table: LootTable
 @export var spawn_radius: float = 96.0
 @export var status_label_path: NodePath
 
@@ -75,6 +75,7 @@ func _on_wave_enemy_died() -> void:
 
 func _on_wave_cleared() -> void:
 	_state = AltarState.CLEARED
+	var contents: Array[LootEntry] = loot_table.roll(_rng) if loot_table != null else []
 	LootSpawner.spawn(contents, owner_entity)
 	_update_visuals()
 	wave_cleared.emit()
