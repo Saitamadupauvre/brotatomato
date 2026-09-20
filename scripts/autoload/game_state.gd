@@ -82,6 +82,10 @@ func _ready() -> void:
 	add_item("materials", STARTING_MATERIALS)
 	add_item("crop", STARTING_CROP)
 	_spawn_starting_villagers()
+	# TEMP: starting weapon so the held-item sprite (#47) has something to
+	# show without going through the shop first. Remove/tune before ship.
+	add_item("sword", 1)
+	equip_item("sword")
 
 
 ## Villagers ARE the tomato/life count (#36) — spawning the starting
