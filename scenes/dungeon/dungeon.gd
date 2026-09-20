@@ -5,10 +5,6 @@ extends Node2D
 ## from that data. Transitions still go through SceneRouter.
 
 const TREE_SCENE: PackedScene = preload("res://scenes/dungeon/tree.tscn")
-const CHEST_SCENE: PackedScene = preload("res://scenes/entities/chest.tscn")
-## Cells from spawn the crop chest sits at — inside spawn_clear_radius so
-## the tile is always guaranteed floor without needing its own cell pick.
-const CHEST_SPAWN_OFFSET: Vector2i = Vector2i(2, 2)
 
 @export var config: DungeonConfig
 ## 0 = random seed each run. Set non-zero to reproduce a layout.
@@ -54,7 +50,6 @@ func _ready() -> void:
 	_hud.setup_minimap(layout, _player)
 	_place_exit()
 	_place_altar()
-	_place_crop_chest()
 	_populate()
 
 
@@ -187,16 +182,6 @@ static func _circle_points(radius: float, segments: int) -> PackedVector2Array:
 		var angle := TAU * i / segments
 		pts.append(Vector2(cos(angle), sin(angle)) * radius)
 	return pts
-
-
-## Crop storage chest, mirrored from the camp one so a run's stored crops
-## deposit/withdraw the same way here. Placed near spawn (inside its clear
-## radius) rather than a zone/altar-style pick since it's a convenience
-## prop, not a difficulty-gated reward.
-func _place_crop_chest() -> void:
-	var chest: Node2D = CHEST_SCENE.instantiate()
-	chest.position = layout.cell_to_world(layout.spawn_cell + CHEST_SPAWN_OFFSET)
-	_props.add_child(chest)
 
 
 ## Enemies and containers from the zone bands. Runs after the player is
