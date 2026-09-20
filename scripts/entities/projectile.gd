@@ -20,6 +20,7 @@ var damage: int = 1:
 func _ready() -> void:
 	_hitbox.damage = damage
 	_hitbox.collision_mask = target_mask
+	_hitbox.area_entered.connect(func(_area: Area2D) -> void: queue_free())
 	get_tree().create_timer(lifetime).timeout.connect(queue_free)
 
 
