@@ -74,3 +74,5 @@ dialogue = ExtResource("12_teleport_dialogue")
 [node name="Popup" parent="UI" instance=ExtResource("10_popup")]
 
 [node name="DialogueBox" parent="UI" instance=ExtResource("11_dialogue_box")]
+
+[editable path="World/CampExit"]

@@ -63,3 +63,5 @@ sprite_path = NodePath("Sprite")
 script = ExtResource("6_tutorial")
 tutorial_id = "altar_intro"
 dialogue = ExtResource("7_tutorial_dialogue")
+
+[editable path="Interactable"]

@@ -49,3 +49,5 @@ script = ExtResource("3_transition")
 script = ExtResource("4_tutorial")
 tutorial_id = "dungeon_entrance"
 dialogue = ExtResource("5_tutorial_dialogue")
+
+[editable path="Interactable"]

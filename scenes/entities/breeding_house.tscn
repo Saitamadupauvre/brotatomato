@@ -71,3 +71,5 @@ glow_rect_path = NodePath("GlowRect")
 script = ExtResource("7_tutorial")
 tutorial_id = "breeding_intro"
 dialogue = ExtResource("8_tutorial_dialogue")
+
+[editable path="Interactable"]

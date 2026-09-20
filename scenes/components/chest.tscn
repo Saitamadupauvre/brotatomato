@@ -29,3 +29,5 @@ sprite_path = NodePath("Sprite")
 [node name="PromptBehavior" type="Node" parent="Interactable/Host"]
 script = ExtResource("3_prompt")
 label_text = "Chest"
+
+[editable path="Interactable"]

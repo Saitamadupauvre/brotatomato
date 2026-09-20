@@ -52,3 +52,5 @@ plant_ripe_texture = ExtResource("6_plant2")
 script = ExtResource("7_tutorial")
 tutorial_id = "plot_basics"
 dialogue = ExtResource("8_tutorial_dialogue")
+
+[editable path="Interactable"]
