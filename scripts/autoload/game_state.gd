@@ -20,7 +20,7 @@ const ITEM_DEFS: Array[ItemData] = [
 ]
 
 signal tomato_changed(count: int)
-signal life_lost(remaining: int)
+signal life_lost(remaining: int, villager_names: Array[String])
 signal player_died
 signal villager_spawned(villager_id: int, position: Vector2, villager_name: String)
 signal villager_removed(villager_id: int)
@@ -125,12 +125,14 @@ func remove_item(item_id: String, amount: int = 1) -> bool:
 func lose_tomato(amount: int = 1) -> void:
 	tomatoes = max(tomatoes - amount, 0)
 	tomato_changed.emit(tomatoes)
-	life_lost.emit(tomatoes)
+	var removed_names: Array[String] = []
 	for i in amount:
 		if villagers.is_empty():
 			break
 		var removed: Dictionary = villagers.pop_back()
+		removed_names.append(removed["name"])
 		villager_removed.emit(removed["id"])
+	life_lost.emit(tomatoes, removed_names)
 	if tomatoes <= 0:
 		player_died.emit()
 
