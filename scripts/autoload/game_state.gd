@@ -7,7 +7,6 @@ extends Node
 ## Add a new item: create its .tres in resources/items/, preload it here.
 const ITEM_DEFS: Array[ItemData] = [
 	preload("res://resources/items/gold.tres"),
-	preload("res://resources/items/materials.tres"),
 	preload("res://resources/items/water.tres"),
 	preload("res://resources/items/crop.tres"),
 	preload("res://resources/items/dungeon_loot.tres"),
@@ -44,9 +43,6 @@ signal breeding_started
 signal card_equipped_changed(slot: int, item_id: String)
 signal breeding_house_created(position: Vector2)
 
-## TEMP: grants enough materials to test grid placement without looting
-## the Container first. Remove/tune before ship.
-const STARTING_MATERIALS: int = 30
 ## TEMP: enough carried crop to seed the starting plots before the first
 ## harvest comes in. Remove/tune before ship.
 const STARTING_CROP: int = 4
@@ -107,9 +103,9 @@ const VILLAGER_NAMES: Array[String] = [
 const BREEDING_COST: int = 2
 const BREEDING_INTERVAL: float = 20.0
 
-## Breeding House creation (#87): gold, not materials — decided after
-## team discussion that crafting-material cost is out of scope for this
-## pass. GDD doesn't fix a value — TEMP-tuned like BREEDING_COST.
+## Breeding House creation (#87): gold cost, purchased like everything else
+## in Camp — the materials/crafting loop was cut as out of scope. GDD
+## doesn't fix a value — TEMP-tuned like BREEDING_COST.
 const BREEDING_HOUSE_GOLD_COST: int = 50
 
 var breeding_active: bool = false
@@ -124,7 +120,6 @@ var breeding_house_placed: bool = false
 func _ready() -> void:
 	for item_data in ITEM_DEFS:
 		_item_defs[item_data.id] = item_data
-	add_item("materials", STARTING_MATERIALS)
 	add_item("crop", STARTING_CROP)
 	add_item("gold", STARTING_GOLD)
 	_spawn_starting_villagers()

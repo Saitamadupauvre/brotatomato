@@ -2,8 +2,7 @@ class_name BreedingHousePlacementController
 extends Node2D
 ## Grid placement for the Breeding House (#87), a one-shot singleton —
 ## reuses PlotPlacementController's grid-cursor pattern, but no MOVING
-## mode (the house never relocates once built) and spends gold instead
-## of materials.
+## mode (the house never relocates once built).
 
 enum Mode { IDLE, PLACING }
 

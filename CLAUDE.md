@@ -47,7 +47,7 @@ Both Camp (`scenes/main/main.tscn`) and Dungeon (`scenes/dungeon/dungeon.tscn`) 
 ## Mechanics summary (full detail in GDD)
 
 - **Camp = safe zone**, no threats. 4 tomato plots at start, timer-based growth (2-3 min), harvest by interacting with a ripe plot.
-- Growth beyond a natural cap requires dungeon-sourced materials to speed up or expand plots (passive anti-farm, no active punishment). Plot placement via a grid-snapped placement cursor (key G), spending `materials`, is implemented.
+- Plot placement via a grid-snapped placement cursor (key G), spending gold, is implemented. (Materials-based crafting/growth-speedup was cut as out of scope — plots and the Breeding House are gold-only purchases now.)
 - **Dungeon**: one fixed room, 5 enemy variants across the 4 attack archetypes (contact, melee, dash, ranged). Getting hit = lose a tomato. 0 tomatoes = death, return to camp. Tomatoes lost in the dungeon are gone permanently (enemies never drop tomatoes/seeds).
 - **Villagers**: Farmer Tomato (auto-harvest), Blacksmith Tomato (crafts from loot), rest are decorative with no function — none of the special roles are implemented yet.
 - **Card system** (Rounds-like): at cumulative tomato thresholds (20/50/100...), player picks 1 of 3 random cards (Combat / Management / Agility categories). Open questions live in the GDD. Not implemented.
