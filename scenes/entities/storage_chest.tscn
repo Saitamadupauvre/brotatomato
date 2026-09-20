@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" path="res://scenes/components/interactable.tscn" id="2_interactable"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/outline_behavior.gd" id="3_outline"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/interact_prompt_behavior.gd" id="4_prompt"]
+[ext_resource type="Texture2D" path="res://assets/sprites/props/barrel.png" id="5_barrel"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_chest"]
 size = Vector2(64, 64)
@@ -14,12 +15,9 @@ script = ExtResource("1_chest")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_chest")
 
-[node name="Sprite" type="ColorRect" parent="."]
-offset_left = -32.0
-offset_top = -32.0
-offset_right = 32.0
-offset_bottom = 32.0
-color = Color(0.75, 0.45, 0.15, 1)
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("5_barrel")
+scale = Vector2(0.16, 0.16)
 
 [node name="Interactable" parent="." instance=ExtResource("2_interactable")]
 

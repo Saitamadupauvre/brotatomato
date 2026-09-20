@@ -1,6 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://cpickup000001"]
 
 [ext_resource type="Script" path="res://scripts/entities/item_pickup.gd" id="1_pickup"]
+[ext_resource type="Texture2D" path="res://assets/sprites/item/coin.png" id="2_coin"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_pickup"]
 radius = 10.0
@@ -21,10 +22,6 @@ offset_bottom = 14.0
 color = Color(0, 0, 0, 0.35)
 mouse_filter = 2
 
-[node name="Sprite" type="ColorRect" parent="."]
-offset_left = -8.0
-offset_top = -8.0
-offset_right = 8.0
-offset_bottom = 8.0
-color = Color(0.95, 0.8, 0.2, 1)
-mouse_filter = 2
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_coin")
+scale = Vector2(0.0417, 0.0417)

@@ -4,9 +4,26 @@
 [ext_resource type="Script" path="res://scripts/components/behaviors/interact_prompt_behavior.gd" id="2_prompt"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/scene_transition_behavior.gd" id="3_transition"]
 
+[sub_resource type="Gradient" id="Gradient_shadow"]
+offsets = PackedFloat32Array(0, 0.35, 0.7, 1)
+colors = PackedColorArray(0.05, 0.05, 0.08, 0.75, 0.05, 0.05, 0.08, 0.5, 0.05, 0.05, 0.08, 0.22, 0.05, 0.05, 0.08, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_shadow"]
+gradient = SubResource("Gradient_shadow")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
 [node name="SceneTransitionPoint" type="Node2D"]
 
+[node name="Shadow" type="Sprite2D" parent="."]
+z_index = -1
+texture = SubResource("GradientTexture2D_shadow")
+
 [node name="Sprite" type="ColorRect" parent="."]
+visible = false
 offset_left = -24.0
 offset_top = -24.0
 offset_right = 24.0
