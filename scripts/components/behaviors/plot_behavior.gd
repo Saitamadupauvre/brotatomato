@@ -37,6 +37,17 @@ func _setup(p_owner: Node2D, p_host: BehaviorHost) -> void:
 	_update_visuals()
 
 
+## Item id the next interaction on this plot consumes, or "" if none
+## (GROWING/RIPE need nothing carried). HUD (#49) reads this on the
+## closest in-range plot to show only the relevant resource.
+func needed_item() -> String:
+	match _state:
+		PlotState.EMPTY:
+			return "crop"
+		PlotState.SEEDED:
+			return "water"
+		_:
+			return ""
 func is_growing() -> bool:
 	return _state == PlotState.GROWING
 

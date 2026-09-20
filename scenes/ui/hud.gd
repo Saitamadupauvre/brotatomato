@@ -13,6 +13,13 @@ const FOG_REVEAL_RADIUS: int = 7
 @onready var _map_overlay: MapOverlay = %MapOverlay
 @onready var _ammo_stat: Control = %AmmoStat
 @onready var _ammo_label: Label = %AmmoLabel
+## Contextual crop/water indicators (#49) — only one shows at a time,
+## whichever the closest in-range plot currently needs, standing in
+## for "the item you'd have in hand" for that action.
+@onready var _crop_stat: Control = %CropStat
+@onready var _crop_label: Label = %CropLabel
+@onready var _water_stat: Control = %WaterStat
+@onready var _water_label: Label = %WaterLabel
 ## Bottom-right weapon hotbar (#50) — shows both weapon slots' icons and
 ## highlights whichever is active, so the "only the active weapon
 ## applies" rule from the acceptance criteria is visible mid-fight, not
@@ -38,6 +45,8 @@ func _ready() -> void:
 	_on_item_changed("gold", GameState.get_item_count("gold"))
 
 	_ammo_stat.visible = false
+	_crop_stat.visible = false
+	_water_stat.visible = false
 	var player := get_tree().get_first_node_in_group("player")
 	if player:
 		player.ammo_changed.connect(_on_ammo_changed)
@@ -51,6 +60,8 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
+	_update_resource_prompt()
+
 	if _layout == null or not is_instance_valid(_player):
 		return
 	var cell := _layout.world_to_cell(_player.position)
@@ -58,6 +69,26 @@ func _process(_delta: float) -> void:
 	var facing: Vector2 = _player.velocity if _player.velocity.length() > 1.0 else Vector2.RIGHT
 	_minimap.update_player(_player.position, facing)
 	_map_overlay.update_player(_player.position, facing)
+
+
+## Shows crop/water — whichever the closest in-range plot needs next —
+## instead of always-on counters, so the HUD only surfaces the resource
+## relevant to what the player is about to do (#49).
+func _update_resource_prompt() -> void:
+	var needed := ""
+	var closest := InteractableComponent.get_closest_in_range()
+	if closest:
+		for child in closest.get_host().get_children():
+			if child is PlotBehavior:
+				needed = child.needed_item()
+				break
+
+	_crop_stat.visible = needed == "crop"
+	_water_stat.visible = needed == "water"
+	if needed == "crop":
+		_crop_label.text = "%d" % GameState.get_item_count("crop")
+	elif needed == "water":
+		_water_label.text = "%d" % GameState.get_item_count("water")
 
 
 ## Called once by the dungeon scene after it builds the layout and
