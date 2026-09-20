@@ -9,11 +9,17 @@ extends Resource
 
 @export var entries: Array[LootTableEntry] = []
 @export var roll_count: int = 1
+## Optional random upper bound for roll_count (e.g. a gold pile split into
+## several 5-gold drops). Leave below roll_count to keep it fixed.
+@export var roll_count_max: int = -1
 
 
 func roll(rng: RandomNumberGenerator) -> Array[LootEntry]:
 	var result: Array[LootEntry] = []
-	for i in roll_count:
+	var count := roll_count
+	if roll_count_max >= roll_count:
+		count = rng.randi_range(roll_count, roll_count_max)
+	for i in count:
 		var entry := _pick(rng)
 		if entry == null:
 			continue
