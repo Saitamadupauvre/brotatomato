@@ -8,8 +8,11 @@
 [node name="EnemyArcher" instance=ExtResource("1_base")]
 data = ExtResource("4_data")
 
-[node name="Sprite" parent="." index="0"]
-color = Color(0.15, 0.45, 0.2, 1)
+[node name="Sprite" parent="." index="1"]
+modulate = Color(0.15, 0.45, 0.2, 1)
+
+[node name="Shadow" parent="." index="0"]
+offset_factor = 0.6
 
 [node name="KiteMovementBehavior" type="Node" parent="Host"]
 script = ExtResource("2_kite")

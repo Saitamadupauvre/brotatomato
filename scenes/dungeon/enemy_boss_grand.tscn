@@ -17,14 +17,14 @@ radius = 46.0
 [node name="EnemyBossGrand" instance=ExtResource("1_base")]
 data = ExtResource("7_data")
 
-[node name="Sprite" parent="." index="0"]
-offset_left = -46.0
-offset_top = -46.0
-offset_right = 46.0
-offset_bottom = 46.0
-color = Color(0.55, 0.05, 0.08, 1)
+[node name="Sprite" parent="." index="1"]
+modulate = Color(0.55, 0.05, 0.08, 1)
+scale = Vector2(0.575, 0.575)
 
-[node name="CollisionShape2D" parent="." index="1"]
+[node name="Shadow" parent="." index="0"]
+offset_factor = 0.6
+
+[node name="CollisionShape2D" parent="." index="2"]
 shape = SubResource("CircleShape2D_boss_body")
 
 [node name="MobInfoBehavior" parent="Host" index="0"]

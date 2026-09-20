@@ -8,6 +8,9 @@
 [node name="EnemySlime" instance=ExtResource("1_base")]
 data = ExtResource("4_data")
 
+[node name="Shadow" parent="." index="0"]
+offset_factor = 0.6
+
 [node name="ChaseMovementBehavior" type="Node" parent="Host"]
 script = ExtResource("2_chase")
 

@@ -8,8 +8,12 @@
 [node name="EnemyBrute" instance=ExtResource("1_base")]
 data = ExtResource("4_data")
 
-[node name="Sprite" parent="." index="0"]
-color = Color(0.6, 0.1, 0.1, 1)
+[node name="Sprite" parent="." index="1"]
+modulate = Color(0.6, 0.1, 0.1, 1)
+scale = Vector2(0.225, 0.225)
+
+[node name="Shadow" parent="." index="0"]
+offset_factor = 0.6
 
 [node name="ChaseMovementBehavior" type="Node" parent="Host"]
 script = ExtResource("2_chase")
