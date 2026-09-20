@@ -6,6 +6,9 @@
 [ext_resource type="Script" path="res://scripts/components/behaviors/summon_behavior.gd" id="4_summon"]
 [ext_resource type="Resource" path="res://resources/enemies/boss_gilded_charger.tres" id="5_data"]
 [ext_resource type="PackedScene" path="res://scenes/dungeon/enemy_boss_minion_dasher.tscn" id="6_minion"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemy/flying.png" id="7_flying_a"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemy/flying2.png" id="8_flying_b"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/flying_flap_behavior.gd" id="9_flap"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_boss_body"]
 radius = 20.0
@@ -13,14 +16,12 @@ radius = 20.0
 [node name="EnemyBossGildedCharger" instance=ExtResource("1_base")]
 data = ExtResource("5_data")
 
-[node name="Sprite" parent="." index="0"]
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
-color = Color(0.95, 0.75, 0.1, 1)
+[node name="Sprite" parent="." index="1"]
+modulate = Color(0.95, 0.75, 0.1, 1)
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("7_flying_a")
 
-[node name="CollisionShape2D" parent="." index="1"]
+[node name="CollisionShape2D" parent="." index="2"]
 shape = SubResource("CircleShape2D_boss_body")
 
 [node name="ChaseMovementBehavior" type="Node" parent="Host"]
@@ -35,3 +36,8 @@ cooldown = 1.6
 [node name="SummonBehavior" type="Node" parent="Host"]
 script = ExtResource("4_summon")
 minion_scene = ExtResource("6_minion")
+
+[node name="FlyingFlapBehavior" type="Node" parent="Host"]
+script = ExtResource("9_flap")
+frame_a = ExtResource("7_flying_a")
+frame_b = ExtResource("8_flying_b")

@@ -11,14 +11,14 @@ radius = 26.0
 [node name="EnemyBossRootbrute" instance=ExtResource("1_base")]
 data = ExtResource("4_data")
 
-[node name="Sprite" parent="." index="0"]
-offset_left = -26.0
-offset_top = -26.0
-offset_right = 26.0
-offset_bottom = 26.0
-color = Color(0.25, 0.5, 0.15, 1)
+[node name="Sprite" parent="." index="1"]
+modulate = Color(0.25, 0.5, 0.15, 1)
+scale = Vector2(0.325, 0.325)
 
-[node name="CollisionShape2D" parent="." index="1"]
+[node name="Shadow" parent="." index="0"]
+offset_factor = 0.6
+
+[node name="CollisionShape2D" parent="." index="2"]
 shape = SubResource("CircleShape2D_boss_body")
 
 [node name="ChaseMovementBehavior" type="Node" parent="Host"]

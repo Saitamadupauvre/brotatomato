@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://c8y3f0m2q8k4a"]
+[gd_scene format=3 uid="uid://c8y3f0m2q8k4a"]
 
 [ext_resource type="Script" uid="uid://1kyxolsqlocl" path="res://scenes/player/player.gd" id="1_player_script"]
 [ext_resource type="Script" uid="uid://ctngo7stmnw5d" path="res://scripts/components/hurtbox_component.gd" id="2_hurtbox"]
@@ -9,10 +9,16 @@
 [ext_resource type="Texture2D" uid="uid://bk1tr6ytqtr35" path="res://assets/sprites/player/body_run_2.png" id="7_body_run2"]
 [ext_resource type="Texture2D" uid="uid://bnnqk23suauxx" path="res://assets/sprites/player/player_head.png" id="8_head"]
 [ext_resource type="Texture2D" uid="uid://dc7xuqidk87ao" path="res://assets/sprites/player/player_face.png" id="9_face"]
-[ext_resource type="Shader" path="res://assets/shaders/teleport_glow.gdshader" id="10_teleport_glow"]
+[ext_resource type="Shader" uid="uid://d16qjiq1dosmv" path="res://assets/shaders/teleport_glow.gdshader" id="10_teleport_glow"]
+[ext_resource type="Shader" uid="uid://rm5qcbrhnve8" path="res://assets/shaders/hit_flash.gdshader" id="11_hit_flash"]
+[ext_resource type="Script" uid="uid://b6jimn48st2vt" path="res://scripts/components/shadow_caster.gd" id="12_shadow_caster"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 16.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hit_flash"]
+shader = ExtResource("11_hit_flash")
+shader_parameter/flash_amount = 0.0
 
 [sub_resource type="Animation" id="Animation_idle"]
 resource_name = "idle"
@@ -126,41 +132,58 @@ _data = {
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_teleport_glow"]
 shader = ExtResource("10_teleport_glow")
+shader_parameter/glow_color = Color(0.4, 0.85, 1, 1)
+shader_parameter/pulse_speed = 3.0
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_teleport"]
 direction = Vector3(0, -1, 0)
 spread = 180.0
-gravity = Vector3(0, -20, 0)
 initial_velocity_min = 10.0
 initial_velocity_max = 30.0
+gravity = Vector3(0, -20, 0)
 scale_min = 2.0
 scale_max = 4.0
-color = Color(0.4, 0.85, 1.0, 1.0)
+color = Color(0.4, 0.85, 1, 1)
 
 [node name="Player" type="CharacterBody2D" unique_id=1595004106]
 script = ExtResource("1_player_script")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=563864023]
+position = Vector2(0, -12)
 shape = SubResource("CircleShape2D_1")
 
 [node name="Sprite" type="Node2D" parent="." unique_id=1884280128]
+position = Vector2(0, -43)
 
 [node name="Body" type="Sprite2D" parent="Sprite" unique_id=1782631494]
 modulate = Color(0.7038078, 0.7038079, 0.70380765, 1)
+material = SubResource("ShaderMaterial_hit_flash")
 position = Vector2(0, 3)
 scale = Vector2(0.2, 0.2)
 texture = ExtResource("5_body_idle")
 
+[node name="Shadow" type="Node2D" parent="Sprite/Body" unique_id=-1273018425]
+z_index = -1
+position = Vector2(-10, -10)
+scale = Vector2(4.999999, 4.999999)
+script = ExtResource("12_shadow_caster")
+radius_x = 14.0
+radius_y = 6.0
+offset = Vector2(0, 14)
+
 [node name="Head" type="Sprite2D" parent="Sprite/Body" unique_id=1062242764]
+use_parent_material = true
 position = Vector2(0, 6)
 scale = Vector2(0.99999994, 0.99999994)
 texture = ExtResource("8_head")
 
 [node name="Face" type="Sprite2D" parent="Sprite/Body/Head" unique_id=130556607]
+use_parent_material = true
 scale = Vector2(0.99999994, 0.99999994)
 texture = ExtResource("9_face")
 
 [node name="Oreol" type="Sprite2D" parent="Sprite/Body/Head" unique_id=1132845337]
+use_parent_material = true
 scale = Vector2(1.0000001, 1.0000001)
 texture = ExtResource("4_oreol")
 
@@ -178,9 +201,11 @@ libraries/ = SubResource("AnimationLibrary_halo")
 autoplay = &"halo_float"
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1840951259]
+position = Vector2(0, -31)
 position_smoothing_enabled = true
 
 [node name="Hurtbox" type="Area2D" parent="." unique_id=952955520]
+position = Vector2(0, -11)
 collision_layer = 4
 collision_mask = 0
 script = ExtResource("2_hurtbox")
@@ -189,6 +214,7 @@ script = ExtResource("2_hurtbox")
 shape = SubResource("CircleShape2D_1")
 
 [node name="AttackHitbox" type="Area2D" parent="." unique_id=1906529252]
+position = Vector2(0, -23)
 collision_layer = 0
 collision_mask = 8
 monitoring = false
@@ -202,7 +228,7 @@ visible = false
 color = Color(1, 1, 0, 0.4)
 polygon = PackedVector2Array(0, 0, 16.07, -38.8, 34.92, -23.33, 42, 0, 34.92, 23.33, 16.07, 38.8)
 
-[node name="ChannelBar" type="ProgressBar" parent="."]
+[node name="ChannelBar" type="ProgressBar" parent="." unique_id=869157185]
 visible = false
 offset_left = -30.0
 offset_top = -46.0
@@ -210,20 +236,18 @@ offset_right = 30.0
 offset_bottom = -30.0
 show_percentage = false
 
-[node name="TeleportGlow" type="ColorRect" parent="."]
+[node name="TeleportGlow" type="ColorRect" parent="." unique_id=2037909868]
 visible = false
+material = SubResource("ShaderMaterial_teleport_glow")
 offset_left = -40.0
 offset_top = -40.0
 offset_right = 40.0
 offset_bottom = 40.0
 mouse_filter = 2
-material = SubResource("ShaderMaterial_teleport_glow")
-color = Color(1, 1, 1, 1)
 
-[node name="TeleportParticles" type="GPUParticles2D" parent="."]
+[node name="TeleportParticles" type="GPUParticles2D" parent="." unique_id=917393578]
+position = Vector2(0, -31)
 emitting = false
 amount = 24
 lifetime = 0.8
-one_shot = false
-explosiveness = 0.0
 process_material = SubResource("ParticleProcessMaterial_teleport")

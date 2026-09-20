@@ -90,6 +90,14 @@ var _armor_reduction: int = 0
 @onready var _teleport_glow: ColorRect = $TeleportGlow
 @onready var _teleport_particles: GPUParticles2D = $TeleportParticles
 @onready var _held_item: Sprite2D = $Sprite/HeldItem
+@onready var _camera: Camera2D = $Camera2D
+@onready var _sprite_body: Sprite2D = $Sprite/Body
+
+@export var screen_shake_player_hit_strength: float = 14.0
+@export var screen_shake_enemy_hit_strength: float = 6.0
+@export var screen_shake_duration: float = 0.25
+var _shake_timer: float = 0.0
+var _shake_strength: float = 0.0
 
 
 func _ready() -> void:
@@ -101,6 +109,7 @@ func _ready() -> void:
 	GameState.equipment_changed.connect(_on_equipment_changed)
 	GameState.active_weapon_changed.connect(_on_active_weapon_changed)
 	_sync_active_weapon() # sync held sprite to whatever's already equipped
+	CombatFx.hit_landed.connect(_on_combat_hit)
 
 
 func _on_equipment_changed(slot: EquipmentData.EquipSlot, _item_id: String) -> void:
@@ -142,8 +151,24 @@ func _on_damage_taken(amount: int) -> void:
 	if _invincible_timer > 0.0:
 		return
 	AudioManager.play(&"hit_impact")
+	CombatFx.notify_hit(true)
+	HitFlash.flash(_sprite_body)
 	GameState.lose_tomato(max(amount - _armor_reduction, 0))
 	_invincible_timer = invincibility_duration
+
+
+func _on_combat_hit(is_player: bool) -> void:
+	_shake_strength = screen_shake_player_hit_strength if is_player else screen_shake_enemy_hit_strength
+	_shake_timer = screen_shake_duration
+
+
+func _update_screen_shake(delta: float) -> void:
+	if _shake_timer > 0.0:
+		_shake_timer -= delta
+		var falloff := _shake_timer / screen_shake_duration
+		_camera.offset = Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)) * _shake_strength * falloff
+	elif _camera.offset != Vector2.ZERO:
+		_camera.offset = Vector2.ZERO
 
 
 func _physics_process(delta: float) -> void:
@@ -156,6 +181,7 @@ func _physics_process(delta: float) -> void:
 	for i in _card_cooldowns.size():
 		if _card_cooldowns[i] > 0.0:
 			_card_cooldowns[i] -= delta
+	_update_screen_shake(delta)
 
 	if _is_reloading:
 		_reload_timer -= delta
