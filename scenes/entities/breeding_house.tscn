@@ -1,0 +1,67 @@
+[gd_scene format=3 uid="uid://b0vvv1o3e646c"]
+
+[ext_resource type="PackedScene" path="res://scenes/components/interactable.tscn" id="1_interactable"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/outline_behavior.gd" id="2_outline"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/interact_prompt_behavior.gd" id="3_prompt"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/breeding_behavior.gd" id="4_breeding"]
+[ext_resource type="Shader" path="res://assets/shaders/teleport_glow.gdshader" id="5_glow_shader"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_breeding"]
+size = Vector2(64, 64)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_breeding_glow"]
+shader = ExtResource("5_glow_shader")
+shader_parameter/glow_color = Color(1.0, 0.45, 0.1, 1.0)
+shader_parameter/pulse_speed = 2.0
+
+[node name="BreedingHouse" type="StaticBody2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_breeding")
+
+[node name="Sprite" type="ColorRect" parent="."]
+offset_left = -32.0
+offset_top = -32.0
+offset_right = 32.0
+offset_bottom = 32.0
+color = Color(0.75, 0.35, 0.2, 1)
+
+[node name="GlowRect" type="ColorRect" parent="."]
+visible = false
+offset_left = -56.0
+offset_top = -56.0
+offset_right = 56.0
+offset_bottom = 56.0
+mouse_filter = 2
+color = Color(1, 1, 1, 1)
+material = SubResource("ShaderMaterial_breeding_glow")
+
+[node name="TimeLabel" type="Label" parent="."]
+offset_left = -28.0
+offset_top = -50.0
+offset_right = 28.0
+offset_bottom = -28.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+visible = false
+mouse_filter = 2
+text = "0s"
+
+[node name="Interactable" parent="." instance=ExtResource("1_interactable")]
+
+[node name="Host" parent="Interactable" index="1"]
+owner_entity_path = NodePath("../..")
+
+[node name="OutlineBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("2_outline")
+sprite_path = NodePath("Sprite")
+
+[node name="PromptBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("3_prompt")
+label_text = "Breeding House"
+
+[node name="BreedingBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("4_breeding")
+time_label_path = NodePath("TimeLabel")
+glow_rect_path = NodePath("GlowRect")

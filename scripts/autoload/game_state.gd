@@ -12,6 +12,7 @@ const ITEM_DEFS: Array[ItemData] = [
 	preload("res://resources/items/crop.tres"),
 	preload("res://resources/items/dungeon_loot.tres"),
 	preload("res://resources/items/ammo.tres"),
+	preload("res://resources/items/key.tres"),
 	preload("res://resources/equipment/sword.tres"),
 	preload("res://resources/equipment/bow.tres"),
 	preload("res://resources/equipment/dash_blade.tres"),
@@ -20,6 +21,10 @@ const ITEM_DEFS: Array[ItemData] = [
 	preload("res://resources/equipment/leather_chestplate.tres"),
 	preload("res://resources/equipment/leather_leggings.tres"),
 	preload("res://resources/equipment/leather_boots.tres"),
+	preload("res://resources/cards/verdant_charm.tres"),
+	preload("res://resources/cards/iron_fang.tres"),
+	preload("res://resources/cards/swift_paws.tres"),
+	preload("res://resources/cards/golden_touch.tres"),
 ]
 
 signal tomato_changed(count: int)
@@ -35,6 +40,8 @@ signal equipment_changed(slot: EquipmentData.EquipSlot, item_id: String)
 ## distinct from equipment_changed, since swapping active slot changes
 ## which weapon is "in hand" without either slot's contents changing.
 signal active_weapon_changed(slot: EquipmentData.EquipSlot)
+signal breeding_started
+signal card_equipped_changed(slot: int, item_id: String)
 
 ## TEMP: grants enough materials to test grid placement without looting
 ## the Container first. Remove/tune before ship.
@@ -42,6 +49,11 @@ const STARTING_MATERIALS: int = 30
 ## TEMP: enough carried crop to seed the starting plots before the first
 ## harvest comes in. Remove/tune before ship.
 const STARTING_CROP: int = 4
+## TEMP: lets cards (#7) be bought/tested immediately without a full
+## gold-farming loop first. Remove/tune before ship.
+const STARTING_GOLD: int = 100
+
+const CARD_SLOTS: int = 3
 
 ## Carried tomatoes = lives = villagers.size(), always — see #36. Never
 ## set directly; only spawn_villager()/lose_tomato() change it, keeping it
@@ -59,6 +71,9 @@ var crop_stored: int = 0
 var _inventory: Dictionary = {} # item_id -> count
 var _item_defs: Dictionary = {} # item_id -> ItemData
 var _equipped: Dictionary = {} # EquipmentData.EquipSlot -> item_id
+## Card (#7) loadout, index -> item_id ("" = empty slot). Equipping never
+## consumes the owned copy (mirrors weapon/armor equip semantics).
+var equipped_cards: Array[String] = ["", "", ""]
 ## Which weapon slot attacks currently draw from (#50). Only WEAPON or
 ## WEAPON_2 is ever valid here; toggled by swap_active_weapon().
 var active_weapon_slot: EquipmentData.EquipSlot = EquipmentData.EquipSlot.WEAPON
@@ -85,12 +100,23 @@ const VILLAGER_NAMES: Array[String] = [
 	"Mustard", "Nutmeg", "Cinnamon", "Anise", "Coriander", "Tarragon",
 ]
 
+## Breeding House (#8): spends 2 lives to start, then grants a new one
+## every BREEDING_INTERVAL seconds until the run ends. GDD doesn't fix a
+## value for either — TEMP-tuned like PlotBehavior.grow_time.
+const BREEDING_COST: int = 2
+const BREEDING_INTERVAL: float = 20.0
+
+var breeding_active: bool = false
+var breeding_timer: float = 0.0
+var breeding_house_position: Vector2 = Vector2.ZERO
+
 
 func _ready() -> void:
 	for item_data in ITEM_DEFS:
 		_item_defs[item_data.id] = item_data
 	add_item("materials", STARTING_MATERIALS)
 	add_item("crop", STARTING_CROP)
+	add_item("gold", STARTING_GOLD)
 	_spawn_starting_villagers()
 	# TEMP: starting weapon so the held-item sprite (#47) has something to
 	# show without going through the shop first. Remove/tune before ship.
@@ -105,6 +131,15 @@ func _ready() -> void:
 	# (equip via inventory drag-drop, not equipped by default). Remove
 	# before ship.
 	add_item("dash_blade", 1)
+
+
+func _process(delta: float) -> void:
+	if not breeding_active:
+		return
+	breeding_timer -= delta
+	if breeding_timer <= 0.0:
+		breeding_timer += BREEDING_INTERVAL
+		spawn_villager(breeding_house_position)
 
 
 ## Villagers ARE the tomato/life count (#36) — spawning the starting
@@ -129,6 +164,11 @@ func get_item_count(item_id: String) -> int:
 
 
 func add_item(item_id: String, amount: int = 1) -> void:
+	## Golden Touch-style cards (#7) boost gold gain from any source —
+	## hooked here rather than per-source since add_item is the single
+	## place gold ever enters the inventory.
+	if item_id == "gold" and amount > 0:
+		amount = int(amount * get_passive_multiplier(CardData.Passive.GOLD_GAIN))
 	_inventory[item_id] = get_item_count(item_id) + amount
 	item_changed.emit(item_id, _inventory[item_id])
 
@@ -174,6 +214,32 @@ func spawn_villager(at_position: Vector2) -> void:
 	tomato_changed.emit(tomatoes)
 
 
+func can_start_breeding() -> bool:
+	return not breeding_active and tomatoes >= BREEDING_COST
+
+
+## Spends villager_ids as the breeding cost (#8) — a deliberate life spend,
+## same lockstep removal as lose_tomato() but by specific id (the caller
+## already walked these exact villagers to the house) rather than
+## pop_back, and no life_lost signal (that's combat-flavored, only
+## dungeon.gd listens for it).
+func start_breeding(villager_ids: Array[int], house_position: Vector2) -> void:
+	for id in villager_ids:
+		for i in villagers.size():
+			if villagers[i]["id"] == id:
+				villagers.remove_at(i)
+				villager_removed.emit(id)
+				break
+	tomatoes = max(tomatoes - villager_ids.size(), 0)
+	tomato_changed.emit(tomatoes)
+	if tomatoes <= 0:
+		player_died.emit()
+	breeding_active = true
+	breeding_timer = BREEDING_INTERVAL
+	breeding_house_position = house_position
+	breeding_started.emit()
+
+
 ## Spends one carried crop to plant a seed — never tomatoes (#36):
 ## tomatoes are lives, always == villagers.size(), and planting isn't a
 ## death condition.
@@ -200,6 +266,7 @@ func move_plot(plot_id: int, position: Vector2) -> void:
 func reset_run() -> void:
 	villagers.clear()
 	tomatoes = 0
+	breeding_active = false
 	_spawn_starting_villagers()
 
 
@@ -242,6 +309,50 @@ func unequip_item(slot: EquipmentData.EquipSlot) -> void:
 func get_equipped(slot: EquipmentData.EquipSlot) -> ItemData:
 	var id: String = _equipped.get(slot, "")
 	return get_item_data(id) if id != "" else null
+
+
+## Card (#7) equip, mirroring equip_item's consume-from-inventory
+## semantics: the slot's previous occupant (if any) is returned to the
+## counted inventory, the new one is removed from it.
+func equip_card(item_id: String, slot: int) -> void:
+	var data: ItemData = get_item_data(item_id)
+	if not (data is CardData) or get_item_count(item_id) <= 0:
+		return
+	if slot < 0 or slot >= CARD_SLOTS:
+		return
+	var current_id: String = equipped_cards[slot]
+	if current_id == item_id:
+		return
+	if current_id != "":
+		add_item(current_id, 1)
+	remove_item(item_id, 1)
+	equipped_cards[slot] = item_id
+	card_equipped_changed.emit(slot, item_id)
+
+
+func unequip_card(slot: int) -> void:
+	if slot < 0 or slot >= CARD_SLOTS:
+		return
+	var id: String = equipped_cards[slot]
+	if id == "":
+		return
+	equipped_cards[slot] = ""
+	add_item(id, 1)
+	card_equipped_changed.emit(slot, "")
+
+
+## 1.0 + sum of passive_value across equipped cards matching `passive` —
+## consumers (PlotBehavior, Player, add_item's gold hook) just read this,
+## no card-specific branching outside GameState.
+func get_passive_multiplier(passive: CardData.Passive) -> float:
+	var multiplier: float = 1.0
+	for item_id in equipped_cards:
+		if item_id == "":
+			continue
+		var card := get_item_data(item_id) as CardData
+		if card and card.passive == passive:
+			multiplier += card.passive_value
+	return multiplier
 
 
 ## Toggles which weapon slot attacks draw from (#50). Swaps even to an

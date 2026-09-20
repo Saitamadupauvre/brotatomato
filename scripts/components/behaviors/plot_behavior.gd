@@ -29,10 +29,34 @@ func is_empty() -> bool:
 
 func _setup(p_owner: Node2D, p_host: BehaviorHost) -> void:
 	super(p_owner, p_host)
+	add_to_group("plot_behavior") # Instant Harvest card active (#7) targets this group
 	_sprite = owner_entity.get_node(sprite_path)
 	_plant_sprite = owner_entity.get_node(plant_sprite_path)
 	_time_label = owner_entity.get_node(time_label_path)
 	_attention_outline = OutlineVisual.create(_sprite, Color(1.0, 0.9, 0.2), 6.0, 1.15)
+	_update_visuals()
+
+
+## Item id the next interaction on this plot consumes, or "" if none
+## (GROWING/RIPE need nothing carried). HUD (#49) reads this on the
+## closest in-range plot to show only the relevant resource.
+func needed_item() -> String:
+	match _state:
+		PlotState.EMPTY:
+			return "crop"
+		PlotState.SEEDED:
+			return "water"
+		_:
+			return ""
+func is_growing() -> bool:
+	return _state == PlotState.GROWING
+
+
+## Instant Harvest card active (#7) — skips straight to RIPE.
+func force_ripen() -> void:
+	if _state != PlotState.GROWING:
+		return
+	_state = PlotState.RIPE
 	_update_visuals()
 
 
@@ -58,7 +82,7 @@ func on_event(event_name: String, _payload: Dictionary = {}) -> void:
 			if GameState.remove_item("water", 1):
 				AudioManager.play(&"water_plot")
 				_state = PlotState.GROWING
-				_grow_timer = grow_time
+				_grow_timer = grow_time / GameState.get_passive_multiplier(CardData.Passive.PLOT_GROWTH_SPEED)
 				_update_visuals()
 		PlotState.RIPE:
 			AudioManager.play(&"harvest")

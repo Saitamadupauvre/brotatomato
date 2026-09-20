@@ -27,6 +27,28 @@ content_margin_top = 6.0
 content_margin_right = 10.0
 content_margin_bottom = 6.0
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_crop"]
+bg_color = Color(0.2, 0.45, 0.15, 0.85)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_water"]
+bg_color = Color(0.12, 0.32, 0.55, 0.85)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ammo"]
 bg_color = Color(0.2, 0.22, 0.25, 0.85)
 corner_radius_top_left = 8
@@ -65,7 +87,7 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -300.0
+offset_left = -460.0
 offset_top = 16.0
 offset_right = -16.0
 offset_bottom = 56.0
@@ -110,6 +132,54 @@ expand_mode = 1
 modulate = Color(1, 0.9, 0.3, 1)
 
 [node name="GoldLabel" type="Label" parent="StatBar/GoldStat/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+text = "0"
+
+[node name="CropStat" type="PanelContainer" parent="StatBar"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_crop")
+
+[node name="HBox" type="HBoxContainer" parent="StatBar/CropStat"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Icon" type="TextureRect" parent="StatBar/CropStat/HBox"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+texture = ExtResource("2_icon")
+expand_mode = 1
+modulate = Color(0.5, 1, 0.4, 1)
+
+[node name="CropLabel" type="Label" parent="StatBar/CropStat/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+text = "0"
+
+[node name="WaterStat" type="PanelContainer" parent="StatBar"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_water")
+
+[node name="HBox" type="HBoxContainer" parent="StatBar/WaterStat"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Icon" type="TextureRect" parent="StatBar/WaterStat/HBox"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+texture = ExtResource("2_icon")
+expand_mode = 1
+modulate = Color(0.4, 0.75, 1, 1)
+
+[node name="WaterLabel" type="Label" parent="StatBar/WaterStat/HBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22

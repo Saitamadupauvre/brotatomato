@@ -4,8 +4,11 @@
 [ext_resource type="PackedScene" uid="uid://bqhud00000001" path="res://scenes/ui/hud.tscn" id="3_hud"]
 [ext_resource type="PackedScene" uid="uid://cshop0000001" path="res://scenes/entities/shop.tscn" id="4_shop"]
 [ext_resource type="PackedScene" uid="uid://bgpkm5gclkrc7" path="res://scenes/ui/shop_menu.tscn" id="5_shop_menu"]
+[ext_resource type="PackedScene" path="res://scenes/entities/card_shop.tscn" id="19_card_shop"]
+[ext_resource type="PackedScene" path="res://scenes/ui/card_shop_menu.tscn" id="20_card_shop_menu"]
 [ext_resource type="PackedScene" path="res://scenes/ui/inventory_menu.tscn" id="7_inventory_menu"]
 [ext_resource type="PackedScene" path="res://scenes/entities/storage_chest.tscn" id="9_chest"]
+[ext_resource type="PackedScene" path="res://scenes/entities/breeding_house.tscn" id="18_breeding_house"]
 [ext_resource type="PackedScene" path="res://scenes/ui/chest_menu.tscn" id="10_chest_menu"]
 [ext_resource type="Script" uid="uid://c80uoyn25pvrk" path="res://scenes/main/main.gd" id="8_main"]
 [ext_resource type="PackedScene" uid="uid://c4xjvfnydiyay" path="res://scenes/entities/scene_transition_point.tscn" id="11_transition"]
@@ -129,8 +132,14 @@ position = Vector2(896, 672)
 [node name="Shop" parent="World" unique_id=933082294 instance=ExtResource("4_shop")]
 position = Vector2(524, 924)
 
+[node name="CardShop" parent="World" instance=ExtResource("19_card_shop")]
+position = Vector2(400, 800)
+
 [node name="Chest" parent="World" unique_id=1231121261 instance=ExtResource("9_chest")]
 position = Vector2(774, 1004)
+
+[node name="BreedingHouse" parent="World" instance=ExtResource("18_breeding_house")]
+position = Vector2(1268, 1004)
 
 [node name="Plots" type="Node2D" parent="World" unique_id=449040098]
 
@@ -150,6 +159,8 @@ destination = 1
 [node name="HUD" parent="UI" unique_id=549657007 instance=ExtResource("3_hud")]
 
 [node name="ShopMenu" parent="UI" unique_id=1065178460 instance=ExtResource("5_shop_menu")]
+
+[node name="CardShopMenu" parent="UI" instance=ExtResource("20_card_shop_menu")]
 
 [node name="InventoryMenu" parent="UI" unique_id=1940431405 instance=ExtResource("7_inventory_menu")]
 

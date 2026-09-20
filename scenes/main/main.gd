@@ -55,6 +55,7 @@ func _on_villager_spawned(villager_id: int, position: Vector2, villager_name: St
 	var villager: Villager = VILLAGER_SCENE.instantiate()
 	$World.add_child(villager)
 	villager.global_position = position
+	villager.villager_id = villager_id
 	villager.set_villager_name(villager_name)
 	_villager_nodes[villager_id] = villager
 

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="LootTable" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/loot_table.gd" id="1_table"]
+[ext_resource type="Script" path="res://scripts/data/loot_table_entry.gd" id="2_entry"]
+
+[sub_resource type="Resource" id="LootTableEntry_gold"]
+script = ExtResource("2_entry")
+item_id = "gold"
+min_amount = 15
+max_amount = 20
+weight = 2.0
+
+[sub_resource type="Resource" id="LootTableEntry_loot"]
+script = ExtResource("2_entry")
+item_id = "dungeon_loot"
+min_amount = 6
+max_amount = 10
+weight = 1.0
+
+[resource]
+script = ExtResource("1_table")
+entries = Array[LootTableEntry]([SubResource("LootTableEntry_gold"), SubResource("LootTableEntry_loot")])
+roll_count = 12

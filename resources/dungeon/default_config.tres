@@ -1,18 +1,28 @@
-[gd_resource type="Resource" script_class="DungeonConfig" load_steps=10 format=3 uid="uid://dungeoncfg00001"]
+[gd_resource type="Resource" script_class="DungeonConfig" load_steps=14 format=3 uid="uid://dungeoncfg00001"]
 
 [ext_resource type="Script" path="res://scripts/data/dungeon_config.gd" id="1_cfg"]
 [ext_resource type="Resource" path="res://resources/dungeon/zones/outskirts.tres" id="2_outskirts"]
 [ext_resource type="Resource" path="res://resources/dungeon/zones/woods.tres" id="3_woods"]
 [ext_resource type="Resource" path="res://resources/dungeon/zones/deep_forest.tres" id="4_deep"]
 [ext_resource type="PackedScene" path="res://scenes/entities/container.tscn" id="5_container"]
-[ext_resource type="PackedScene" path="res://scenes/dungeon/altar_gold.tscn" id="6_altar_gold"]
-[ext_resource type="PackedScene" path="res://scenes/dungeon/altar_crops.tscn" id="7_altar_crops"]
 [ext_resource type="PackedScene" path="res://scenes/entities/crop_chest.tscn" id="8_crop_chest"]
 [ext_resource type="PackedScene" path="res://scenes/entities/resources_chest.tscn" id="9_resources_chest"]
+[ext_resource type="PackedScene" path="res://scenes/dungeon/altar_boss_crops.tscn" id="10_altar_boss_crops"]
+[ext_resource type="PackedScene" path="res://scenes/dungeon/altar_boss_gold.tscn" id="11_altar_boss_gold"]
+[ext_resource type="PackedScene" path="res://scenes/dungeon/altar_boss_relic.tscn" id="12_altar_boss_relic"]
+[ext_resource type="PackedScene" path="res://scenes/dungeon/altar_final_boss.tscn" id="13_altar_final_boss"]
+[ext_resource type="PackedScene" path="res://scenes/dungeon/altar_gold.tscn" id="14_altar_gold"]
+[ext_resource type="PackedScene" path="res://scenes/dungeon/altar_crops.tscn" id="15_altar_crops"]
 
 [resource]
 script = ExtResource("1_cfg")
+grid_width = 160
+grid_height = 160
 zones = Array[Resource]([ExtResource("2_outskirts"), ExtResource("3_woods"), ExtResource("4_deep")])
 container_scenes = Array[PackedScene]([ExtResource("5_container"), ExtResource("8_crop_chest"), ExtResource("9_resources_chest")])
 container_weights = Array[float]([1.0, 1.0, 1.0])
-altar_scenes = Array[PackedScene]([ExtResource("6_altar_gold"), ExtResource("7_altar_crops")])
+boss_altar_scenes = Array[PackedScene]([ExtResource("10_altar_boss_crops"), ExtResource("11_altar_boss_gold"), ExtResource("12_altar_boss_relic")])
+final_boss_altar_scene = ExtResource("13_altar_final_boss")
+regular_altar_scenes = Array[PackedScene]([ExtResource("14_altar_gold"), ExtResource("15_altar_crops")])
+regular_altar_weights = Array[float]([1.0, 1.0])
+altar_min_separation = 24

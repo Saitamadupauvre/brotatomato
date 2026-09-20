@@ -45,6 +45,11 @@ func on_event(event_name: String, payload: Dictionary = {}) -> void:
 		_cooldown_timer -= delta
 		return
 
+	# Another attack behavior (e.g. SlamAttackBehavior on a multi-attack
+	# boss) already owns movement_locked — don't steal velocity mid-attack.
+	if enemy.movement_locked:
+		return
+
 	if enemy.player and enemy.global_position.distance_to(enemy.player.global_position) <= trigger_range:
 		_start_dash()
 

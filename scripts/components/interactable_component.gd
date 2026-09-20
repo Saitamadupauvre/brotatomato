@@ -39,11 +39,17 @@ func _exit_tree() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not disabled and _player_nearby and event.is_action_pressed("interact"):
-		if self != _closest_in_range():
+		if self != get_closest_in_range():
 			return
 		get_viewport().set_input_as_handled()
 		_host.broadcast("interacted")
 		interacted.emit()
+
+
+## Public accessor for this Interactable's Host — HUD (#49) reads the
+## closest in-range Interactable's Behaviors to show what it needs.
+func get_host() -> BehaviorHost:
+	return _host
 
 
 func _on_body_entered(body: Node2D) -> void:
@@ -64,7 +70,9 @@ func _on_body_exited(body: Node2D) -> void:
 		player_out_of_range.emit()
 
 
-func _closest_in_range() -> InteractableComponent:
+## Static — shared by the interact-input check above and by HUD (#49),
+## which needs the single closest Interactable regardless of instance.
+static func get_closest_in_range() -> InteractableComponent:
 	var closest: InteractableComponent = null
 	var closest_distance: float = INF
 	for candidate in _in_range:

@@ -6,9 +6,14 @@ extends RefCounted
 const ITEM_PICKUP_SCENE: PackedScene = preload("res://scenes/entities/item_pickup.tscn")
 
 
+## Callers (e.g. AltarBehavior._on_wave_cleared) can run from deep inside a
+## HitboxComponent area_entered callback — itself fired mid physics-query
+## flush. Adding an Area2D (ItemPickup) synchronously there hits "Can't
+## change this state while flushing queries" the moment it enables its
+## monitoring shape in _ready(), so the whole spawn is deferred.
 static func spawn(entries: Array[LootEntry], owner_entity: Node2D, scatter_min_distance: float = 24.0, scatter_max_distance: float = 64.0, scatter_attempts: int = 8) -> void:
 	for entry in entries:
-		_spawn_pickup(entry, owner_entity, scatter_min_distance, scatter_max_distance, scatter_attempts)
+		_spawn_pickup.call_deferred(entry, owner_entity, scatter_min_distance, scatter_max_distance, scatter_attempts)
 
 
 static func _spawn_pickup(entry: LootEntry, owner_entity: Node2D, scatter_min_distance: float, scatter_max_distance: float, scatter_attempts: int) -> void:

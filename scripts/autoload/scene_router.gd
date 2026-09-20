@@ -11,11 +11,15 @@ func _ready() -> void:
 
 
 func go_to_camp() -> void:
-	get_tree().change_scene_to_file(CAMP_SCENE)
+	## Deferred: go_to_camp can run from _on_player_died, itself reached
+	## from a HitboxComponent Area2D signal fired mid physics-step —
+	## change_scene_to_file frees the current scene's CollisionObjects
+	## immediately, which Godot forbids during a physics callback.
+	get_tree().change_scene_to_file.call_deferred(CAMP_SCENE)
 
 
 func go_to_dungeon() -> void:
-	get_tree().change_scene_to_file(DUNGEON_SCENE)
+	get_tree().change_scene_to_file.call_deferred(DUNGEON_SCENE)
 
 
 func _on_player_died() -> void:
