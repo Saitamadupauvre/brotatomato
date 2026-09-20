@@ -17,6 +17,7 @@ extends Node2D
 @export var debug_contours: bool = false
 
 var layout: DungeonLayout
+var _pois: Array[MapPoi] = []
 
 @onready var _player: CharacterBody2D = $World/Player
 @onready var _hud: HUD = $UI/HUD
@@ -166,6 +167,7 @@ func _place_altar(scene: PackedScene, cell: Vector2i) -> void:
 	var altar_behavior: AltarBehavior = altar.get_node("Interactable/Host/AltarBehavior")
 	altar_behavior.enemies_container = _enemies
 	_wave_bar.bind_altar(altar_behavior)
+	_pois.append(MapPoi.new(altar, MapPoi.Kind.ALTAR))
 
 	_build_altar_zone(cell)
 
@@ -193,18 +195,17 @@ static func _circle_points(radius: float, segments: int) -> PackedVector2Array:
 ## placed because Enemy looks up the "player" group in _ready.
 func _populate() -> void:
 	var spawns := DungeonPopulator.build(layout, config)
-	var pois: Array[MapPoi] = []
 	for spawn in spawns:
 		var node: Node2D = spawn.scene.instantiate()
 		node.position = spawn.position
 		if node is Enemy:
 			_enemies.add_child(node)
-			pois.append(MapPoi.new(node, MapPoi.Kind.ENEMY))
+			_pois.append(MapPoi.new(node, MapPoi.Kind.ENEMY))
 		else:
 			var container: ContainerBehavior = node.get_node_or_null("Interactable/Host/ContainerBehavior")
 			if container != null:
 				container.loot_seed = spawn.loot_seed
 			_props.add_child(node)
-			pois.append(MapPoi.new(node, MapPoi.Kind.CHEST))
-	_hud.set_points_of_interest(pois)
+			_pois.append(MapPoi.new(node, MapPoi.Kind.CHEST))
+	_hud.set_points_of_interest(_pois)
 	print("Dungeon spawns: ", spawns.size())

@@ -4,7 +4,7 @@ extends RefCounted
 ## a container, following its live node so a dead enemy's icon
 ## disappears with it. Built by dungeon.gd right after _populate().
 
-enum Kind { ENEMY, CHEST }
+enum Kind { ENEMY, CHEST, ALTAR }
 
 var node: Node2D
 var kind: Kind

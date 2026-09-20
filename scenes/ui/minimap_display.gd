@@ -17,6 +17,7 @@ enum Mode { MINI, FULL }
 const ICON_SIZE: Dictionary = {
 	MapPoi.Kind.ENEMY: Vector2(1.5, 1.5),
 	MapPoi.Kind.CHEST: Vector2(1.3, 1.3),
+	MapPoi.Kind.ALTAR: Vector2(2.2, 2.2),
 }
 
 @onready var _background: Panel = %Background

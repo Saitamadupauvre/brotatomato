@@ -12,6 +12,8 @@ func _draw() -> void:
 			_draw_enemy()
 		MapPoi.Kind.CHEST:
 			_draw_chest()
+		MapPoi.Kind.ALTAR:
+			_draw_altar()
 
 
 ## Red diamond with a darker outline, reads as "danger" at a glance.
@@ -33,3 +35,18 @@ func _draw_chest() -> void:
 	draw_rect(rect, Color(0.65, 0.45, 0.2))
 	draw_rect(rect, Color(0.3, 0.18, 0.05), false, 0.15)
 	draw_line(Vector2(0.0, size.y * 0.4), Vector2(size.x, size.y * 0.4), Color(0.3, 0.18, 0.05), 0.12)
+
+
+## Purple star, reads as "landmark" — biggest icon on the map so it stays
+## visible at minimap scale.
+func _draw_altar() -> void:
+	var half := size / 2.0
+	var outer := minf(half.x, half.y)
+	var inner := outer * 0.45
+	var points := PackedVector2Array()
+	for i in 8:
+		var angle := TAU * i / 8.0 - PI / 2.0
+		var radius := outer if i % 2 == 0 else inner
+		points.append(half + Vector2(cos(angle), sin(angle)) * radius)
+	draw_colored_polygon(points, Color(0.6, 0.25, 0.85))
+	draw_polyline(points + PackedVector2Array([points[0]]), Color(0.3, 0.1, 0.45), 0.15)
