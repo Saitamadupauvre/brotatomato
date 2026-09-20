@@ -24,10 +24,18 @@ var _held_icon: TextureRect = null
 @onready var _grid: GridContainer = %InventoryGrid
 @onready var _slot_rects: Dictionary = {
 	EquipmentData.EquipSlot.WEAPON: %WeaponSlot,
+	EquipmentData.EquipSlot.WEAPON_2: %WeaponSlot2,
 	EquipmentData.EquipSlot.HELMET: %HelmetSlot,
 	EquipmentData.EquipSlot.CHESTPLATE: %ChestplateSlot,
 	EquipmentData.EquipSlot.LEGGINGS: %LeggingsSlot,
 	EquipmentData.EquipSlot.BOOTS: %BootsSlot,
+}
+## Weapon slots' own panel (parent of the TextureRect), highlighted to
+## show which one attacks currently draw from (#50) — armor slots have
+## no such concept, so only these two are tracked.
+@onready var _weapon_slot_panels: Dictionary = {
+	EquipmentData.EquipSlot.WEAPON: %WeaponSlot.get_parent(),
+	EquipmentData.EquipSlot.WEAPON_2: %WeaponSlot2.get_parent(),
 }
 
 
@@ -36,11 +44,13 @@ func _ready() -> void:
 	_slot_order.resize(TOTAL_SLOTS)
 	_slot_order.fill("")
 	GameState.equipment_changed.connect(_on_equipment_changed)
+	GameState.active_weapon_changed.connect(_on_active_weapon_changed)
 	for slot in EquipmentData.ALL_SLOTS:
 		var slot_rect = _slot_rects[slot]
 		slot_rect.equip_slot = slot
 		slot_rect.clicked.connect(_on_slot_clicked)
 		_refresh_slot(slot)
+	_refresh_active_weapon_highlight()
 
 
 func _input(event: InputEvent) -> void:
@@ -65,6 +75,30 @@ func open() -> void:
 
 func _on_equipment_changed(slot: EquipmentData.EquipSlot, _item_id: String) -> void:
 	_refresh_slot(slot)
+
+
+func _on_active_weapon_changed(_slot: EquipmentData.EquipSlot) -> void:
+	_refresh_active_weapon_highlight()
+
+
+const _ACTIVE_WEAPON_BORDER := Color(0.95, 0.8, 0.3, 1) # gold ring = active weapon slot
+
+
+func _refresh_active_weapon_highlight() -> void:
+	for slot in _weapon_slot_panels:
+		var panel: PanelContainer = _weapon_slot_panels[slot]
+		if slot == GameState.active_weapon_slot:
+			var style := StyleBoxFlat.new()
+			style.bg_color = Color(0.2, 0.23, 0.28, 1)
+			style.border_width_left = 3
+			style.border_width_top = 3
+			style.border_width_right = 3
+			style.border_width_bottom = 3
+			style.border_color = _ACTIVE_WEAPON_BORDER
+			style.set_corner_radius_all(6)
+			panel.add_theme_stylebox_override("panel", style)
+		else:
+			panel.remove_theme_stylebox_override("panel")
 
 
 func _refresh_slot(slot: EquipmentData.EquipSlot) -> void:
@@ -134,7 +168,7 @@ func _try_place(target: InventorySlot) -> void:
 	if target.equip_slot != -1:
 		if not _item_fits_equip_slot(_held_item_id, target.equip_slot):
 			return
-		GameState.equip_item(_held_item_id)
+		GameState.equip_item(_held_item_id, target.equip_slot)
 	elif _held_origin.equip_slot != -1:
 		GameState.unequip_item(_held_origin.equip_slot)
 	else:
@@ -143,9 +177,16 @@ func _try_place(target: InventorySlot) -> void:
 	_finish_hold()
 
 
+## WEAPON_2 accepts the same items as WEAPON — weapon resources are always
+## authored with data.slot == WEAPON (#50); WEAPON_2 is a second physical
+## slot, not a distinct item category.
 func _item_fits_equip_slot(item_id: String, slot: int) -> bool:
 	var data: ItemData = GameState.get_item_data(item_id)
-	return data is EquipmentData and data.slot == slot
+	if not (data is EquipmentData):
+		return false
+	if slot == EquipmentData.EquipSlot.WEAPON_2:
+		return data.slot == EquipmentData.EquipSlot.WEAPON
+	return data.slot == slot
 
 
 func _swap_grid_slots(origin: InventorySlot, target: InventorySlot) -> void:
