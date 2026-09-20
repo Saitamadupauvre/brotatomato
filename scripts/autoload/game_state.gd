@@ -31,6 +31,10 @@ signal plot_placed(plot_id: int, position: Vector2)
 signal item_changed(item_id: String, count: int)
 signal crop_stored_changed(count: int)
 signal equipment_changed(slot: EquipmentData.EquipSlot, item_id: String)
+## Fired when the active weapon toggles between WEAPON/WEAPON_2 (#50) —
+## distinct from equipment_changed, since swapping active slot changes
+## which weapon is "in hand" without either slot's contents changing.
+signal active_weapon_changed(slot: EquipmentData.EquipSlot)
 
 ## TEMP: grants enough materials to test grid placement without looting
 ## the Container first. Remove/tune before ship.
@@ -55,6 +59,9 @@ var crop_stored: int = 0
 var _inventory: Dictionary = {} # item_id -> count
 var _item_defs: Dictionary = {} # item_id -> ItemData
 var _equipped: Dictionary = {} # EquipmentData.EquipSlot -> item_id
+## Which weapon slot attacks currently draw from (#50). Only WEAPON or
+## WEAPON_2 is ever valid here; toggled by swap_active_weapon().
+var active_weapon_slot: EquipmentData.EquipSlot = EquipmentData.EquipSlot.WEAPON
 
 ## Positions of player-placed plots (beyond the 4 built-in ones), keyed by
 ## a stable id (not by position — floats round-tripped through a Node2D
@@ -200,18 +207,25 @@ func reset_run() -> void:
 ## (so it stops also showing there), swapping any previous occupant of
 ## the slot back into the inventory first. No-ops if the item isn't
 ## owned, or is already equipped in its slot.
-func equip_item(item_id: String) -> void:
+## target_slot lets a weapon land in WEAPON or WEAPON_2 (#50) — both
+## accept the same items (weapon resources are always authored with
+## data.slot == WEAPON), so which physical slot it fills can't be read
+## off the item itself. Defaults to data.slot, which is correct for
+## armor (single slot per piece) and for equipping a weapon with no
+## explicit target (falls into WEAPON).
+func equip_item(item_id: String, target_slot: int = -1) -> void:
 	var data: ItemData = get_item_data(item_id)
 	if not (data is EquipmentData) or get_item_count(item_id) <= 0:
 		return
-	var current_id: String = _equipped.get(data.slot, "")
+	var slot: int = target_slot if target_slot != -1 else data.slot
+	var current_id: String = _equipped.get(slot, "")
 	if current_id == item_id:
 		return
 	if current_id != "":
 		add_item(current_id, 1)
 	remove_item(item_id, 1)
-	_equipped[data.slot] = item_id
-	equipment_changed.emit(data.slot, item_id)
+	_equipped[slot] = item_id
+	equipment_changed.emit(slot, item_id)
 
 
 ## Returns a slot's item to the counted inventory. No-op if the slot is
@@ -228,6 +242,21 @@ func unequip_item(slot: EquipmentData.EquipSlot) -> void:
 func get_equipped(slot: EquipmentData.EquipSlot) -> ItemData:
 	var id: String = _equipped.get(slot, "")
 	return get_item_data(id) if id != "" else null
+
+
+## Toggles which weapon slot attacks draw from (#50). Swaps even to an
+## empty slot (going unarmed is a valid, if bad, choice) rather than
+## refusing — a player should always be able to tell what "switch
+## weapon" did without a silent no-op.
+func swap_active_weapon() -> void:
+	active_weapon_slot = EquipmentData.EquipSlot.WEAPON_2 \
+		if active_weapon_slot == EquipmentData.EquipSlot.WEAPON \
+		else EquipmentData.EquipSlot.WEAPON
+	active_weapon_changed.emit(active_weapon_slot)
+
+
+func get_active_weapon() -> ItemData:
+	return get_equipped(active_weapon_slot)
 
 
 ## Moves crop from carried inventory into chest storage.
