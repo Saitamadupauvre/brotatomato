@@ -41,12 +41,29 @@ extends Resource
 ## pool (each entry its own reward type/loot table) — not zone/density
 ## driven, since exactly one unique object is placed, not scattered copies.
 @export var altar_scenes: Array[PackedScene] = []
+## Parallel to altar_scenes. Missing entries count as 1.0 — boss altars are
+## given lower weight than regular altars so they roll rarer (see #27).
+@export var altar_weights: Array[float] = []
 ## Floor cells cleared around the altar (bigger than spawn's, so the
 ## altar clearing reads as a distinct, recognizable zone from a distance).
 @export var altar_clear_radius: int = 8
 ## Band bounds as a fraction of DungeonLayout.max_distance, [min, max].
 @export_range(0.0, 1.0) var altar_min_distance_ratio: float = 0.4
 @export_range(0.0, 1.0) var altar_max_distance_ratio: float = 0.8
+
+
+func pick_altar(rng: RandomNumberGenerator) -> PackedScene:
+	if altar_scenes.is_empty():
+		return null
+	var total := 0.0
+	for i in altar_scenes.size():
+		total += altar_weights[i] if i < altar_weights.size() else 1.0
+	var roll := rng.randf() * total
+	for i in altar_scenes.size():
+		roll -= altar_weights[i] if i < altar_weights.size() else 1.0
+		if roll <= 0.0:
+			return altar_scenes[i]
+	return altar_scenes[-1]
 
 
 func pick_container(rng: RandomNumberGenerator) -> PackedScene:

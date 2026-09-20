@@ -145,7 +145,7 @@ func _place_altar() -> void:
 		return
 	var rng := RandomNumberGenerator.new()
 	rng.seed = layout.seed ^ 0xA17A2
-	var scene: PackedScene = config.altar_scenes[rng.randi_range(0, config.altar_scenes.size() - 1)]
+	var scene: PackedScene = config.pick_altar(rng)
 	var altar: Node2D = scene.instantiate()
 	altar.position = layout.cell_to_world(layout.altar_cell)
 	_props.add_child(altar)

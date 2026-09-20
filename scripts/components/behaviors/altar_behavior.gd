@@ -17,6 +17,9 @@ enum AltarState { IDLE, ACTIVE, CLEARED }
 @export var loot_table: LootTable
 @export var spawn_radius: float = 96.0
 @export var status_label_path: NodePath
+## Swaps the status label wording so a boss fight reads as higher stakes
+## than a regular wave — purely cosmetic, no behavior difference.
+@export var is_boss: bool = false
 
 signal wave_started(count: int)
 signal wave_progress(remaining: int)
@@ -90,7 +93,7 @@ func _update_visuals() -> void:
 			_status_label.visible = false
 		AltarState.ACTIVE:
 			_status_label.visible = true
-			_status_label.text = "Wave active"
+			_status_label.text = "Boss fight!" if is_boss else "Wave active"
 		AltarState.CLEARED:
 			_status_label.visible = true
-			_status_label.text = "Altar cleared"
+			_status_label.text = "Boss defeated" if is_boss else "Altar cleared"
