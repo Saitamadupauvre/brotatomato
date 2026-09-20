@@ -180,7 +180,7 @@ static func _pick_exit(layout: DungeonLayout) -> void:
 				return
 
 
-## Altars: 4 guaranteed fixed floor cells in a mid/far distance band (so
+## Altars: 5 guaranteed fixed floor cells in a mid/far distance band (so
 ## none sits at the player's feet or overlaps the exit), each with a big
 ## clear disc around it — same carving technique as _pick_spawn, just
 ## bigger, so each clearing is a visible landmark. Runs after
@@ -188,10 +188,11 @@ static func _pick_exit(layout: DungeonLayout) -> void:
 ## distance value (possibly -1/unreached) they had before clearing, which
 ## is fine — it only means DungeonPopulator won't drop zone content
 ## inside the clearing, never that the clearing itself is invalid.
-## The 4th (farthest-from-spawn) cell becomes the final boss's, so that
-## fight always reads as "the deepest room"; the other 3 (shuffled) are
-## the boss altars.
+## The farthest-from-spawn cell becomes the final boss's, so that fight
+## always reads as "the deepest room"; of the remaining 4 (shuffled),
+## 3 are the boss altars and 1 is the regular (#5) altar.
 static func _pick_altars(layout: DungeonLayout, config: DungeonConfig, rng: RandomNumberGenerator) -> void:
+	const ALTAR_COUNT := 5
 	var lo := int(config.altar_min_distance_ratio * layout.max_distance)
 	var hi := int(config.altar_max_distance_ratio * layout.max_distance)
 	var candidates: Array[Vector2i] = []
@@ -206,6 +207,7 @@ static func _pick_altars(layout: DungeonLayout, config: DungeonConfig, rng: Rand
 	if candidates.is_empty():
 		var fallback := layout.exit_cell
 		layout.boss_altar_cells = [fallback, fallback, fallback]
+		layout.regular_altar_cell = fallback
 		layout.final_boss_cell = fallback
 		_clear_altar_disc(layout, fallback, config.altar_clear_radius)
 		return
@@ -213,7 +215,7 @@ static func _pick_altars(layout: DungeonLayout, config: DungeonConfig, rng: Rand
 	candidates.shuffle()
 	var picked: Array[Vector2i] = []
 	for c in candidates:
-		if picked.size() >= 4:
+		if picked.size() >= ALTAR_COUNT:
 			break
 		var far_enough := true
 		for p in picked:
@@ -222,10 +224,10 @@ static func _pick_altars(layout: DungeonLayout, config: DungeonConfig, rng: Rand
 				break
 		if far_enough:
 			picked.append(c)
-	# Small maps may not fit 4 well-separated cells — fill the rest
-	# ignoring separation rather than leaving a placement unset.
+	# Small maps may not fit ALTAR_COUNT well-separated cells — fill the
+	# rest ignoring separation rather than leaving a placement unset.
 	var i := 0
-	while picked.size() < 4 and i < candidates.size():
+	while picked.size() < ALTAR_COUNT and i < candidates.size():
 		if not picked.has(candidates[i]):
 			picked.append(candidates[i])
 		i += 1
@@ -239,10 +241,12 @@ static func _pick_altars(layout: DungeonLayout, config: DungeonConfig, rng: Rand
 			final_index = j
 
 	layout.final_boss_cell = picked[final_index]
-	layout.boss_altar_cells = []
+	var rest: Array[Vector2i] = []
 	for j in picked.size():
 		if j != final_index:
-			layout.boss_altar_cells.append(picked[j])
+			rest.append(picked[j])
+	layout.boss_altar_cells = rest.slice(0, 3)
+	layout.regular_altar_cell = rest[3] if rest.size() > 3 else layout.final_boss_cell
 
 	for cell in picked:
 		_clear_altar_disc(layout, cell, config.altar_clear_radius)

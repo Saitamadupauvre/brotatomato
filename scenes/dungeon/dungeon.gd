@@ -137,13 +137,22 @@ func _place_exit() -> void:
 
 
 ## Fixed, unique placement (unlike zone-driven _populate below) — the 3
-## boss altars plus the gated final-boss altar always spawn, one per
-## layout.boss_altar_cells/final_boss_cell, each wired to the enemy
-## container and wave bar and given a clearing so it reads as a landmark
-## from a distance, not just a small prop.
+## boss altars, the regular (#5) altar, and the gated final-boss altar
+## always spawn, one per layout.boss_altar_cells/regular_altar_cell/
+## final_boss_cell, each wired to the enemy container and wave bar and
+## given a clearing so it reads as a landmark from a distance, not just a
+## small prop. The regular altar's scene is still randomly picked from
+## its pool, same as before boss altars existed.
 func _place_boss_altars() -> void:
 	for i in mini(config.boss_altar_scenes.size(), layout.boss_altar_cells.size()):
 		_place_altar(config.boss_altar_scenes[i], layout.boss_altar_cells[i])
+
+	var rng := RandomNumberGenerator.new()
+	rng.seed = layout.seed ^ 0xA17A2
+	var regular_scene := config.pick_regular_altar(rng)
+	if regular_scene != null:
+		_place_altar(regular_scene, layout.regular_altar_cell)
+
 	if config.final_boss_altar_scene != null:
 		_place_altar(config.final_boss_altar_scene, layout.final_boss_cell)
 
