@@ -133,11 +133,11 @@ position = Vector2(524, 924)
 [node name="CardShop" parent="World" instance=ExtResource("19_card_shop")]
 position = Vector2(400, 800)
 
-[node name="BreedingHousePlacement" parent="World" instance=ExtResource("18_breeding_house_placement")]
+[node name="BreedingHousePlacement" parent="World" groups=["breeding_house_placement"] instance=ExtResource("18_breeding_house_placement")]
 
 [node name="Plots" type="Node2D" parent="World" unique_id=449040098]
 
-[node name="PlotPlacement" parent="World" unique_id=1942575348 instance=ExtResource("12_plot_placement")]
+[node name="PlotPlacement" parent="World" unique_id=1942575348 groups=["plot_placement"] instance=ExtResource("12_plot_placement")]
 
 [node name="DungeonEntrance" parent="World" unique_id=44108438 instance=ExtResource("11_transition")]
 position = Vector2(896, 90)
