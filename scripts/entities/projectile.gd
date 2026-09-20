@@ -14,10 +14,14 @@ var damage: int = 1:
 		if _hitbox:
 			_hitbox.damage = value
 
+const RENDER_SIZE: float = 40.0
+
 @onready var _hitbox: HitboxComponent = $Hitbox
+@onready var _sprite: Sprite2D = $Sprite
 
 
 func _ready() -> void:
+	SpriteScale.fit(_sprite, RENDER_SIZE)
 	_hitbox.damage = damage
 	_hitbox.collision_mask = target_mask
 	_hitbox.area_entered.connect(func(_area: Area2D) -> void: queue_free())

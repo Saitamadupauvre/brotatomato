@@ -73,7 +73,12 @@ func _input(event: InputEvent) -> void:
 
 func _process(_delta: float) -> void:
 	if _held_icon:
-		_held_icon.global_position = get_global_mouse_position() - _held_icon.size / 2.0
+		# Re-forced every frame: a TextureRect with no Container parent has
+		# nothing else re-applying its size after the initial assignment,
+		# and previously that one assignment wasn't enough to stop it
+		# rendering at its source texture's full native resolution.
+		_held_icon.size = _HELD_ICON_SIZE
+		_held_icon.global_position = get_global_mouse_position() - _HELD_ICON_SIZE / 2.0
 
 
 func open() -> void:
@@ -89,22 +94,11 @@ func _on_active_weapon_changed(_slot: EquipmentData.EquipSlot) -> void:
 	_refresh_active_weapon_highlight()
 
 
-const _ACTIVE_WEAPON_BORDER := Color(0.95, 0.8, 0.3, 1) # gold ring = active weapon slot
-
-
 func _refresh_active_weapon_highlight() -> void:
 	for slot in _weapon_slot_panels:
 		var panel: PanelContainer = _weapon_slot_panels[slot]
 		if slot == GameState.active_weapon_slot:
-			var style := StyleBoxFlat.new()
-			style.bg_color = Color(0.2, 0.23, 0.28, 1)
-			style.border_width_left = 3
-			style.border_width_top = 3
-			style.border_width_right = 3
-			style.border_width_bottom = 3
-			style.border_color = _ACTIVE_WEAPON_BORDER
-			style.set_corner_radius_all(6)
-			panel.add_theme_stylebox_override("panel", style)
+			panel.add_theme_stylebox_override("panel", UITheme.highlight_style())
 		else:
 			panel.remove_theme_stylebox_override("panel")
 
@@ -249,14 +243,14 @@ const _HELD_ICON_SIZE := Vector2(56, 56)
 
 func _show_held_icon(texture: Texture2D) -> void:
 	_held_icon = TextureRect.new()
-	_held_icon.texture = texture
-	_held_icon.custom_minimum_size = _HELD_ICON_SIZE
-	_held_icon.size = _HELD_ICON_SIZE
 	_held_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_held_icon.stretch_mode = TextureRect.STRETCH_SCALE
+	_held_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_held_icon.custom_minimum_size = _HELD_ICON_SIZE
+	_held_icon.texture = texture
 	_held_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_held_icon.modulate.a = 0.9
 	add_child(_held_icon)
+	_held_icon.size = _HELD_ICON_SIZE
 	_held_icon.global_position = get_global_mouse_position() - _HELD_ICON_SIZE / 2.0
 
 
@@ -272,22 +266,16 @@ func _clear_held_icon() -> void:
 ## "extends Control") even though the runtime script is correct.
 func _make_slot_shell():
 	var slot := PanelContainer.new()
-	slot.custom_minimum_size = Vector2(56, 56)
+	slot.custom_minimum_size = Vector2(88, 88)
+	slot.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	slot.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	slot.set_script(_SLOT_SCRIPT)
 	return slot
 
 
 func _make_empty_slot():
 	var slot = _make_slot_shell()
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.18, 0.2, 0.24, 1.0)
-	style.border_width_left = 2
-	style.border_width_top = 2
-	style.border_width_right = 2
-	style.border_width_bottom = 2
-	style.border_color = Color(0.3, 0.34, 0.4, 1.0)
-	style.set_corner_radius_all(6)
-	slot.add_theme_stylebox_override("panel", style)
+	slot.add_theme_stylebox_override("panel", UITheme.slot_style(false))
 	return slot
 
 
@@ -295,31 +283,49 @@ func _make_card(item_data: ItemData, count: int):
 	var card = _make_slot_shell()
 	card.tooltip_text = item_data.describe() if item_data is CardData else item_data.display_name
 	card.item_id = item_data.id
+	card.add_theme_stylebox_override("panel", UITheme.slot_style(true))
 
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.22, 0.26, 0.32, 1.0)
-	style.set_corner_radius_all(6)
-	card.add_theme_stylebox_override("panel", style)
+	# PanelContainer forces a full-rect layout on any direct Container
+	# child, so a plain (non-Container) Control bridges here — its own
+	# children keep manual anchors, letting the badge sit in a corner
+	# instead of being stretched to fill the whole slot.
+	var content := Control.new()
+	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	content.set_anchors_preset(Control.PRESET_FULL_RECT)
+	card.add_child(content)
 
 	var icon_rect := TextureRect.new()
 	icon_rect.texture = item_data.icon
-	icon_rect.custom_minimum_size = Vector2(48, 48)
 	icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	card.add_child(icon_rect)
+	icon_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	content.add_child(icon_rect)
+
+	# Built and populated *before* being anchored: set_anchors_and_offsets_
+	# preset(..., PRESET_MODE_MINSIZE, ...) reads the control's current
+	# minimum size to place it, so anchoring an empty panel first (its
+	# minimum size still 0x0 with no label child yet) previously placed the
+	# badge's origin outside the slot's visible box.
+	var badge_panel := PanelContainer.new()
+	badge_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var badge_style := StyleBoxFlat.new()
+	badge_style.bg_color = UITheme.PANEL_BORDER
+	badge_style.set_corner_radius_all(4)
+	badge_style.content_margin_left = 4
+	badge_style.content_margin_right = 4
+	badge_style.content_margin_top = 1
+	badge_style.content_margin_bottom = 1
+	badge_panel.add_theme_stylebox_override("panel", badge_style)
 
 	var badge := Label.new()
 	badge.text = str(count)
 	badge.add_theme_font_size_override("font_size", 12)
-	badge.add_theme_color_override("font_color", Color(1, 1, 1))
-	badge.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	badge.add_theme_color_override("font_color", UITheme.BUTTON_TEXT)
 	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var badge_style := StyleBoxFlat.new()
-	badge_style.bg_color = Color(0, 0, 0, 0.6)
-	badge_style.set_corner_radius_all(4)
-	badge_style.content_margin_left = 4
-	badge_style.content_margin_right = 4
-	badge.add_theme_stylebox_override("normal", badge_style)
-	card.add_child(badge)
+	badge_panel.add_child(badge)
+
+	content.add_child(badge_panel)
+	badge_panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT, Control.PRESET_MODE_MINSIZE, 2)
 
 	return card

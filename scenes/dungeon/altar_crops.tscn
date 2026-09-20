@@ -7,7 +7,7 @@
 [node name="AltarCrops" instance=ExtResource("1_base")]
 
 [node name="Sprite" parent="."]
-color = Color(0.35, 0.55, 0.25, 1)
+modulate = Color(0.35, 0.55, 0.25, 1)
 
 [node name="AltarBehavior" parent="Interactable/Host"]
 wave_zone = ExtResource("2_wave")

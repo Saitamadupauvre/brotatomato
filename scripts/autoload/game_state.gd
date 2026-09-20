@@ -29,6 +29,7 @@ const ITEM_DEFS: Array[ItemData] = [
 signal tomato_changed(count: int)
 signal life_lost(remaining: int, villager_names: Array[String])
 signal player_died
+signal player_won
 signal villager_spawned(villager_id: int, position: Vector2, villager_name: String)
 signal villager_removed(villager_id: int)
 signal plot_placed(plot_id: int, position: Vector2)
@@ -284,6 +285,11 @@ func move_plot(plot_id: int, position: Vector2) -> void:
 ## Death already popped villagers down to 0 in lockstep with tomatoes
 ## (see lose_tomato) — respawning the starting roster restores both at
 ## once, rather than resetting `tomatoes` on its own (see #36).
+## Fired by the final-boss altar on its wave_cleared — see AltarBehavior.is_final_boss.
+func win_game() -> void:
+	player_won.emit()
+
+
 func reset_run() -> void:
 	villagers.clear()
 	tomatoes = 0

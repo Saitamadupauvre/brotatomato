@@ -1,7 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://cpickup000001"]
+[gd_scene load_steps=4 format=3 uid="uid://cpickup000001"]
 
 [ext_resource type="Script" path="res://scripts/entities/item_pickup.gd" id="1_pickup"]
-[ext_resource type="Texture2D" path="res://assets/sprites/item/coin.png" id="2_coin"]
+[ext_resource type="Script" path="res://scripts/components/shadow_caster.gd" id="2_shadow_caster"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_pickup"]
 radius = 10.0
@@ -14,14 +14,11 @@ script = ExtResource("1_pickup")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_pickup")
 
-[node name="Shadow" type="ColorRect" parent="."]
-offset_left = -12.0
-offset_top = 4.0
-offset_right = 12.0
-offset_bottom = 14.0
-color = Color(0, 0, 0, 0.35)
-mouse_filter = 2
+[node name="Shadow" type="Node2D" parent="."]
+z_index = -1
+script = ExtResource("2_shadow_caster")
+radius_x = 10.0
+radius_y = 4.0
+offset = Vector2(0, 10)
 
 [node name="Sprite" type="Sprite2D" parent="."]
-texture = ExtResource("2_coin")
-scale = Vector2(0.0417, 0.0417)

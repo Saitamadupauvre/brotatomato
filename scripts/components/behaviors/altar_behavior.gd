@@ -27,6 +27,8 @@ enum AltarState { IDLE, ACTIVE, CLEARED }
 ## this many "key" items, which are spent (not just checked) before the
 ## wave starts. Used by the final-boss altar only.
 @export var required_key_count: int = 0
+## Clearing this altar wins the run (defeat-the-final-boss win condition).
+@export var is_final_boss: bool = false
 
 signal wave_started(count: int)
 signal wave_progress(remaining: int)
@@ -111,6 +113,8 @@ func _on_wave_cleared() -> void:
 	_update_visuals()
 	wave_cleared.emit()
 	host.broadcast("contents_emptied")
+	if is_final_boss:
+		GameState.win_game()
 
 
 func _update_visuals() -> void:
