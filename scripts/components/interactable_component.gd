@@ -41,9 +41,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not disabled and _player_nearby and event.is_action_pressed("interact"):
 		if self != _closest_in_range():
 			return
+		get_viewport().set_input_as_handled()
 		_host.broadcast("interacted")
 		interacted.emit()
-		get_viewport().set_input_as_handled()
 
 
 func _on_body_entered(body: Node2D) -> void:
