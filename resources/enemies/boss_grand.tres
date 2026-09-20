@@ -5,6 +5,6 @@
 [resource]
 script = ExtResource("1_grand")
 display_name = "The Grand Tomato"
-max_hp = 120
-move_speed = 55.0
-damage = 3
+max_hp = 250
+move_speed = 85.0
+damage = 5
