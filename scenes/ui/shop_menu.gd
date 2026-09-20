@@ -3,7 +3,6 @@ extends MenuPanel
 ## registry — clicking a card spends gold and grants the item.
 
 const OFFERS: Array[Dictionary] = [
-	{"item_id": "materials", "price": 25},
 	{"item_id": "water", "price": 5},
 	{"item_id": "dungeon_loot", "price": 15},
 	{"item_id": "sword", "price": 40},

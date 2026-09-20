@@ -7,7 +7,9 @@ extends Node2D
 enum Mode { IDLE, PLACING, MOVING }
 
 const CELL_SIZE: float = 64.0
-const MATERIALS_COST: int = 10
+## Gold cost to place a plot — no longer a materials/crafting cost (cut as
+## out of scope), just a Shop-style gold spend like the Breeding House.
+const GOLD_COST: int = 30
 const PLOT_HALF_SIZE: float = 28.0
 const CAMP_MIN: Vector2 = Vector2(32 + PLOT_HALF_SIZE, 32 + PLOT_HALF_SIZE)
 const CAMP_MAX: Vector2 = Vector2(944 - PLOT_HALF_SIZE, 624 - PLOT_HALF_SIZE)
@@ -67,8 +69,8 @@ func _process(_delta: float) -> void:
 
 
 func _try_start_placing() -> void:
-	if GameState.get_item_count("materials") < MATERIALS_COST:
-		_show_feedback("Not enough materials (need %d, have %d)" % [MATERIALS_COST, GameState.get_item_count("materials")])
+	if GameState.get_item_count("gold") < GOLD_COST:
+		_show_feedback("Not enough gold (need %d, have %d)" % [GOLD_COST, GameState.get_item_count("gold")])
 		return
 	_mode = Mode.PLACING
 	_preview.visible = true
@@ -79,8 +81,8 @@ func _try_confirm_placing() -> void:
 	if not _is_valid_position(_preview_position):
 		_show_feedback("Can't place here")
 		return
-	if not GameState.remove_item("materials", MATERIALS_COST):
-		_show_feedback("Not enough materials")
+	if not GameState.remove_item("gold", GOLD_COST):
+		_show_feedback("Not enough gold")
 		return
 	GameState.add_plot(_preview_position)
 	_exit_mode()

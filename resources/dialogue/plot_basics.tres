@@ -16,7 +16,7 @@ text = "Press E again with water to water it, then wait for it to grow."
 [sub_resource type="Resource" id="Resource_line3"]
 script = ExtResource("2_line")
 speaker = "Tomato Villager"
-text = "Once it's ripe, press E to harvest — that's a new life, right there. Press G to place a new plot when you have materials."
+text = "Once it's ripe, press E to harvest — that's a new life, right there. Press G to place a new plot when you have enough gold."
 
 [resource]
 script = ExtResource("1_data")
