@@ -4,12 +4,17 @@
 [ext_resource type="Script" path="res://scripts/components/behaviors/kite_movement_behavior.gd" id="2_kite"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/ranged_attack_behavior.gd" id="3_ranged"]
 [ext_resource type="Resource" path="res://resources/enemies/archer.tres" id="4_data"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemy/ghost.png" id="5_ghost"]
 
 [node name="EnemyArcher" instance=ExtResource("1_base")]
 data = ExtResource("4_data")
 
-[node name="Sprite" parent="." index="0"]
-color = Color(0.15, 0.45, 0.2, 1)
+[node name="Sprite" parent="." index="1"]
+modulate = Color(0.15, 0.45, 0.2, 1)
+texture = ExtResource("5_ghost")
+
+[node name="Shadow" parent="." index="0"]
+offset_factor = 0.6
 
 [node name="KiteMovementBehavior" type="Node" parent="Host"]
 script = ExtResource("2_kite")

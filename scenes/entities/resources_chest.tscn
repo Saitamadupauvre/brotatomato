@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://dund061ooft7u"]
+
+[ext_resource type="PackedScene" path="res://scenes/components/chest.tscn" id="1_base"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/container_behavior.gd" id="2_container"]
+[ext_resource type="Resource" path="res://resources/dungeon/loot_tables/resources_loot.tres" id="3_loot_table"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/opened_state_behavior.gd" id="4_opened"]
+[ext_resource type="Texture2D" path="res://assets/sprites/props/barrel_open.png" id="5_barrel_open"]
+
+[node name="ResourcesChest" instance=ExtResource("1_base")]
+
+[node name="Sprite" parent="." index="1"]
+color = Color(0.55, 0.45, 0.3, 1)
+
+[node name="PromptBehavior" parent="Interactable/Host" index="1"]
+label_text = "Gold Container"
+
+[node name="ContainerBehavior" type="Node" parent="Interactable/Host" index="2"]
+script = ExtResource("2_container")
+loot_table = ExtResource("3_loot_table")
+
+[node name="OpenedStateBehavior" type="Node" parent="Interactable/Host" index="3"]
+script = ExtResource("4_opened")
+sprite_path = NodePath("Sprite")
+opened_texture = ExtResource("5_barrel_open")

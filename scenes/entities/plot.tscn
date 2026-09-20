@@ -3,16 +3,22 @@
 [ext_resource type="PackedScene" path="res://scenes/components/interactable.tscn" id="1_interactable"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/interact_prompt_behavior.gd" id="2_prompt"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/plot_behavior.gd" id="3_plot"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/tutorial_trigger_behavior.gd" id="7_tutorial"]
+[ext_resource type="Resource" path="res://resources/dialogue/plot_basics.tres" id="8_tutorial_dialogue"]
+[ext_resource type="Texture2D" path="res://assets/sprites/tomato/dirt.png" id="4_dirt"]
+[ext_resource type="Texture2D" path="res://assets/sprites/tomato/tomato_plan_1.png" id="5_plant1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/tomato/tomato_plan_2.png" id="6_plant2"]
 
 [node name="Plot" type="Node2D"]
 
-[node name="Sprite" type="ColorRect" parent="."]
-offset_left = -28.0
-offset_top = -28.0
-offset_right = 28.0
-offset_bottom = 28.0
-color = Color(0.4, 0.3, 0.2, 1)
-mouse_filter = 2
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("4_dirt")
+scale = Vector2(0.1167, 0.1167)
+
+[node name="PlantSprite" type="Sprite2D" parent="."]
+texture = ExtResource("5_plant1")
+scale = Vector2(0.1167, 0.1167)
+visible = false
 
 [node name="TimeLabel" type="Label" parent="."]
 offset_left = -28.0
@@ -37,4 +43,12 @@ script = ExtResource("2_prompt")
 [node name="PlotBehavior" type="Node" parent="Interactable/Host"]
 script = ExtResource("3_plot")
 sprite_path = NodePath("Sprite")
+plant_sprite_path = NodePath("PlantSprite")
 time_label_path = NodePath("TimeLabel")
+plant_growing_texture = ExtResource("5_plant1")
+plant_ripe_texture = ExtResource("6_plant2")
+
+[node name="TutorialTriggerBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("7_tutorial")
+tutorial_id = "plot_basics"
+dialogue = ExtResource("8_tutorial_dialogue")

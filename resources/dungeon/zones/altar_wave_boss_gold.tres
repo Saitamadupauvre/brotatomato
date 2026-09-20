@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ZoneData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/zone_data.gd" id="1_zone"]
+[ext_resource type="PackedScene" path="res://scenes/dungeon/enemy_boss_gilded_charger.tscn" id="2_gilded_charger"]
+
+[resource]
+script = ExtResource("1_zone")
+display_name = "Gold boss altar wave"
+enemy_scenes = Array[PackedScene]([ExtResource("2_gilded_charger")])
+enemy_weights = Array[float]([1.0])

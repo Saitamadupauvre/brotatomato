@@ -12,6 +12,7 @@ enum Destination { CAMP, DUNGEON }
 func on_event(event_name: String, _payload: Dictionary = {}) -> void:
 	if event_name != "interacted":
 		return
+	AudioManager.play(&"scene_transition")
 	match destination:
 		Destination.CAMP:
 			SceneRouter.go_to_camp()

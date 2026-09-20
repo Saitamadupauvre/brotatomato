@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://ccardshop0001"]
+
+[ext_resource type="Script" path="res://scripts/entities/card_shop.gd" id="1_card_shop"]
+[ext_resource type="PackedScene" path="res://scenes/components/interactable.tscn" id="2_interactable"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/outline_behavior.gd" id="3_outline"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/interact_prompt_behavior.gd" id="4_prompt"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/tutorial_trigger_behavior.gd" id="5_tutorial"]
+[ext_resource type="Resource" path="res://resources/dialogue/gambling_intro.tres" id="6_tutorial_dialogue"]
+[ext_resource type="Texture2D" path="res://assets/sprites/props/altar.png" id="7_altar"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_card_shop"]
+size = Vector2(64, 64)
+
+[node name="CardShop" type="StaticBody2D"]
+script = ExtResource("1_card_shop")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_card_shop")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+modulate = Color(0.75, 0.35, 0.75, 1)
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("7_altar")
+
+[node name="Interactable" parent="." instance=ExtResource("2_interactable")]
+
+[node name="Host" parent="Interactable" index="1"]
+owner_entity_path = NodePath("../..")
+
+[node name="OutlineBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("3_outline")
+sprite_path = NodePath("Sprite")
+
+[node name="PromptBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("4_prompt")
+
+[node name="TutorialTriggerBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("5_tutorial")
+tutorial_id = "gambling_intro"
+dialogue = ExtResource("6_tutorial_dialogue")

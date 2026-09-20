@@ -5,5 +5,7 @@ extends EnemyBehavior
 func on_event(event_name: String, payload: Dictionary = {}) -> void:
 	if event_name != "physics_tick" or enemy.movement_locked:
 		return
-	if enemy.player:
-		enemy.velocity = enemy.global_position.direction_to(enemy.player.global_position) * enemy.data.move_speed
+	if not _is_player_aggro():
+		enemy.velocity = Vector2.ZERO
+		return
+	enemy.velocity = enemy.global_position.direction_to(enemy.player.global_position) * enemy.data.move_speed

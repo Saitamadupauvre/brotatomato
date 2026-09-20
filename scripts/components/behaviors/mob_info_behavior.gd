@@ -3,7 +3,7 @@ extends EnemyBehavior
 ## Shows current/max HP above the enemy's head as a tomato icon + count.
 ## Universal — added once in enemy_base.tscn, every variant gets it free.
 
-const TOMATO_ICON: Texture2D = preload("res://icon.svg")
+const TOMATO_ICON: Texture2D = preload("res://assets/sprites/item/heart.png")
 
 @export var offset: Vector2 = Vector2(0, -32)
 

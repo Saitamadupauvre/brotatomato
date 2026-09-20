@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1_gilded_charger"]
+[ext_resource type="LootTable" path="res://resources/dungeon/loot_tables/enemy_gold_loot.tres" id="2_loot"]
+
+[resource]
+script = ExtResource("1_gilded_charger")
+display_name = "Gilded Charger"
+max_hp = 30
+move_speed = 70.0
+damage = 2
+loot_table = ExtResource("2_loot")

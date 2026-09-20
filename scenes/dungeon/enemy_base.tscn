@@ -5,20 +5,31 @@
 [ext_resource type="Script" path="res://scripts/components/hurtbox_component.gd" id="3_hurtbox"]
 [ext_resource type="Script" path="res://scripts/components/behavior_host.gd" id="4_host"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/mob_info_behavior.gd" id="5_mob_info"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemy/octopus.png" id="6_octopus"]
+[ext_resource type="Shader" path="res://assets/shaders/hit_flash.gdshader" id="7_hit_flash"]
+[ext_resource type="Script" path="res://scripts/components/shadow_caster.gd" id="8_shadow_caster"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_body"]
 radius = 14.0
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hit_flash"]
+shader = ExtResource("7_hit_flash")
+
 [node name="Enemy" type="CharacterBody2D"]
 script = ExtResource("1_enemy")
 
-[node name="Sprite" type="ColorRect" parent="."]
-offset_left = -14.0
-offset_top = -14.0
-offset_right = 14.0
-offset_bottom = 14.0
-color = Color(0.5, 0.15, 0.55, 1)
-mouse_filter = 2
+[node name="Shadow" type="Node2D" parent="."]
+script = ExtResource("8_shadow_caster")
+radius_x = 12.0
+radius_y = 5.0
+offset = Vector2(0, 12)
+offset_factor = 0.6
+
+[node name="Sprite" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_hit_flash")
+modulate = Color(0.5, 0.15, 0.55, 1)
+scale = Vector2(0.175, 0.175)
+texture = ExtResource("6_octopus")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_body")
@@ -36,6 +47,9 @@ shape = SubResource("CircleShape2D_body")
 
 [node name="Host" type="Node" parent="."]
 script = ExtResource("4_host")
+
+[node name="ScreenEnabler" type="VisibleOnScreenEnabler2D" parent="."]
+rect = Rect2(-256, -256, 512, 512)
 
 [node name="MobInfoBehavior" type="Node" parent="Host"]
 script = ExtResource("5_mob_info")

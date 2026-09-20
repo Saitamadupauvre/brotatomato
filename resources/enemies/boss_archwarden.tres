@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1_archwarden"]
+[ext_resource type="LootTable" path="res://resources/dungeon/loot_tables/enemy_gold_loot.tres" id="2_loot"]
+
+[resource]
+script = ExtResource("1_archwarden")
+display_name = "Archwarden"
+max_hp = 25
+move_speed = 55.0
+damage = 2
+loot_table = ExtResource("2_loot")

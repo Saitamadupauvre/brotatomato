@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ZoneData" load_steps=4 format=3 uid="uid://dzoneoutskirts1"]
+
+[ext_resource type="Script" path="res://scripts/data/zone_data.gd" id="1_zone"]
+[ext_resource type="PackedScene" path="res://scenes/dungeon/enemy_slime.tscn" id="2_slime"]
+[ext_resource type="PackedScene" path="res://scenes/dungeon/enemy_imp.tscn" id="3_imp"]
+
+[resource]
+script = ExtResource("1_zone")
+display_name = "Outskirts"
+min_distance_ratio = 0.0
+max_distance_ratio = 0.35
+enemy_scenes = Array[PackedScene]([ExtResource("2_slime"), ExtResource("3_imp")])
+enemy_weights = Array[float]([3.0, 1.0])
+enemy_density = 0.8
+container_density = 0.3

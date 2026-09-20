@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="LootTable" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/loot_table.gd" id="1_table"]
+[ext_resource type="Script" path="res://scripts/data/loot_table_entry.gd" id="2_entry"]
+
+[sub_resource type="Resource" id="LootTableEntry_none"]
+script = ExtResource("2_entry")
+item_id = "gold"
+min_amount = 0
+max_amount = 0
+weight = 50.0
+
+[sub_resource type="Resource" id="LootTableEntry_small"]
+script = ExtResource("2_entry")
+item_id = "gold"
+min_amount = 5
+max_amount = 5
+weight = 40.0
+
+[sub_resource type="Resource" id="LootTableEntry_big"]
+script = ExtResource("2_entry")
+item_id = "gold"
+min_amount = 10
+max_amount = 10
+weight = 10.0
+
+[resource]
+script = ExtResource("1_table")
+entries = Array[LootTableEntry]([SubResource("LootTableEntry_none"), SubResource("LootTableEntry_small"), SubResource("LootTableEntry_big")])
+roll_count = 1

@@ -1,11 +1,37 @@
 [gd_scene format=3 uid="uid://cvillager0001"]
 
-[node name="Villager" type="Node2D"]
+[ext_resource type="Script" uid="uid://baq38di2w88k5" path="res://scripts/entities/villager.gd" id="1_villager"]
+[ext_resource type="Texture2D" uid="uid://dsopt6e66i45g" path="res://assets/sprites/tomato/tomato.png" id="7_tomato"]
+[ext_resource type="Script" uid="uid://b6jimn48st2vt" path="res://scripts/components/shadow_caster.gd" id="8_shadow_caster"]
 
-[node name="Sprite" type="ColorRect" parent="."]
-offset_left = -14.0
-offset_top = -14.0
-offset_right = 14.0
-offset_bottom = 14.0
-color = Color(0.9, 0.55, 0.2, 1)
-mouse_filter = 2
+[sub_resource type="CircleShape2D" id="CircleShape2D_villager"]
+radius = 14.0
+
+[node name="Villager" type="CharacterBody2D" unique_id=552039954]
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("1_villager")
+
+[node name="Shadow" type="Node2D" parent="." unique_id=-373962782]
+position = Vector2(0, -10)
+scale = Vector2(1.4400003, 1)
+script = ExtResource("8_shadow_caster")
+radius_x = 36.955
+radius_y = 4.0
+offset = Vector2(0, -25)
+
+[node name="Sprite" type="Sprite2D" parent="." unique_id=605077116]
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("7_tomato")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1567776946]
+shape = SubResource("CircleShape2D_villager")
+
+[node name="NameLabel" type="Label" parent="." unique_id=587175994]
+offset_left = -40.0
+offset_top = -34.0
+offset_right = 40.0
+offset_bottom = -18.0
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+vertical_alignment = 2

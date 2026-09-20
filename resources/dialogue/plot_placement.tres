@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="DialogueData" format=3]
+
+[ext_resource type="Script" uid="uid://yr3rit5uoix7" path="res://scripts/data/dialogue_data.gd" id="1_data"]
+[ext_resource type="Script" uid="uid://cxuj4i20nvims" path="res://scripts/data/dialogue_line.gd" id="2_line"]
+
+[sub_resource type="Resource" id="Resource_line1"]
+script = ExtResource("2_line")
+speaker = "Tomato Villager"
+text = "New plot! Move the cursor to a green tile and press E to confirm, or Esc to cancel."
+
+[resource]
+script = ExtResource("1_data")
+lines = Array[ExtResource("2_line")]([SubResource("Resource_line1")])

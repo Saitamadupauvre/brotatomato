@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://dka3xxyqkjdbh"]
+
+[ext_resource type="Script" uid="uid://gaoxcu8es06i" path="res://scripts/data/card_data.gd" id="1_card"]
+[ext_resource type="Texture2D" uid="uid://ddf7y6e6tbqsa" path="res://assets/sprites/item/card.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_card")
+passive = 4
+passive_value = 0.2
+active = 4
+active_value = 50.0
+active_cooldown = 20.0
+id = "golden_touch"
+display_name = "Golden Touch"
+icon = ExtResource("2_icon")
+stackable = false
+max_stack = 1

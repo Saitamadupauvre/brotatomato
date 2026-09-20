@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://brf5py0x3jev4"]
+
+[ext_resource type="Script" uid="uid://c1eyjc84x05t2" path="res://scripts/data/item_data.gd" id="1_ammo"]
+[ext_resource type="Texture2D" uid="uid://c6ged35v6mpc6" path="res://assets/sprites/props/bullet.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_ammo")
+id = "ammo"
+display_name = "Ammo"
+icon = ExtResource("2_icon")

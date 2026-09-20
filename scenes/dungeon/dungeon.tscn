@@ -1,82 +1,76 @@
-[gd_scene load_steps=12 format=3 uid="uid://cdungeon0000001"]
+[gd_scene format=3 uid="uid://dltym5ukrtid1"]
 
-[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="1_player"]
-[ext_resource type="NoiseTexture2D" path="res://scenes/dungeon/ground_noise.tres" id="2_ground_noise"]
-[ext_resource type="PackedScene" path="res://scenes/dungeon/enemy_slime.tscn" id="3_slime"]
-[ext_resource type="PackedScene" path="res://scenes/dungeon/enemy_imp.tscn" id="4_imp"]
-[ext_resource type="PackedScene" path="res://scenes/dungeon/enemy_brute.tscn" id="5_brute"]
-[ext_resource type="PackedScene" path="res://scenes/dungeon/enemy_charger.tscn" id="6_charger"]
-[ext_resource type="PackedScene" path="res://scenes/dungeon/enemy_archer.tscn" id="7_archer"]
-[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="8_hud"]
-[ext_resource type="PackedScene" path="res://scenes/entities/scene_transition_point.tscn" id="9_transition"]
+[ext_resource type="Script" uid="uid://ddkld4d1d4dly" path="res://scenes/dungeon/dungeon.gd" id="1_script"]
+[ext_resource type="Resource" uid="uid://crf8wlefcgam7" path="res://resources/dungeon/default_config.tres" id="2_config"]
+[ext_resource type="PackedScene" uid="uid://c8y3f0m2q8k4a" path="res://scenes/player/player.tscn" id="3_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="4_hud"]
+[ext_resource type="PackedScene" uid="uid://c4xjvfnydiyay" path="res://scenes/entities/scene_transition_point.tscn" id="5_transition"]
+[ext_resource type="Script" uid="uid://dysh5fj707o0f" path="res://scripts/entities/grass_field.gd" id="6_grass"]
+[ext_resource type="Texture2D" uid="uid://h34eqexr237" path="res://assets/sprites/grass.png" id="7_grass_tex"]
+[ext_resource type="Shader" uid="uid://bn348tfe688vn" path="res://assets/shaders/forest_shade.gdshader" id="8_shade_shader"]
+[ext_resource type="PackedScene" path="res://scenes/ui/wave_bar.tscn" id="9_wave_bar"]
+[ext_resource type="PackedScene" path="res://scenes/ui/popup.tscn" id="10_popup"]
+[ext_resource type="PackedScene" uid="uid://cs7u6iyl5d4nc" path="res://scenes/ui/dialogue_box.tscn" id="11_dialogue_box"]
+[ext_resource type="Resource" path="res://resources/dialogue/teleport_back.tres" id="12_teleport_dialogue"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
-size = Vector2(1600, 32)
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_shade"]
+shader = ExtResource("8_shade_shader")
+shader_parameter/levels = 10
+shader_parameter/shade_color = Color(0.25, 0.28, 0.4, 1)
+shader_parameter/max_darkness = 0.75
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_v"]
-size = Vector2(32, 1200)
+[node name="Dungeon" type="Node2D" unique_id=422973390]
+script = ExtResource("1_script")
+config = ExtResource("2_config")
+grass_density = 1.0
 
-[node name="Dungeon" type="Node2D"]
+[node name="Ground" type="ColorRect" parent="." unique_id=1355852986]
+z_index = -10
+mouse_filter = 2
+color = Color(0.58, 0.6, 0.58, 1)
 
-[node name="Ground" type="Sprite2D" parent="."]
-position = Vector2(800, 600)
-texture = ExtResource("2_ground_noise")
+[node name="Grass" type="MultiMeshInstance2D" parent="." unique_id=1198695518]
+z_index = -8
+texture = ExtResource("7_grass_tex")
+script = ExtResource("6_grass")
 
-[node name="Player" parent="." instance=ExtResource("1_player")]
-position = Vector2(800, 600)
+[node name="Shade" type="ColorRect" parent="." unique_id=199001785]
+z_index = -6
+material = SubResource("ShaderMaterial_shade")
+mouse_filter = 2
 
-[node name="Walls" type="Node2D" parent="."]
+[node name="Forest" type="Node2D" parent="." unique_id=302023061]
 
-[node name="TopWall" type="StaticBody2D" parent="Walls"]
-position = Vector2(800, 16)
+[node name="Debug" type="Node2D" parent="Forest" unique_id=993923793]
+z_index = -5
 
-[node name="TopWallShape" type="CollisionShape2D" parent="Walls/TopWall"]
-shape = SubResource("RectangleShape2D_wall_h")
+[node name="Body" type="StaticBody2D" parent="Forest" unique_id=1600361035]
 
-[node name="BottomWall" type="StaticBody2D" parent="Walls"]
-position = Vector2(800, 1184)
+[node name="World" type="Node2D" parent="." unique_id=1113605569]
+y_sort_enabled = true
 
-[node name="BottomWallShape" type="CollisionShape2D" parent="Walls/BottomWall"]
-shape = SubResource("RectangleShape2D_wall_h")
+[node name="Trees" type="Node2D" parent="World" unique_id=548025514]
+y_sort_enabled = true
 
-[node name="LeftWall" type="StaticBody2D" parent="Walls"]
-position = Vector2(16, 600)
+[node name="Enemies" type="Node2D" parent="World" unique_id=1545915825]
+y_sort_enabled = true
 
-[node name="LeftWallShape" type="CollisionShape2D" parent="Walls/LeftWall"]
-shape = SubResource("RectangleShape2D_wall_v")
+[node name="Props" type="Node2D" parent="World" unique_id=1886126030]
 
-[node name="RightWall" type="StaticBody2D" parent="Walls"]
-position = Vector2(1584, 600)
+[node name="CampExit" parent="World" unique_id=1511090038 instance=ExtResource("5_transition")]
 
-[node name="RightWallShape" type="CollisionShape2D" parent="Walls/RightWall"]
-shape = SubResource("RectangleShape2D_wall_v")
+[node name="TutorialTriggerBehavior" parent="World/CampExit/Interactable/Host" index="2"]
+tutorial_id = "camp_exit_point"
+dialogue = ExtResource("12_teleport_dialogue")
 
-[node name="Enemies" type="Node2D" parent="."]
+[node name="Player" parent="World" unique_id=734373218 instance=ExtResource("3_player")]
 
-[node name="Slime1" parent="Enemies" instance=ExtResource("3_slime")]
-position = Vector2(1100, 300)
+[node name="UI" type="CanvasLayer" parent="." unique_id=452060986]
 
-[node name="Slime2" parent="Enemies" instance=ExtResource("3_slime")]
-position = Vector2(1150, 900)
+[node name="HUD" parent="UI" unique_id=52734484 instance=ExtResource("4_hud")]
 
-[node name="Imp1" parent="Enemies" instance=ExtResource("4_imp")]
-position = Vector2(450, 900)
+[node name="WaveBar" parent="UI" instance=ExtResource("9_wave_bar")]
 
-[node name="Brute1" parent="Enemies" instance=ExtResource("5_brute")]
-position = Vector2(250, 300)
+[node name="Popup" parent="UI" instance=ExtResource("10_popup")]
 
-[node name="Charger1" parent="Enemies" instance=ExtResource("6_charger")]
-position = Vector2(800, 200)
-
-[node name="Archer1" parent="Enemies" instance=ExtResource("7_archer")]
-position = Vector2(1400, 600)
-
-[node name="CampExit" parent="." instance=ExtResource("9_transition")]
-position = Vector2(800, 1050)
-
-[node name="PromptBehavior" parent="CampExit/Interactable/Host" index="0"]
-label_text = "Camp"
-
-[node name="UI" type="CanvasLayer" parent="."]
-
-[node name="HUD" parent="UI" instance=ExtResource("8_hud")]
+[node name="DialogueBox" parent="UI" instance=ExtResource("11_dialogue_box")]

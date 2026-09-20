@@ -1,0 +1,17 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/dungeon/altar_base.tscn" id="1_base"]
+[ext_resource type="Resource" path="res://resources/dungeon/zones/altar_wave_boss_gold.tres" id="2_wave"]
+[ext_resource type="Resource" path="res://resources/dungeon/loot_tables/altar_boss_gold_loot.tres" id="3_loot_table"]
+
+[node name="AltarBossGold" instance=ExtResource("1_base")]
+
+[node name="Sprite" parent="."]
+modulate = Color(0.55, 0.42, 0.05, 1)
+
+[node name="AltarBehavior" parent="Interactable/Host"]
+wave_zone = ExtResource("2_wave")
+wave_size = 1
+loot_table = ExtResource("3_loot_table")
+is_boss = true
+grants_key = true

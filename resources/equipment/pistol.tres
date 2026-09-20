@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://dj215ahpavtbk"]
+
+[ext_resource type="Script" uid="uid://3i15tds7efwe" path="res://scripts/data/weapon_data.gd" id="1_pistol"]
+[ext_resource type="Texture2D" uid="uid://b50v4quikwgiy" path="res://assets/sprites/item/gun.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_pistol")
+attack_type = 1
+attack_cooldown = 0.25
+projectile_speed = 1400.0
+magazine_size = 6
+reload_time = 1.2
+id = "pistol"
+display_name = "Pistol"
+icon = ExtResource("2_icon")
+stackable = false
+max_stack = 1
