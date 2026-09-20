@@ -20,11 +20,19 @@ extends CharacterBody2D
 ## without it, overlapping hitboxes (or one that lingers across physics
 ## frames) can strip several lives from a single hit.
 @export var invincibility_duration: float = 0.4
+## How long the teleport-to-camp channel takes to complete (#38). Moving
+## or taking damage during the channel cancels it.
+@export var teleport_channel_duration: float = 5.0
 
 ## Emitted at the start of a melee swing with the world-space center and
 ## rough radius of the hitbox, for things that react to a swing without
 ## needing a hurtbox (grass, breakables).
 signal melee_swung(center: Vector2, radius: float)
+## Teleport-channel lifecycle events (#38) — VFX (#39) hooks these
+## instead of the mechanic re-implementing its own timing.
+signal teleport_channel_started
+signal teleport_channel_cancelled
+signal teleport_channel_completed
 ## AttackHitboxShape's authored (unscaled) reach, in px.
 const MELEE_SHAPE_REACH: float = 42.0
 ## Distance from the player to the center of the melee arc, and its
@@ -43,6 +51,8 @@ var _last_move_direction: Vector2 = Vector2.DOWN
 var _attack_cooldown_timer: float = 0.0
 var _is_attacking: bool = false
 var _invincible_timer: float = 0.0
+var _is_channeling: bool = false
+var _channel_timer: float = 0.0
 
 var equipped_weapon: WeaponData = null
 var _armor_reduction: int = 0
@@ -50,6 +60,7 @@ var _armor_reduction: int = 0
 @onready var _hurtbox: HurtboxComponent = $Hurtbox
 @onready var _attack_hitbox: HitboxComponent = $AttackHitbox
 @onready var _attack_debug_visual: CanvasItem = $AttackHitbox/DebugVisual
+@onready var _channel_bar: ProgressBar = $ChannelBar
 
 
 func _ready() -> void:
@@ -77,6 +88,8 @@ func _recompute_armor_reduction() -> void:
 
 
 func _on_damage_taken(amount: int) -> void:
+	if _is_channeling:
+		_cancel_teleport_channel()
 	if _invincible_timer > 0.0:
 		return
 	GameState.lose_tomato(max(amount - _armor_reduction, 0))
@@ -91,6 +104,12 @@ func _physics_process(delta: float) -> void:
 	if _invincible_timer > 0.0:
 		_invincible_timer -= delta
 
+	if _is_channeling:
+		_process_teleport_channel(delta)
+		velocity = Vector2.ZERO
+		move_and_slide()
+		return
+
 	if _is_dashing:
 		_process_dash(delta)
 	else:
@@ -99,7 +118,44 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("attack") and _attack_cooldown_timer <= 0.0:
 		_start_attack()
 
+	if Input.is_action_just_pressed("teleport"):
+		_start_teleport_channel()
+
 	move_and_slide()
+
+
+func _start_teleport_channel() -> void:
+	_is_channeling = true
+	_channel_timer = teleport_channel_duration
+	_channel_bar.max_value = teleport_channel_duration
+	_channel_bar.value = 0.0
+	_channel_bar.visible = true
+	teleport_channel_started.emit()
+
+
+func _process_teleport_channel(delta: float) -> void:
+	if _get_input_direction() != Vector2.ZERO:
+		_cancel_teleport_channel()
+		return
+
+	_channel_timer -= delta
+	_channel_bar.value = teleport_channel_duration - _channel_timer
+
+	if _channel_timer <= 0.0:
+		_complete_teleport_channel()
+
+
+func _cancel_teleport_channel() -> void:
+	_is_channeling = false
+	_channel_bar.visible = false
+	teleport_channel_cancelled.emit()
+
+
+func _complete_teleport_channel() -> void:
+	_is_channeling = false
+	_channel_bar.visible = false
+	teleport_channel_completed.emit()
+	SceneRouter.go_to_camp()
 
 
 func _start_attack() -> void:
