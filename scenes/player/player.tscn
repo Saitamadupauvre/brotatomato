@@ -44,3 +44,11 @@ polygon = PackedVector2Array(0, 0, 16.07, -38.8, 34.92, -23.33, 42, 0, 34.92, 23
 polygon = PackedVector2Array(0, 0, 16.07, -38.8, 34.92, -23.33, 42, 0, 34.92, 23.33, 16.07, 38.8)
 color = Color(1, 1, 0, 0.4)
 visible = false
+
+[node name="ChannelBar" type="ProgressBar" parent="."]
+visible = false
+offset_left = -30.0
+offset_top = -46.0
+offset_right = 30.0
+offset_bottom = -30.0
+show_percentage = false
