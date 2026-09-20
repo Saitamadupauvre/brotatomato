@@ -6,6 +6,8 @@
 [ext_resource type="Script" path="res://scripts/components/behaviors/container_behavior.gd" id="4_container"]
 [ext_resource type="Script" path="res://scripts/data/loot_entry.gd" id="5_loot_entry"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/opened_state_behavior.gd" id="6_opened"]
+[ext_resource type="Texture2D" path="res://assets/sprites/props/barrel.png" id="7_barrel"]
+[ext_resource type="Texture2D" path="res://assets/sprites/props/barrel_open.png" id="8_barrel_open"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_container"]
 size = Vector2(64, 64)
@@ -35,12 +37,9 @@ amount = 5
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_container")
 
-[node name="Sprite" type="ColorRect" parent="."]
-offset_left = -32.0
-offset_top = -32.0
-offset_right = 32.0
-offset_bottom = 32.0
-color = Color(0.55, 0.35, 0.2, 1)
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("7_barrel")
+scale = Vector2(0.16, 0.16)
 
 [node name="Interactable" parent="." instance=ExtResource("1_interactable")]
 
@@ -61,3 +60,4 @@ contents = Array[LootEntry]([SubResource("LootEntry_loot"), SubResource("LootEnt
 [node name="OpenedStateBehavior" type="Node" parent="Interactable/Host"]
 script = ExtResource("6_opened")
 sprite_path = NodePath("Sprite")
+opened_texture = ExtResource("8_barrel_open")

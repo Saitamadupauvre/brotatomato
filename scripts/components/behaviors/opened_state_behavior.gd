@@ -9,6 +9,7 @@ extends Behavior
 @export var trigger_event: String = "contents_emptied"
 @export var sprite_path: NodePath
 @export var opened_modulate: Color = Color(0.45, 0.45, 0.45, 1.0)
+@export var opened_texture: Texture2D # optional: swap sprite to an "open" variant
 
 
 func on_event(event_name: String, _payload: Dictionary = {}) -> void:
@@ -25,3 +26,5 @@ func on_event(event_name: String, _payload: Dictionary = {}) -> void:
 		var sprite: CanvasItem = owner_entity.get_node_or_null(sprite_path)
 		if sprite != null:
 			sprite.modulate = opened_modulate
+			if opened_texture != null and sprite is Sprite2D:
+				(sprite as Sprite2D).texture = opened_texture

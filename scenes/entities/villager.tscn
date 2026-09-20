@@ -1,53 +1,28 @@
-[gd_scene load_steps=7 format=3 uid="uid://cvillager0001"]
+[gd_scene format=3 uid="uid://cvillager0001"]
 
-[ext_resource type="Script" path="res://scripts/entities/villager.gd" id="1_villager"]
-[ext_resource type="PackedScene" path="res://scenes/components/interactable.tscn" id="2_interactable"]
-[ext_resource type="Script" path="res://scripts/components/behaviors/outline_behavior.gd" id="3_outline"]
-[ext_resource type="Script" path="res://scripts/components/behaviors/interact_prompt_behavior.gd" id="4_prompt"]
-[ext_resource type="Script" path="res://scripts/components/behaviors/dialogue_behavior.gd" id="5_dialogue"]
-[ext_resource type="Resource" path="res://resources/dialogue/villager_greeting.tres" id="6_greeting"]
+[ext_resource type="Script" uid="uid://baq38di2w88k5" path="res://scripts/entities/villager.gd" id="1_villager"]
+[ext_resource type="Texture2D" uid="uid://dsopt6e66i45g" path="res://assets/sprites/tomato/tomato.png" id="7_tomato"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_villager"]
 radius = 14.0
 
-[node name="Villager" type="CharacterBody2D"]
+[node name="Villager" type="CharacterBody2D" unique_id=552039954]
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("1_villager")
 
-[node name="Sprite" type="ColorRect" parent="."]
-offset_left = -14.0
-offset_top = -14.0
-offset_right = 14.0
-offset_bottom = 14.0
-color = Color(0.9, 0.55, 0.2, 1)
-mouse_filter = 2
+[node name="Sprite" type="Sprite2D" parent="." unique_id=605077116]
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("7_tomato")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1567776946]
 shape = SubResource("CircleShape2D_villager")
 
-[node name="NameLabel" type="Label" parent="."]
+[node name="NameLabel" type="Label" parent="." unique_id=587175994]
 offset_left = -40.0
 offset_top = -34.0
 offset_right = 40.0
 offset_bottom = -18.0
-mouse_filter = 2
+theme_override_font_sizes/font_size = 12
 horizontal_alignment = 1
 vertical_alignment = 2
-theme_override_font_sizes/font_size = 12
-
-[node name="Interactable" parent="." instance=ExtResource("2_interactable")]
-
-[node name="Host" parent="Interactable" index="1"]
-owner_entity_path = NodePath("../..")
-
-[node name="OutlineBehavior" type="Node" parent="Interactable/Host"]
-script = ExtResource("3_outline")
-sprite_path = NodePath("Sprite")
-
-[node name="PromptBehavior" type="Node" parent="Interactable/Host"]
-script = ExtResource("4_prompt")
-
-[node name="DialogueBehavior" type="Node" parent="Interactable/Host"]
-script = ExtResource("5_dialogue")
-dialogue = ExtResource("6_greeting")
