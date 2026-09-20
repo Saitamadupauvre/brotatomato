@@ -87,6 +87,10 @@ func _ready() -> void:
 	# show without going through the shop first. Remove/tune before ship.
 	add_item("sword", 1)
 	equip_item("sword")
+	# TEMP: dash-strike weapon in inventory for manual testing of #65
+	# (equip via inventory drag-drop, not equipped by default). Remove
+	# before ship.
+	add_item("dash_blade", 1)
 
 
 ## Villagers ARE the tomato/life count (#36) — spawning the starting
