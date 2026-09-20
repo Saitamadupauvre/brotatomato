@@ -27,7 +27,7 @@ func _input(event: InputEvent) -> void:
 	match _mode:
 		Mode.IDLE:
 			if event.is_action_pressed("place_breeding_house"):
-				_try_start_placing()
+				start_placing()
 				get_viewport().set_input_as_handled()
 		Mode.PLACING:
 			if event.is_action_pressed("ui_cancel"):
@@ -46,7 +46,9 @@ func _process(_delta: float) -> void:
 	_preview.color = Color(0.3, 0.9, 0.3, 0.6) if _is_valid_position(_preview_position) else Color(0.9, 0.3, 0.3, 0.6)
 
 
-func _try_start_placing() -> void:
+## Public: also called by the Shop's Breeding House card, not just the
+## place_breeding_house key.
+func start_placing() -> void:
 	if not GameState.can_create_breeding_house():
 		_show_feedback("Not enough gold (need %d, have %d)" % [GameState.BREEDING_HOUSE_GOLD_COST, GameState.get_item_count("gold")])
 		return

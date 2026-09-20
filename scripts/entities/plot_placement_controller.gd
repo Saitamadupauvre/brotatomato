@@ -38,7 +38,7 @@ func _input(event: InputEvent) -> void:
 	match _mode:
 		Mode.IDLE:
 			if event.is_action_pressed("place_plot"):
-				_try_start_placing()
+				start_placing()
 				get_viewport().set_input_as_handled()
 			elif event.is_action_pressed("move_plot"):
 				_try_start_moving()
@@ -68,7 +68,8 @@ func _process(_delta: float) -> void:
 	_preview.color = Color(0.3, 0.9, 0.3, 0.6) if valid else Color(0.9, 0.3, 0.3, 0.6)
 
 
-func _try_start_placing() -> void:
+## Public: also called by the Shop's Plot card, not just the place_plot key.
+func start_placing() -> void:
 	if GameState.get_item_count("gold") < GOLD_COST:
 		_show_feedback("Not enough gold (need %d, have %d)" % [GOLD_COST, GameState.get_item_count("gold")])
 		return
