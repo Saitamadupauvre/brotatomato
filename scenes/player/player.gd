@@ -55,6 +55,9 @@ const MELEE_RADIUS: float = 30.0
 
 const PROJECTILE_SCENE: PackedScene = preload("res://scenes/dungeon/projectile.tscn")
 const ENEMY_HURTBOX_MASK: int = 8
+## Distance from the player's hand pivot to the held-item sprite, kept
+## constant while it orbits to face the aim direction.
+const HELD_ITEM_OFFSET: float = 17.9
 
 var _is_dashing: bool = false
 var _dash_timer: float = 0.0
@@ -88,7 +91,7 @@ var equipped_weapon: WeaponData = null
 @onready var _channel_bar: ProgressBar = $ChannelBar
 @onready var _teleport_glow: ColorRect = $TeleportGlow
 @onready var _teleport_particles: GPUParticles2D = $TeleportParticles
-@onready var _held_item: Sprite2D = $Sprite/HeldItem
+@onready var _held_item: Sprite2D = $HeldItem
 @onready var _camera: Camera2D = $Camera2D
 @onready var _sprite_body: Sprite2D = $Sprite/Body
 
@@ -214,6 +217,7 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	if _last_move_direction.x != 0.0:
 		$Sprite.scale.x = 1.0 if _last_move_direction.x < 0.0 else -1.0
+	_update_held_item_orientation()
 
 	var target_animation := "run" if velocity.length() > 5.0 else "idle"
 	if _animation_player.current_animation != target_animation:
@@ -408,6 +412,19 @@ func _process_dash_attack(delta: float) -> void:
 func _get_aim_direction() -> Vector2:
 	var direction := get_global_mouse_position() - global_position
 	return direction.normalized() if direction != Vector2.ZERO else _last_move_direction
+
+
+## Points the held-item sprite at the mouse instead of the player's
+## movement-facing — the item is a separate root-level node (not under
+## Sprite) so it isn't mirrored by the body's flip-on-move.
+func _update_held_item_orientation() -> void:
+	if not _held_item.visible:
+		return
+	var aim_direction := _get_aim_direction()
+	var angle := aim_direction.angle()
+	_held_item.position = Vector2(0, -43) + Vector2.RIGHT.rotated(angle) * HELD_ITEM_OFFSET
+	_held_item.rotation = angle
+	_held_item.flip_v = aim_direction.x < 0.0
 
 
 func _end_attack() -> void:
