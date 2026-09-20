@@ -7,7 +7,9 @@ extends Behavior
 ## — the dungeon regenerates fresh every time it's entered, so there is
 ## no separate "reset on reentry" state to manage.
 
-enum AltarState { IDLE, ACTIVE, CLEARED }
+enum AltarState { IDLE, TELEGRAPH, ACTIVE, CLEARED }
+
+const _DANGER_SHADER := preload("res://assets/shaders/altar_danger.gdshader")
 
 ## Reused ZoneData: only enemy_scenes/enemy_weights/pick_enemy() matter
 ## here, density fields are ignored — this isn't zone population, just a
@@ -17,6 +19,10 @@ enum AltarState { IDLE, ACTIVE, CLEARED }
 @export var loot_table: LootTable
 @export var spawn_radius: float = 96.0
 @export var status_label_path: NodePath
+@export var sprite_path: NodePath
+## Delay between interact and the wave actually spawning, so the player
+## can back off instead of eating a hit the instant they press E.
+@export var telegraph_duration: float = 3.0
 ## Swaps the status label wording so a boss fight reads as higher stakes
 ## than a regular wave — purely cosmetic, no behavior difference.
 @export var is_boss: bool = false
@@ -41,12 +47,14 @@ var enemies_container: Node2D = null
 var _state: AltarState = AltarState.IDLE
 var _remaining: int = 0
 var _status_label: Label = null
+var _sprite: CanvasItem = null
 var _rng := RandomNumberGenerator.new()
 
 
 func _setup(p_owner: Node2D, p_host: BehaviorHost) -> void:
 	super(p_owner, p_host)
 	_status_label = owner_entity.get_node_or_null(status_label_path)
+	_sprite = owner_entity.get_node_or_null(sprite_path)
 	_rng.randomize()
 	_update_visuals()
 
@@ -59,7 +67,7 @@ func on_event(event_name: String, _payload: Dictionary = {}) -> void:
 		return
 	if required_key_count > 0:
 		GameState.remove_item("key", required_key_count)
-	_start_wave()
+	_start_telegraph()
 
 
 func _show_insufficient_keys() -> void:
@@ -73,6 +81,26 @@ func _show_insufficient_keys() -> void:
 func _hide_insufficient_keys() -> void:
 	if _state == AltarState.IDLE:
 		_status_label.visible = false
+
+
+func _start_telegraph() -> void:
+	_state = AltarState.TELEGRAPH
+	_update_visuals()
+	if _sprite != null:
+		var mat := ShaderMaterial.new()
+		mat.shader = _DANGER_SHADER
+		mat.set_shader_parameter("urgency", 0.0)
+		_sprite.material = mat
+		var tween := owner_entity.create_tween()
+		var set_urgency := func(v: float) -> void: mat.set_shader_parameter("urgency", v)
+		tween.tween_method(set_urgency, 0.0, 1.0, telegraph_duration)
+	owner_entity.get_tree().create_timer(telegraph_duration).timeout.connect(_on_telegraph_finished)
+
+
+func _on_telegraph_finished() -> void:
+	if _sprite != null:
+		_sprite.material = null
+	_start_wave()
 
 
 func _start_wave() -> void:
@@ -123,6 +151,9 @@ func _update_visuals() -> void:
 	match _state:
 		AltarState.IDLE:
 			_status_label.visible = false
+		AltarState.TELEGRAPH:
+			_status_label.visible = true
+			_status_label.text = "Boss incoming!" if is_boss else "Danger incoming!"
 		AltarState.ACTIVE:
 			_status_label.visible = true
 			_status_label.text = "Boss fight!" if is_boss else "Wave active"
