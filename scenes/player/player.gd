@@ -218,6 +218,7 @@ func _start_attack() -> void:
 func _fire_projectile() -> void:
 	var projectile: Projectile = PROJECTILE_SCENE.instantiate()
 	projectile.damage = equipped_weapon.damage
+	projectile.speed = equipped_weapon.projectile_speed
 	projectile.target_mask = ENEMY_HURTBOX_MASK
 	get_parent().add_child(projectile)
 	projectile.position = position

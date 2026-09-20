@@ -16,3 +16,4 @@ damage = 1
 attack_cooldown = 0.25
 magazine_size = 6
 reload_time = 1.2
+projectile_speed = 1400.0
