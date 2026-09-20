@@ -7,10 +7,6 @@ const OFFERS: Array[Dictionary] = [
 	{"item_id": "dungeon_loot", "price": 15},
 	{"item_id": "sword", "price": 40},
 	{"item_id": "bow", "price": 50},
-	{"item_id": "leather_helmet", "price": 15},
-	{"item_id": "leather_chestplate", "price": 25},
-	{"item_id": "leather_leggings", "price": 20},
-	{"item_id": "leather_boots", "price": 15},
 ]
 
 @onready var _grid: GridContainer = %ItemGrid
