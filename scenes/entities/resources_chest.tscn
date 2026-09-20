@@ -12,7 +12,7 @@
 color = Color(0.55, 0.45, 0.3, 1)
 
 [node name="PromptBehavior" parent="Interactable/Host" index="1"]
-label_text = "Resources Container"
+label_text = "Gold Container"
 
 [node name="ContainerBehavior" type="Node" parent="Interactable/Host" index="2"]
 script = ExtResource("2_container")

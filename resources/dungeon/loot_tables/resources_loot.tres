@@ -1,37 +1,17 @@
-[gd_resource type="Resource" script_class="LootTable" load_steps=7 format=3]
+[gd_resource type="Resource" script_class="LootTable" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/data/loot_table.gd" id="1_table"]
 [ext_resource type="Script" path="res://scripts/data/loot_table_entry.gd" id="2_entry"]
 
-[sub_resource type="Resource" id="LootTableEntry_sword"]
+[sub_resource type="Resource" id="LootTableEntry_gold"]
 script = ExtResource("2_entry")
-item_id = "sword"
-min_amount = 1
-max_amount = 1
-weight = 0.3
-
-[sub_resource type="Resource" id="LootTableEntry_bow"]
-script = ExtResource("2_entry")
-item_id = "bow"
-min_amount = 1
-max_amount = 1
-weight = 0.3
-
-[sub_resource type="Resource" id="LootTableEntry_dash_blade"]
-script = ExtResource("2_entry")
-item_id = "dash_blade"
-min_amount = 1
-max_amount = 1
-weight = 0.3
-
-[sub_resource type="Resource" id="LootTableEntry_pistol"]
-script = ExtResource("2_entry")
-item_id = "pistol"
-min_amount = 1
-max_amount = 1
-weight = 0.3
+item_id = "gold"
+min_amount = 5
+max_amount = 5
+weight = 1.0
 
 [resource]
 script = ExtResource("1_table")
-entries = Array[LootTableEntry]([SubResource("LootTableEntry_sword"), SubResource("LootTableEntry_bow"), SubResource("LootTableEntry_dash_blade"), SubResource("LootTableEntry_pistol")])
-roll_count = 2
+entries = Array[LootTableEntry]([SubResource("LootTableEntry_gold")])
+roll_count = 1
+roll_count_max = 6
