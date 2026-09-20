@@ -9,7 +9,6 @@ const ITEM_DEFS: Array[ItemData] = [
 	preload("res://resources/items/gold.tres"),
 	preload("res://resources/items/water.tres"),
 	preload("res://resources/items/crop.tres"),
-	preload("res://resources/items/dungeon_loot.tres"),
 	preload("res://resources/items/ammo.tres"),
 	preload("res://resources/items/key.tres"),
 	preload("res://resources/equipment/sword.tres"),
