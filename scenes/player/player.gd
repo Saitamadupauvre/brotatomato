@@ -86,7 +86,6 @@ var equipped_weapon: WeaponData = null
 
 @onready var _hurtbox: HurtboxComponent = $Hurtbox
 @onready var _attack_hitbox: HitboxComponent = $AttackHitbox
-@onready var _attack_debug_visual: CanvasItem = $AttackHitbox/DebugVisual
 @onready var _animation_player: AnimationPlayer = $AnimationPlayer
 @onready var _channel_bar: ProgressBar = $ChannelBar
 @onready var _teleport_glow: ColorRect = $TeleportGlow
@@ -383,8 +382,6 @@ func _swing_melee() -> void:
 	_attack_hitbox.rotation = aim_direction.angle()
 	_attack_hitbox.monitoring = true
 	melee_swung.emit(global_position + aim_direction * MELEE_REACH * range_scale, MELEE_RADIUS * range_scale)
-	if OS.is_debug_build():
-		_attack_debug_visual.visible = true
 	get_tree().create_timer(attack_duration).timeout.connect(_end_attack)
 
 
@@ -397,8 +394,6 @@ func _start_dash_attack() -> void:
 	_attack_hitbox.damage = int((equipped_weapon.damage if equipped_weapon else attack_damage) * GameState.get_passive_multiplier(CardData.Passive.PLAYER_DAMAGE))
 	_attack_hitbox.rotation = aim_direction.angle()
 	_attack_hitbox.monitoring = true
-	if OS.is_debug_build():
-		_attack_debug_visual.visible = true
 	get_tree().create_timer(attack_duration).timeout.connect(_end_attack)
 
 
@@ -429,7 +424,6 @@ func _update_held_item_orientation() -> void:
 
 func _end_attack() -> void:
 	_attack_hitbox.monitoring = false
-	_attack_debug_visual.visible = false
 
 
 func _process_movement(delta: float) -> void:

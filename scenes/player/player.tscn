@@ -223,11 +223,6 @@ script = ExtResource("3_hitbox")
 [node name="AttackHitboxShape" type="CollisionPolygon2D" parent="AttackHitbox" unique_id=618112662]
 polygon = PackedVector2Array(0, 0, 16.07, -38.8, 34.92, -23.33, 42, 0, 34.92, 23.33, 16.07, 38.8)
 
-[node name="DebugVisual" type="Polygon2D" parent="AttackHitbox" unique_id=735610771]
-visible = false
-color = Color(1, 1, 0, 0.4)
-polygon = PackedVector2Array(0, 0, 16.07, -38.8, 34.92, -23.33, 42, 0, 34.92, 23.33, 16.07, 38.8)
-
 [node name="ChannelBar" type="ProgressBar" parent="." unique_id=869157185]
 visible = false
 offset_left = -30.0
