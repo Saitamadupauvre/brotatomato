@@ -3,6 +3,8 @@
 [ext_resource type="PackedScene" path="res://scenes/components/interactable.tscn" id="1_interactable"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/interact_prompt_behavior.gd" id="2_prompt"]
 [ext_resource type="Script" path="res://scripts/components/behaviors/plot_behavior.gd" id="3_plot"]
+[ext_resource type="Script" path="res://scripts/components/behaviors/tutorial_trigger_behavior.gd" id="7_tutorial"]
+[ext_resource type="Resource" path="res://resources/dialogue/plot_basics.tres" id="8_tutorial_dialogue"]
 [ext_resource type="Texture2D" path="res://assets/sprites/tomato/dirt.png" id="4_dirt"]
 [ext_resource type="Texture2D" path="res://assets/sprites/tomato/tomato_plan_1.png" id="5_plant1"]
 [ext_resource type="Texture2D" path="res://assets/sprites/tomato/tomato_plan_2.png" id="6_plant2"]
@@ -45,3 +47,8 @@ plant_sprite_path = NodePath("PlantSprite")
 time_label_path = NodePath("TimeLabel")
 plant_growing_texture = ExtResource("5_plant1")
 plant_ripe_texture = ExtResource("6_plant2")
+
+[node name="TutorialTriggerBehavior" type="Node" parent="Interactable/Host"]
+script = ExtResource("7_tutorial")
+tutorial_id = "plot_basics"
+dialogue = ExtResource("8_tutorial_dialogue")
