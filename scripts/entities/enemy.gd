@@ -16,7 +16,7 @@ var movement_locked: bool = false # an attack behavior sets this while it owns v
 
 func _ready() -> void:
 	health.configure(data.max_hp)
-	health.died.connect(queue_free)
+	health.died.connect(_on_died)
 	_hurtbox.damage_taken.connect(health.take_damage)
 	player = get_tree().get_first_node_in_group("player")
 
@@ -24,3 +24,7 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	_host.broadcast("physics_tick", {"delta": delta})
 	move_and_slide()
+
+
+func _on_died() -> void:
+	queue_free()
