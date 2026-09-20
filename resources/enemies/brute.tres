@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1_brute"]
+[ext_resource type="LootTable" path="res://resources/dungeon/loot_tables/enemy_gold_loot.tres" id="2_loot"]
 
 [resource]
 script = ExtResource("1_brute")
@@ -8,3 +9,4 @@ display_name = "Brute"
 max_hp = 5
 move_speed = 60.0
 damage = 1
+loot_table = ExtResource("2_loot")

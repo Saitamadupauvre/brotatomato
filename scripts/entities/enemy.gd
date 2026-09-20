@@ -19,6 +19,7 @@ var movement_locked: bool = false # an attack behavior sets this while it owns v
 
 var _squash_time: float = 0.0
 var _base_sprite_scale: Vector2 = Vector2.ONE
+var _rng := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
@@ -26,6 +27,7 @@ func _ready() -> void:
 	if _sprite.material:
 		_sprite.material = _sprite.material.duplicate() # else every enemy shares one ShaderMaterial and flashes fight each other
 	_base_sprite_scale = _sprite.scale
+	_rng.randomize()
 	health.configure(data.max_hp)
 	health.died.connect(_on_died)
 	_hurtbox.damage_taken.connect(health.take_damage)
@@ -57,4 +59,8 @@ func _update_squash(delta: float) -> void:
 
 
 func _on_died() -> void:
+	if data.loot_table:
+		var drops: Array[LootEntry] = data.loot_table.roll(_rng)
+		drops = drops.filter(func(entry: LootEntry) -> bool: return entry.amount > 0)
+		LootSpawner.spawn(drops, self)
 	queue_free()
