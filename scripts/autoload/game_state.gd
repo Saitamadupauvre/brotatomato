@@ -35,6 +35,7 @@ signal equipment_changed(slot: EquipmentData.EquipSlot, item_id: String)
 ## distinct from equipment_changed, since swapping active slot changes
 ## which weapon is "in hand" without either slot's contents changing.
 signal active_weapon_changed(slot: EquipmentData.EquipSlot)
+signal breeding_started
 
 ## TEMP: grants enough materials to test grid placement without looting
 ## the Container first. Remove/tune before ship.
@@ -85,6 +86,16 @@ const VILLAGER_NAMES: Array[String] = [
 	"Mustard", "Nutmeg", "Cinnamon", "Anise", "Coriander", "Tarragon",
 ]
 
+## Breeding House (#8): spends 2 lives to start, then grants a new one
+## every BREEDING_INTERVAL seconds until the run ends. GDD doesn't fix a
+## value for either — TEMP-tuned like PlotBehavior.grow_time.
+const BREEDING_COST: int = 2
+const BREEDING_INTERVAL: float = 20.0
+
+var breeding_active: bool = false
+var breeding_timer: float = 0.0
+var breeding_house_position: Vector2 = Vector2.ZERO
+
 
 func _ready() -> void:
 	for item_data in ITEM_DEFS:
@@ -105,6 +116,15 @@ func _ready() -> void:
 	# (equip via inventory drag-drop, not equipped by default). Remove
 	# before ship.
 	add_item("dash_blade", 1)
+
+
+func _process(delta: float) -> void:
+	if not breeding_active:
+		return
+	breeding_timer -= delta
+	if breeding_timer <= 0.0:
+		breeding_timer += BREEDING_INTERVAL
+		spawn_villager(breeding_house_position)
 
 
 ## Villagers ARE the tomato/life count (#36) — spawning the starting
@@ -174,6 +194,32 @@ func spawn_villager(at_position: Vector2) -> void:
 	tomato_changed.emit(tomatoes)
 
 
+func can_start_breeding() -> bool:
+	return not breeding_active and tomatoes >= BREEDING_COST
+
+
+## Spends villager_ids as the breeding cost (#8) — a deliberate life spend,
+## same lockstep removal as lose_tomato() but by specific id (the caller
+## already walked these exact villagers to the house) rather than
+## pop_back, and no life_lost signal (that's combat-flavored, only
+## dungeon.gd listens for it).
+func start_breeding(villager_ids: Array[int], house_position: Vector2) -> void:
+	for id in villager_ids:
+		for i in villagers.size():
+			if villagers[i]["id"] == id:
+				villagers.remove_at(i)
+				villager_removed.emit(id)
+				break
+	tomatoes = max(tomatoes - villager_ids.size(), 0)
+	tomato_changed.emit(tomatoes)
+	if tomatoes <= 0:
+		player_died.emit()
+	breeding_active = true
+	breeding_timer = BREEDING_INTERVAL
+	breeding_house_position = house_position
+	breeding_started.emit()
+
+
 ## Spends one carried crop to plant a seed — never tomatoes (#36):
 ## tomatoes are lives, always == villagers.size(), and planting isn't a
 ## death condition.
@@ -200,6 +246,7 @@ func move_plot(plot_id: int, position: Vector2) -> void:
 func reset_run() -> void:
 	villagers.clear()
 	tomatoes = 0
+	breeding_active = false
 	_spawn_starting_villagers()
 
 

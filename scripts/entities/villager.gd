@@ -15,17 +15,35 @@ extends CharacterBody2D
 var _state_timer: float = 0.0
 var _is_moving: bool = false
 var villager_name: String = ""
+var villager_id: int = -1
 var _squash_time: float = 0.0
 var _base_sprite_scale: Vector2 = Vector2.ONE
+
+## Breeding House (#8): once true, short-circuits the idle/wander state
+## machine below in favor of walking straight to _walk_target.
+var _housed: bool = false
+var _walk_target: Vector2
+var _arrival_callback: Callable
+const _ARRIVAL_DISTANCE: float = 4.0
 
 @onready var _name_label: Label = $NameLabel
 @onready var _sprite: Sprite2D = $Sprite
 
 
 func _ready() -> void:
+	add_to_group("villager")
 	_enter_idle()
 	_name_label.text = villager_name
 	_base_sprite_scale = _sprite.scale
+
+
+## Sends this villager to walk to target_position and disappear on
+## arrival (Breeding House, #8) — permanent until this node is freed by
+## GameState.start_breeding()'s villager_removed signal.
+func walk_to_and_hide(target_position: Vector2, on_arrived: Callable) -> void:
+	_housed = true
+	_walk_target = target_position
+	_arrival_callback = on_arrived
 
 
 ## Identity label (#36) — cosmetic only, no mechanical effect.
@@ -36,6 +54,12 @@ func set_villager_name(new_name: String) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if _housed:
+		_process_housed_walk()
+		move_and_slide()
+		_update_squash(delta)
+		return
+
 	_state_timer -= delta
 	if _state_timer <= 0.0:
 		if _is_moving:
@@ -45,6 +69,17 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 	_update_squash(delta)
+
+
+func _process_housed_walk() -> void:
+	if global_position.distance_to(_walk_target) <= _ARRIVAL_DISTANCE:
+		velocity = Vector2.ZERO
+		visible = false
+		set_physics_process(false)
+		_arrival_callback.call(villager_id)
+		return
+	_is_moving = true
+	velocity = global_position.direction_to(_walk_target) * move_speed
 
 
 func _update_squash(delta: float) -> void:
