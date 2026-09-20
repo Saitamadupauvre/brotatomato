@@ -29,6 +29,7 @@ func is_empty() -> bool:
 
 func _setup(p_owner: Node2D, p_host: BehaviorHost) -> void:
 	super(p_owner, p_host)
+	add_to_group("plot_behavior") # Instant Harvest card active (#7) targets this group
 	_sprite = owner_entity.get_node(sprite_path)
 	_plant_sprite = owner_entity.get_node(plant_sprite_path)
 	_time_label = owner_entity.get_node(time_label_path)
@@ -47,6 +48,16 @@ func needed_item() -> String:
 			return "water"
 		_:
 			return ""
+func is_growing() -> bool:
+	return _state == PlotState.GROWING
+
+
+## Instant Harvest card active (#7) — skips straight to RIPE.
+func force_ripen() -> void:
+	if _state != PlotState.GROWING:
+		return
+	_state = PlotState.RIPE
+	_update_visuals()
 
 
 func _process(delta: float) -> void:
@@ -69,7 +80,7 @@ func on_event(event_name: String, _payload: Dictionary = {}) -> void:
 		PlotState.SEEDED:
 			if GameState.remove_item("water", 1):
 				_state = PlotState.GROWING
-				_grow_timer = grow_time
+				_grow_timer = grow_time / GameState.get_passive_multiplier(CardData.Passive.PLOT_GROWTH_SPEED)
 				_update_visuals()
 		PlotState.RIPE:
 			GameState.spawn_villager(owner_entity.global_position)

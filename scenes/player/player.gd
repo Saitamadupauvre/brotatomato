@@ -69,6 +69,10 @@ var _reload_timer: float = 0.0
 var _invincible_timer: float = 0.0
 var _is_channeling: bool = false
 var _channel_timer: float = 0.0
+## Per-card-slot active cooldowns (#7), index-matched to GameState.equipped_cards.
+var _card_cooldowns: Array[float] = [0.0, 0.0, 0.0]
+## Fixed radius for the Damage Burst card active (#7) — no weapon/range data to derive it from.
+const CARD_DAMAGE_BURST_RADIUS: float = 150.0
 
 var equipped_weapon: WeaponData = null
 var _armor_reduction: int = 0
@@ -143,6 +147,9 @@ func _physics_process(delta: float) -> void:
 		_attack_cooldown_timer -= delta
 	if _invincible_timer > 0.0:
 		_invincible_timer -= delta
+	for i in _card_cooldowns.size():
+		if _card_cooldowns[i] > 0.0:
+			_card_cooldowns[i] -= delta
 
 	if _is_reloading:
 		_reload_timer -= delta
@@ -180,6 +187,10 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("swap_weapon"):
 		GameState.swap_active_weapon()
 
+	for i in GameState.CARD_SLOTS:
+		if Input.is_action_just_pressed("card_active_%d" % (i + 1)):
+			_try_trigger_card_active(i)
+
 	move_and_slide()
 	if _last_move_direction.x != 0.0:
 		$Sprite.scale.x = 1.0 if _last_move_direction.x < 0.0 else -1.0
@@ -187,6 +198,49 @@ func _physics_process(delta: float) -> void:
 	var target_animation := "run" if velocity.length() > 5.0 else "idle"
 	if _animation_player.current_animation != target_animation:
 		_animation_player.play(target_animation)
+
+
+## Card active dispatch (#7) — slot is an index into GameState.equipped_cards,
+## gated by this slot's own cooldown (set from the card's active_cooldown).
+func _try_trigger_card_active(slot: int) -> void:
+	if _card_cooldowns[slot] > 0.0:
+		return
+	var item_id: String = GameState.equipped_cards[slot]
+	if item_id == "":
+		return
+	var card: CardData = GameState.get_item_data(item_id) as CardData
+	if card == null:
+		return
+	_card_cooldowns[slot] = card.active_cooldown
+	match card.active:
+		CardData.Active.INSTANT_HARVEST:
+			_trigger_instant_harvest()
+		CardData.Active.DAMAGE_BURST:
+			_trigger_damage_burst(card.active_value)
+		CardData.Active.DASH_RESET:
+			_dash_cooldown_timer = 0.0
+		CardData.Active.GOLD_RUSH:
+			GameState.add_item("gold", int(card.active_value))
+
+
+func _trigger_instant_harvest() -> void:
+	var nearest: Node = null
+	var nearest_dist: float = INF
+	for plot in get_tree().get_nodes_in_group("plot_behavior"):
+		if not plot.is_growing():
+			continue
+		var dist: float = plot.owner_entity.global_position.distance_squared_to(global_position)
+		if dist < nearest_dist:
+			nearest_dist = dist
+			nearest = plot
+	if nearest:
+		nearest.force_ripen()
+
+
+func _trigger_damage_burst(amount: float) -> void:
+	for enemy in get_tree().get_nodes_in_group("enemy"):
+		if enemy.global_position.distance_to(global_position) <= CARD_DAMAGE_BURST_RADIUS:
+			enemy.health.take_damage(int(amount))
 
 
 func _start_teleport_channel() -> void:
@@ -257,7 +311,7 @@ func _start_attack() -> void:
 
 func _fire_projectile() -> void:
 	var projectile: Projectile = PROJECTILE_SCENE.instantiate()
-	projectile.damage = equipped_weapon.damage
+	projectile.damage = int(equipped_weapon.damage * GameState.get_passive_multiplier(CardData.Passive.PLAYER_DAMAGE))
 	projectile.speed = equipped_weapon.projectile_speed
 	projectile.target_mask = ENEMY_HURTBOX_MASK
 	get_parent().add_child(projectile)
@@ -284,7 +338,7 @@ func _start_reload() -> void:
 func _swing_melee() -> void:
 	var aim_direction := _get_aim_direction()
 	var range_scale := melee_range / MELEE_SHAPE_REACH
-	_attack_hitbox.damage = equipped_weapon.damage if equipped_weapon else attack_damage
+	_attack_hitbox.damage = int((equipped_weapon.damage if equipped_weapon else attack_damage) * GameState.get_passive_multiplier(CardData.Passive.PLAYER_DAMAGE))
 	_attack_hitbox.rotation = aim_direction.angle()
 	_attack_hitbox.monitoring = true
 	melee_swung.emit(global_position + aim_direction * MELEE_REACH * range_scale, MELEE_RADIUS * range_scale)
@@ -298,7 +352,7 @@ func _start_dash_attack() -> void:
 	_is_dash_attacking = true
 	_dash_attack_timer = attack_duration
 	_dash_attack_direction = aim_direction
-	_attack_hitbox.damage = equipped_weapon.damage if equipped_weapon else attack_damage
+	_attack_hitbox.damage = int((equipped_weapon.damage if equipped_weapon else attack_damage) * GameState.get_passive_multiplier(CardData.Passive.PLAYER_DAMAGE))
 	_attack_hitbox.rotation = aim_direction.angle()
 	_attack_hitbox.monitoring = true
 	if OS.is_debug_build():
@@ -330,7 +384,7 @@ func _process_movement(delta: float) -> void:
 		_last_move_direction = input_direction
 
 	var speed_multiplier := attack_move_speed_multiplier if _is_attacking else 1.0
-	var target_velocity := input_direction * speed * speed_multiplier
+	var target_velocity := input_direction * speed * speed_multiplier * GameState.get_passive_multiplier(CardData.Passive.PLAYER_SPEED)
 	var rate: float
 	if target_velocity.length() > velocity.length():
 		rate = acceleration

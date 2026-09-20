@@ -20,6 +20,10 @@ const ITEM_DEFS: Array[ItemData] = [
 	preload("res://resources/equipment/leather_chestplate.tres"),
 	preload("res://resources/equipment/leather_leggings.tres"),
 	preload("res://resources/equipment/leather_boots.tres"),
+	preload("res://resources/cards/verdant_charm.tres"),
+	preload("res://resources/cards/iron_fang.tres"),
+	preload("res://resources/cards/swift_paws.tres"),
+	preload("res://resources/cards/golden_touch.tres"),
 ]
 
 signal tomato_changed(count: int)
@@ -36,6 +40,7 @@ signal equipment_changed(slot: EquipmentData.EquipSlot, item_id: String)
 ## which weapon is "in hand" without either slot's contents changing.
 signal active_weapon_changed(slot: EquipmentData.EquipSlot)
 signal breeding_started
+signal card_equipped_changed(slot: int, item_id: String)
 
 ## TEMP: grants enough materials to test grid placement without looting
 ## the Container first. Remove/tune before ship.
@@ -43,6 +48,11 @@ const STARTING_MATERIALS: int = 30
 ## TEMP: enough carried crop to seed the starting plots before the first
 ## harvest comes in. Remove/tune before ship.
 const STARTING_CROP: int = 4
+## TEMP: lets cards (#7) be bought/tested immediately without a full
+## gold-farming loop first. Remove/tune before ship.
+const STARTING_GOLD: int = 100
+
+const CARD_SLOTS: int = 3
 
 ## Carried tomatoes = lives = villagers.size(), always — see #36. Never
 ## set directly; only spawn_villager()/lose_tomato() change it, keeping it
@@ -60,6 +70,9 @@ var crop_stored: int = 0
 var _inventory: Dictionary = {} # item_id -> count
 var _item_defs: Dictionary = {} # item_id -> ItemData
 var _equipped: Dictionary = {} # EquipmentData.EquipSlot -> item_id
+## Card (#7) loadout, index -> item_id ("" = empty slot). Equipping never
+## consumes the owned copy (mirrors weapon/armor equip semantics).
+var equipped_cards: Array[String] = ["", "", ""]
 ## Which weapon slot attacks currently draw from (#50). Only WEAPON or
 ## WEAPON_2 is ever valid here; toggled by swap_active_weapon().
 var active_weapon_slot: EquipmentData.EquipSlot = EquipmentData.EquipSlot.WEAPON
@@ -102,6 +115,7 @@ func _ready() -> void:
 		_item_defs[item_data.id] = item_data
 	add_item("materials", STARTING_MATERIALS)
 	add_item("crop", STARTING_CROP)
+	add_item("gold", STARTING_GOLD)
 	_spawn_starting_villagers()
 	# TEMP: starting weapon so the held-item sprite (#47) has something to
 	# show without going through the shop first. Remove/tune before ship.
@@ -149,6 +163,11 @@ func get_item_count(item_id: String) -> int:
 
 
 func add_item(item_id: String, amount: int = 1) -> void:
+	## Golden Touch-style cards (#7) boost gold gain from any source —
+	## hooked here rather than per-source since add_item is the single
+	## place gold ever enters the inventory.
+	if item_id == "gold" and amount > 0:
+		amount = int(amount * get_passive_multiplier(CardData.Passive.GOLD_GAIN))
 	_inventory[item_id] = get_item_count(item_id) + amount
 	item_changed.emit(item_id, _inventory[item_id])
 
@@ -289,6 +308,50 @@ func unequip_item(slot: EquipmentData.EquipSlot) -> void:
 func get_equipped(slot: EquipmentData.EquipSlot) -> ItemData:
 	var id: String = _equipped.get(slot, "")
 	return get_item_data(id) if id != "" else null
+
+
+## Card (#7) equip, mirroring equip_item's consume-from-inventory
+## semantics: the slot's previous occupant (if any) is returned to the
+## counted inventory, the new one is removed from it.
+func equip_card(item_id: String, slot: int) -> void:
+	var data: ItemData = get_item_data(item_id)
+	if not (data is CardData) or get_item_count(item_id) <= 0:
+		return
+	if slot < 0 or slot >= CARD_SLOTS:
+		return
+	var current_id: String = equipped_cards[slot]
+	if current_id == item_id:
+		return
+	if current_id != "":
+		add_item(current_id, 1)
+	remove_item(item_id, 1)
+	equipped_cards[slot] = item_id
+	card_equipped_changed.emit(slot, item_id)
+
+
+func unequip_card(slot: int) -> void:
+	if slot < 0 or slot >= CARD_SLOTS:
+		return
+	var id: String = equipped_cards[slot]
+	if id == "":
+		return
+	equipped_cards[slot] = ""
+	add_item(id, 1)
+	card_equipped_changed.emit(slot, "")
+
+
+## 1.0 + sum of passive_value across equipped cards matching `passive` —
+## consumers (PlotBehavior, Player, add_item's gold hook) just read this,
+## no card-specific branching outside GameState.
+func get_passive_multiplier(passive: CardData.Passive) -> float:
+	var multiplier: float = 1.0
+	for item_id in equipped_cards:
+		if item_id == "":
+			continue
+		var card := get_item_data(item_id) as CardData
+		if card and card.passive == passive:
+			multiplier += card.passive_value
+	return multiplier
 
 
 ## Toggles which weapon slot attacks draw from (#50). Swaps even to an

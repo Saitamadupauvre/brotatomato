@@ -218,6 +218,54 @@ theme_override_colors/font_color = Color(0.6, 0.68, 0.75, 1)
 text = "Weapon 2"
 horizontal_alignment = 1
 
+[node name="CardRow" type="HBoxContainer" parent="Panel/VBox"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 12
+
+[node name="CardsLabel" type="Label" parent="Panel/VBox/CardRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.6, 0.68, 0.75, 1)
+text = "Cards"
+vertical_alignment = 1
+
+[node name="CardSlot1Panel" type="PanelContainer" parent="Panel/VBox/CardRow"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
+
+[node name="CardSlot1" type="TextureRect" parent="Panel/VBox/CardRow/CardSlot1Panel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+expand_mode = 1
+script = ExtResource("2_drag_slot")
+
+[node name="CardSlot2Panel" type="PanelContainer" parent="Panel/VBox/CardRow"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
+
+[node name="CardSlot2" type="TextureRect" parent="Panel/VBox/CardRow/CardSlot2Panel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+expand_mode = 1
+script = ExtResource("2_drag_slot")
+
+[node name="CardSlot3Panel" type="PanelContainer" parent="Panel/VBox/CardRow"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
+
+[node name="CardSlot3" type="TextureRect" parent="Panel/VBox/CardRow/CardSlot3Panel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+expand_mode = 1
+script = ExtResource("2_drag_slot")
+
 [node name="Scroll" type="ScrollContainer" parent="Panel/VBox"]
 layout_mode = 2
 size_flags_vertical = 3
