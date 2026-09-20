@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="DungeonConfig" load_steps=8 format=3 uid="uid://dungeoncfg00001"]
+[gd_resource type="Resource" script_class="DungeonConfig" load_steps=9 format=3 uid="uid://dungeoncfg00001"]
 
 [ext_resource type="Script" path="res://scripts/data/dungeon_config.gd" id="1_cfg"]
 [ext_resource type="Resource" path="res://resources/dungeon/zones/outskirts.tres" id="2_outskirts"]
@@ -7,9 +7,10 @@
 [ext_resource type="PackedScene" path="res://scenes/entities/container.tscn" id="5_container"]
 [ext_resource type="PackedScene" path="res://scenes/dungeon/altar_gold.tscn" id="6_altar_gold"]
 [ext_resource type="PackedScene" path="res://scenes/dungeon/altar_crops.tscn" id="7_altar_crops"]
+[ext_resource type="PackedScene" path="res://scenes/entities/crop_chest.tscn" id="8_crop_chest"]
 
 [resource]
 script = ExtResource("1_cfg")
 zones = Array[Resource]([ExtResource("2_outskirts"), ExtResource("3_woods"), ExtResource("4_deep")])
-container_scene = ExtResource("5_container")
+container_scenes = Array[PackedScene]([ExtResource("5_container"), ExtResource("8_crop_chest")])
 altar_scenes = Array[PackedScene]([ExtResource("6_altar_gold"), ExtResource("7_altar_crops")])

@@ -29,7 +29,12 @@ extends Resource
 ## Difficulty bands by distance from spawn. Order does not matter; bands
 ## may overlap or leave gaps.
 @export var zones: Array[ZoneData] = []
-@export var container_scene: PackedScene
+## Chest scenes scattered per zone's container_density. Picked randomly
+## per spawn, like ZoneData.pick_enemy — see #36 (crop chest added
+## alongside the loot chest).
+@export var container_scenes: Array[PackedScene] = []
+## Parallel to container_scenes. Missing entries count as 1.0.
+@export var container_weights: Array[float] = []
 
 @export_group("Altar")
 ## One fixed-placement altar per dungeon, scene picked at random from this
@@ -42,3 +47,17 @@ extends Resource
 ## Band bounds as a fraction of DungeonLayout.max_distance, [min, max].
 @export_range(0.0, 1.0) var altar_min_distance_ratio: float = 0.4
 @export_range(0.0, 1.0) var altar_max_distance_ratio: float = 0.8
+
+
+func pick_container(rng: RandomNumberGenerator) -> PackedScene:
+	if container_scenes.is_empty():
+		return null
+	var total := 0.0
+	for i in container_scenes.size():
+		total += container_weights[i] if i < container_weights.size() else 1.0
+	var roll := rng.randf() * total
+	for i in container_scenes.size():
+		roll -= container_weights[i] if i < container_weights.size() else 1.0
+		if roll <= 0.0:
+			return container_scenes[i]
+	return container_scenes[-1]
