@@ -53,6 +53,7 @@ script = ExtResource("3_prompt")
 [node name="AltarBehavior" type="Node" parent="Interactable/Host"]
 script = ExtResource("4_altar")
 status_label_path = NodePath("StatusLabel")
+sprite_path = NodePath("Sprite")
 
 [node name="OpenedStateBehavior" type="Node" parent="Interactable/Host"]
 script = ExtResource("5_opened")

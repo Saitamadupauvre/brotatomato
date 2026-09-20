@@ -1,6 +1,6 @@
 extends MenuPanel
-## Inventory dashboard, Minecraft-style layout: vertical armor column,
-## player portrait, weapon slot off to the side, fixed-size item grid
+## Inventory dashboard, Minecraft-style layout: player portrait, weapon
+## slot off to the side, fixed-size item grid
 ## below (empty slots shown, not just owned items). Reads GameState
 ## only. Equipping/moving items is click-to-pick-up, click-to-place:
 ## click a slot to lift its item (it follows the cursor), click another
@@ -25,14 +25,9 @@ var _held_icon: TextureRect = null
 @onready var _slot_rects: Dictionary = {
 	EquipmentData.EquipSlot.WEAPON: %WeaponSlot,
 	EquipmentData.EquipSlot.WEAPON_2: %WeaponSlot2,
-	EquipmentData.EquipSlot.HELMET: %HelmetSlot,
-	EquipmentData.EquipSlot.CHESTPLATE: %ChestplateSlot,
-	EquipmentData.EquipSlot.LEGGINGS: %LeggingsSlot,
-	EquipmentData.EquipSlot.BOOTS: %BootsSlot,
 }
 ## Weapon slots' own panel (parent of the TextureRect), highlighted to
-## show which one attacks currently draw from (#50) — armor slots have
-## no such concept, so only these two are tracked.
+## show which one attacks currently draw from (#50).
 @onready var _weapon_slot_panels: Dictionary = {
 	EquipmentData.EquipSlot.WEAPON: %WeaponSlot.get_parent(),
 	EquipmentData.EquipSlot.WEAPON_2: %WeaponSlot2.get_parent(),

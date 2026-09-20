@@ -12,6 +12,7 @@
 [ext_resource type="Shader" uid="uid://d16qjiq1dosmv" path="res://assets/shaders/teleport_glow.gdshader" id="10_teleport_glow"]
 [ext_resource type="Shader" uid="uid://rm5qcbrhnve8" path="res://assets/shaders/hit_flash.gdshader" id="11_hit_flash"]
 [ext_resource type="Script" uid="uid://b6jimn48st2vt" path="res://scripts/components/shadow_caster.gd" id="12_shadow_caster"]
+[ext_resource type="Shader" uid="uid://dk56jg68uygf7" path="res://assets/shaders/sword_swing.gdshader" id="13_sword_swing"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 16.0
@@ -19,6 +20,10 @@ radius = 16.0
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hit_flash"]
 shader = ExtResource("11_hit_flash")
 shader_parameter/flash_amount = 0.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sword_swing"]
+shader = ExtResource("13_sword_swing")
+shader_parameter/swing_amount = 0.0
 
 [sub_resource type="Animation" id="Animation_idle"]
 resource_name = "idle"
@@ -187,11 +192,6 @@ use_parent_material = true
 scale = Vector2(1.0000001, 1.0000001)
 texture = ExtResource("4_oreol")
 
-[node name="HeldItem" type="Sprite2D" parent="Sprite" unique_id=2143008457]
-visible = false
-position = Vector2(16, 8)
-scale = Vector2(0.15, 0.15)
-
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1091508352]
 libraries/ = SubResource("AnimationLibrary_body")
 autoplay = &"idle"
@@ -203,6 +203,12 @@ autoplay = &"halo_float"
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1840951259]
 position = Vector2(0, -31)
 position_smoothing_enabled = true
+
+[node name="HeldItem" type="Sprite2D" parent="." unique_id=2143008457]
+visible = false
+material = SubResource("ShaderMaterial_sword_swing")
+position = Vector2(16, -35)
+scale = Vector2(0.15, 0.15)
 
 [node name="Hurtbox" type="Area2D" parent="." unique_id=952955520]
 position = Vector2(0, -11)
@@ -221,11 +227,6 @@ monitoring = false
 script = ExtResource("3_hitbox")
 
 [node name="AttackHitboxShape" type="CollisionPolygon2D" parent="AttackHitbox" unique_id=618112662]
-polygon = PackedVector2Array(0, 0, 16.07, -38.8, 34.92, -23.33, 42, 0, 34.92, 23.33, 16.07, 38.8)
-
-[node name="DebugVisual" type="Polygon2D" parent="AttackHitbox" unique_id=735610771]
-visible = false
-color = Color(1, 1, 0, 0.4)
 polygon = PackedVector2Array(0, 0, 16.07, -38.8, 34.92, -23.33, 42, 0, 34.92, 23.33, 16.07, 38.8)
 
 [node name="ChannelBar" type="ProgressBar" parent="." unique_id=869157185]

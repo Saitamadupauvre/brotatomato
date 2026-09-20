@@ -9,17 +9,12 @@ const ITEM_DEFS: Array[ItemData] = [
 	preload("res://resources/items/gold.tres"),
 	preload("res://resources/items/water.tres"),
 	preload("res://resources/items/crop.tres"),
-	preload("res://resources/items/dungeon_loot.tres"),
 	preload("res://resources/items/ammo.tres"),
 	preload("res://resources/items/key.tres"),
 	preload("res://resources/equipment/sword.tres"),
 	preload("res://resources/equipment/bow.tres"),
 	preload("res://resources/equipment/dash_blade.tres"),
 	preload("res://resources/equipment/pistol.tres"),
-	preload("res://resources/equipment/leather_helmet.tres"),
-	preload("res://resources/equipment/leather_chestplate.tres"),
-	preload("res://resources/equipment/leather_leggings.tres"),
-	preload("res://resources/equipment/leather_boots.tres"),
 	preload("res://resources/cards/verdant_charm.tres"),
 	preload("res://resources/cards/iron_fang.tres"),
 	preload("res://resources/cards/swift_paws.tres"),
@@ -68,7 +63,7 @@ var _inventory: Dictionary = {} # item_id -> count
 var _item_defs: Dictionary = {} # item_id -> ItemData
 var _equipped: Dictionary = {} # EquipmentData.EquipSlot -> item_id
 ## Card (#7) loadout, index -> item_id ("" = empty slot). Equipping never
-## consumes the owned copy (mirrors weapon/armor equip semantics).
+## consumes the owned copy (mirrors weapon equip semantics).
 var equipped_cards: Array[String] = ["", "", ""]
 ## Which weapon slot attacks currently draw from (#50). Only WEAPON or
 ## WEAPON_2 is ever valid here; toggled by swap_active_weapon().
@@ -330,8 +325,7 @@ func reset_run() -> void:
 ## accept the same items (weapon resources are always authored with
 ## data.slot == WEAPON), so which physical slot it fills can't be read
 ## off the item itself. Defaults to data.slot, which is correct for
-## armor (single slot per piece) and for equipping a weapon with no
-## explicit target (falls into WEAPON).
+## equipping a weapon with no explicit target (falls into WEAPON).
 func equip_item(item_id: String, target_slot: int = -1) -> void:
 	var data: ItemData = get_item_data(item_id)
 	if not (data is EquipmentData) or get_item_count(item_id) <= 0:
