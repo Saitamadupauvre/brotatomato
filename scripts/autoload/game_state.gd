@@ -41,9 +41,7 @@ signal breeding_house_created(position: Vector2)
 ## TEMP: enough carried crop to seed the starting plots before the first
 ## harvest comes in. Remove/tune before ship.
 const STARTING_CROP: int = 4
-## TEMP: lets cards (#7) be bought/tested immediately without a full
-## gold-farming loop first. Remove/tune before ship.
-const STARTING_GOLD: int = 100
+const STARTING_GOLD: int = 0
 
 const CARD_SLOTS: int = 3
 
