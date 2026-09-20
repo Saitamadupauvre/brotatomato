@@ -127,7 +127,10 @@ func _physics_process(delta: float) -> void:
 	if _is_reloading:
 		_reload_timer -= delta
 		if _reload_timer <= 0.0:
-			_current_ammo = equipped_weapon.magazine_size
+			var needed: int = equipped_weapon.magazine_size - _current_ammo
+			var taken: int = min(needed, GameState.get_item_count("ammo"))
+			GameState.remove_item("ammo", taken)
+			_current_ammo += taken
 			_is_reloading = false
 			reload_ended.emit()
 			ammo_changed.emit(_current_ammo, equipped_weapon.magazine_size)
@@ -237,10 +240,15 @@ func _fire_projectile() -> void:
 
 func _can_reload() -> bool:
 	return equipped_weapon != null and equipped_weapon.magazine_size > 0 \
-		and not _is_reloading and _current_ammo < equipped_weapon.magazine_size
+		and not _is_reloading and _current_ammo < equipped_weapon.magazine_size \
+		and GameState.get_item_count("ammo") > 0
 
 
+## No-ops if the reserve ammo pool is empty — weapon just stays dry until
+## a pickup restocks it, rather than refilling for free.
 func _start_reload() -> void:
+	if GameState.get_item_count("ammo") <= 0:
+		return
 	_is_reloading = true
 	_reload_timer = equipped_weapon.reload_time
 	reload_started.emit()
