@@ -14,6 +14,7 @@
 [ext_resource type="PackedScene" uid="uid://osr6vkqm54ei" path="res://scenes/entities/plot_placement_controller.tscn" id="12_plot_placement"]
 [ext_resource type="PackedScene" uid="uid://cs7u6iyl5d4nc" path="res://scenes/ui/dialogue_box.tscn" id="13_dialogue_box"]
 [ext_resource type="PackedScene" path="res://scenes/ui/popup.tscn" id="14_popup"]
+[ext_resource type="PackedScene" path="res://scenes/entities/ammo_crafter.tscn" id="15_ammo_crafter"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
 size = Vector2(960, 32)
@@ -69,6 +70,9 @@ position = Vector2(700, 480)
 
 [node name="Chest" parent="." instance=ExtResource("9_chest")]
 position = Vector2(500, 580)
+
+[node name="AmmoCrafter" parent="." instance=ExtResource("15_ammo_crafter")]
+position = Vector2(700, 580)
 
 [node name="Plots" type="Node2D" parent="." unique_id=449040098]
 

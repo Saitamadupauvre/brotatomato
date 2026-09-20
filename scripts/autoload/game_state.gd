@@ -89,6 +89,11 @@ func _ready() -> void:
 	# show without going through the shop first. Remove/tune before ship.
 	add_item("sword", 1)
 	equip_item("sword")
+	# TEMP: gun + reserve ammo in inventory for manual testing of #66/#67
+	# (equip via the inventory drag-drop, not equipped by default). Remove
+	# before ship.
+	add_item("pistol", 1)
+	add_item("ammo", 20)
 	# TEMP: dash-strike weapon in inventory for manual testing of #65
 	# (equip via inventory drag-drop, not equipped by default). Remove
 	# before ship.
