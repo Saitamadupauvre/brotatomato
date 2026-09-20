@@ -80,7 +80,6 @@ var _card_cooldowns: Array[float] = [0.0, 0.0, 0.0]
 const CARD_DAMAGE_BURST_RADIUS: float = 150.0
 
 var equipped_weapon: WeaponData = null
-var _armor_reduction: int = 0
 
 @onready var _hurtbox: HurtboxComponent = $Hurtbox
 @onready var _attack_hitbox: HitboxComponent = $AttackHitbox
@@ -113,11 +112,8 @@ func _ready() -> void:
 
 
 func _on_equipment_changed(slot: EquipmentData.EquipSlot, _item_id: String) -> void:
-	if slot == EquipmentData.EquipSlot.WEAPON or slot == EquipmentData.EquipSlot.WEAPON_2:
-		if slot == GameState.active_weapon_slot:
-			_sync_active_weapon()
-	else:
-		_recompute_armor_reduction()
+	if slot == GameState.active_weapon_slot:
+		_sync_active_weapon()
 
 
 func _on_active_weapon_changed(_slot: EquipmentData.EquipSlot) -> void:
@@ -137,14 +133,6 @@ func _sync_active_weapon() -> void:
 	ammo_changed.emit(max(_current_ammo, 0), equipped_weapon.magazine_size if equipped_weapon else 0)
 
 
-func _recompute_armor_reduction() -> void:
-	_armor_reduction = 0
-	for armor_slot in EquipmentData.ARMOR_SLOTS:
-		var armor := GameState.get_equipped(armor_slot) as ArmorData
-		if armor:
-			_armor_reduction += armor.damage_reduction
-
-
 func _on_damage_taken(amount: int) -> void:
 	if _is_channeling:
 		_cancel_teleport_channel()
@@ -153,7 +141,7 @@ func _on_damage_taken(amount: int) -> void:
 	AudioManager.play(&"hit_impact")
 	CombatFx.notify_hit(true)
 	HitFlash.flash(_sprite_body)
-	GameState.lose_tomato(max(amount - _armor_reduction, 0))
+	GameState.lose_tomato(amount)
 	_invincible_timer = invincibility_duration
 
 
