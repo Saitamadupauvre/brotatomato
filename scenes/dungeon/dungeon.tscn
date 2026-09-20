@@ -10,7 +10,6 @@
 [ext_resource type="Shader" uid="uid://bn348tfe688vn" path="res://assets/shaders/forest_shade.gdshader" id="8_shade_shader"]
 [ext_resource type="PackedScene" path="res://scenes/ui/wave_bar.tscn" id="9_wave_bar"]
 [ext_resource type="PackedScene" path="res://scenes/ui/popup.tscn" id="10_popup"]
-[ext_resource type="PackedScene" uid="uid://cchestmenu0001" path="res://scenes/ui/chest_menu.tscn" id="11_chest_menu"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_shade"]
 shader = ExtResource("8_shade_shader")
@@ -65,7 +64,5 @@ y_sort_enabled = true
 [node name="HUD" parent="UI" unique_id=52734484 instance=ExtResource("4_hud")]
 
 [node name="WaveBar" parent="UI" instance=ExtResource("9_wave_bar")]
-
-[node name="ChestMenu" parent="UI" instance=ExtResource("11_chest_menu")]
 
 [node name="Popup" parent="UI" instance=ExtResource("10_popup")]
