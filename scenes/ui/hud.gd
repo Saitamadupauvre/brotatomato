@@ -150,7 +150,7 @@ func _refresh_active_weapon_highlight() -> void:
 		var panel: PanelContainer = _weapon_slot_panels[slot]
 		if slot == GameState.active_weapon_slot:
 			var style := StyleBoxFlat.new()
-			style.bg_color = Color(0.2, 0.22, 0.25, 0.85)
+			style.bg_color = Color(0.9, 0.83, 0.62, 0.92)
 			style.border_width_left = 3
 			style.border_width_top = 3
 			style.border_width_right = 3

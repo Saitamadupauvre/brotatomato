@@ -133,6 +133,10 @@ card_active_3={
 ]
 }
 
+[gui]
+
+theme/custom="res://resources/theme/default_theme.tres"
+
 [physics]
 
 3d/physics_engine="Jolt Physics"

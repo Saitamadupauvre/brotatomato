@@ -6,9 +6,9 @@
 layout_mode = 3
 anchors_preset = 0
 offset_left = 16.0
-offset_top = 16.0
+offset_top = 64.0
 offset_right = 336.0
-offset_bottom = 400.0
+offset_bottom = 448.0
 mouse_filter = 2
 script = ExtResource("1_popup")
 

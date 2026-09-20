@@ -32,11 +32,10 @@ func _build_offer_cards() -> void:
 
 func _make_card(item_data: ItemData, offer: Dictionary, gold_icon: Texture2D) -> Control:
 	var card := PanelContainer.new()
+	card.custom_minimum_size = Vector2(120, 0)
 	card.mouse_filter = Control.MOUSE_FILTER_STOP
 	card.gui_input.connect(_on_card_gui_input.bind(offer))
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.98, 0.93, 0.78, 1.0)
-	style.set_corner_radius_all(6)
+	var style := UITheme.slot_style(true)
 	style.content_margin_left = 8
 	style.content_margin_right = 8
 	style.content_margin_top = 8
@@ -50,6 +49,7 @@ func _make_card(item_data: ItemData, offer: Dictionary, gold_icon: Texture2D) ->
 	var icon_rect := TextureRect.new()
 	icon_rect.texture = item_data.icon
 	icon_rect.custom_minimum_size = Vector2(48, 48)
+	icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon_rect.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	vbox.add_child(icon_rect)
@@ -67,6 +67,7 @@ func _make_card(item_data: ItemData, offer: Dictionary, gold_icon: Texture2D) ->
 	var price_icon := TextureRect.new()
 	price_icon.texture = gold_icon
 	price_icon.custom_minimum_size = Vector2(16, 16)
+	price_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	price_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	price_icon.modulate = Color(1.0, 0.85, 0.2)
 	price_row.add_child(price_icon)

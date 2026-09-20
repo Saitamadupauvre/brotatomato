@@ -16,6 +16,7 @@ func _ready() -> void:
 	add_to_group("card_shop_ui")
 	_gamble_button.text = "Draw a card — %d gold" % GAMBLE_COST
 	_gamble_button.pressed.connect(_on_gamble_pressed)
+	UITheme.style_button(_gamble_button)
 	_build_pool_preview()
 
 
@@ -26,13 +27,20 @@ func _build_pool_preview() -> void:
 		var card: CardData = GameState.get_item_data(entry.item_id) as CardData
 		if card == null:
 			continue
+		var slot := PanelContainer.new()
+		slot.custom_minimum_size = Vector2(52, 52)
+		slot.add_theme_stylebox_override("panel", UITheme.slot_style(true))
+		slot.tooltip_text = card.describe()
+		slot.mouse_filter = Control.MOUSE_FILTER_STOP
+
 		var icon_rect := TextureRect.new()
 		icon_rect.texture = card.icon
 		icon_rect.custom_minimum_size = Vector2(40, 40)
+		icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon_rect.tooltip_text = card.describe()
-		icon_rect.mouse_filter = Control.MOUSE_FILTER_STOP
-		_pool_row.add_child(icon_rect)
+		icon_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		slot.add_child(icon_rect)
+		_pool_row.add_child(slot)
 
 
 func open() -> void:

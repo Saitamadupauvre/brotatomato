@@ -11,6 +11,8 @@ extends MenuPanel
 func _ready() -> void:
 	super()
 	add_to_group("chest_ui")
+	UITheme.style_button(_deposit_button)
+	UITheme.style_button(_withdraw_button)
 	_deposit_button.pressed.connect(_on_deposit_pressed)
 	_withdraw_button.pressed.connect(_on_withdraw_pressed)
 	GameState.item_changed.connect(_on_item_changed)
